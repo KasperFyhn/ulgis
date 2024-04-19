@@ -1,0 +1,37 @@
+h1 {
+    font-size: 20px;
+}
+h2 {
+    font-size: 16px;
+}
+
+.shadow-border {
+    box-shadow: 1px 1px 4px gray;
+}
+
+.padded {
+    padding: 10px;
+}
+
+.flex-container--vert {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.flex-container--horiz {
+    display: flex;
+    gap: 10px;
+}
+
+.flex-container__box {
+    flex-grow: 1;
+}
+
+.flex-container__box--big {
+    flex-grow: 2;
+}
+
+.size_40percent {
+    width: 40%;
+}
