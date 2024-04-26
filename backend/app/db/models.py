@@ -1,4 +1,4 @@
-from sqlalchemy import Boolean, Column, Integer, String, Text
+from sqlalchemy import Column, Integer, String, Text
 
 from app.db.base import Base
 
@@ -10,5 +10,3 @@ class Taxonomy(Base):
     name = Column(String, unique=True, index=True)
     short_description = Column(String)
     text = Column(Text)
-
-

@@ -102,9 +102,29 @@ export class GenerationServiceMockup implements GenerationService {
         }
     }
 
+    async createPrompt(options: GenerationOptions): Promise<string> {
+        try {
+            const response = await fetch(
+                "http://localhost:8000/create_prompt",
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(options)
+                }
+            );
+
+            const json = await response.json()
+            return json;
+        } catch (error) {
+            console.error("Failed to generate:", error);
+            throw error;
+        }
+    }
+
     async generate(options: GenerationOptions): Promise<string> {
         try {
-            console.log(options)
             const response = await fetch(
                 "http://localhost:8000/generate_outcomes",
                 {

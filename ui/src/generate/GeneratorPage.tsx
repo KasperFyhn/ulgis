@@ -51,10 +51,22 @@ export const GeneratorPage = () => {
 
     const createResponse = () => {
         setCreatingResponse(true);
-        setResponse(undefined);
+        setResponse("Generating learning outcomes ...");
         service.generate(options!).then(
             responseString => {
-                setResponse(responseString)
+                setResponse(responseString);
+                setCreatingResponse(false);
+
+            }
+        );
+    }
+
+    const createPrompt = () => {
+        setCreatingResponse(true);
+        setResponse("Creating prompt ...");
+        service.createPrompt(options!).then(
+            prompt => {
+                setResponse(prompt);
                 setCreatingResponse(false);
 
             }
@@ -88,12 +100,13 @@ export const GeneratorPage = () => {
                 )}
             </div>
             <div className={"shadow-border flex-container__box size_40percent padded"}>
-                {(response && (<div>
-                        <Markdown>{response}</Markdown>
-                        <button onClick={createResponse}>Regenerate</button>
-                    </div>)) ||
-                    (creatingResponse && <p>Generating response ...</p>) ||
-                    <button onClick={createResponse}>Generate</button>}
+                {response && <Markdown>{response}</Markdown>}
+                {!creatingResponse && (<>
+                        <button onClick={createResponse}>Generate learning outcomes</button>
+                        <button onClick={createPrompt}>Create prompt</button>
+                    </>
+                )}
+
             </div>
             <div className={"shadow-border flex-container__box--big padded"}>
                 <h1>Custom Input</h1>
@@ -106,11 +119,11 @@ export const GeneratorPage = () => {
                 )}
                 <h1>Output Formatting</h1>
                 {optionsMetadata.outputOptions.map(
-                    (outputOption, i) => <p key={outputOption.name}>
+                    (outputOption, i) => <div key={outputOption.name}>
                         <span>{outputOption.name}: </span>
                         <Options metadata={outputOption}
                                  getAndSet={optionGetterAndSetter("outputOptions", outputOption.name)}/>
-                    </p>
+                    </div>
                 )}
             </div>
         </div>

@@ -117,7 +117,7 @@ async def generation_options_metadata(db: Session = Depends(get_db)):
                     "initial_value": False,
                 },
                 {
-                    "name": "As Bullet Points",
+                    "name": "Bullet Points",
                     "type": "boolean",
                     "initial_value": True,
                 },
@@ -132,6 +132,13 @@ async def generate_outcomes(request: GenerationOptions):
     prompt = build_prompt(request)
     response = await llm.generate(prompt)
     return response
+
+
+@app.post("/create_prompt")
+async def create_prompt(request: GenerationOptions):
+    logger.debug(request)
+    prompt = build_prompt(request)
+    return prompt
 
 
 if __name__ == "__main__":
