@@ -3,10 +3,13 @@ import sys
 
 import uvicorn
 from pydantic import BaseModel
-from fastapi import FastAPI
+from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.orm import Session
 
 from app import llm
+from app.db.base import SessionLocal
+from app.db.models import Taxonomy
 from app.models import GenerationOptions, GenerationOptionsMetadata, StringArrayOptionMetadata
 from app.prompt import build_prompt
 
@@ -26,6 +29,18 @@ handler = logging.StreamHandler(sys.stdout)
 handler.setFormatter(logging.Formatter('%(asctime)s - %(name)s - %(levelname)s - %(message)s'))
 logger.addHandler(handler)
 
+
+# Dependency
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
+
+@app.get("/taxonomies")
+async def get_taxonomies(db: Session = Depends(get_db)):
+    return db.query(Taxonomy).all()
 
 @app.get("/generation_options_metadata")
 async def generation_options_metadata():
