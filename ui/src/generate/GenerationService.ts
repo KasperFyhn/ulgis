@@ -1,73 +1,85 @@
-export interface OptionBase {
-    type: "string" | "number" | "boolean";
+export interface OptionMetadataBase {
+    name: string
+    initialValue?: any
 }
 
-export interface StringOption extends OptionBase {
+export interface BooleanOptionMetadata extends OptionMetadataBase {
+    type: "boolean";
+}
+
+export interface StringOptionMetadata extends OptionMetadataBase {
     type: "string";
-    multiple?: boolean;
+    initialValue?: string
+    options?: string[];
+    short?: boolean;
+}
+
+export interface StringArrayOptionMetadata extends OptionMetadataBase {
+    type: "stringArray";
+    initialValue?: string[]
     options?: string[];
 }
 
-export interface NumberOption extends OptionBase {
+export interface NumberOptionMetadata extends OptionMetadataBase {
     type: "number";
+    initialValue: number;
     min: number;
     max: number;
     step?: number;
 }
 
-export type OptionMetadata = StringOption | NumberOption | "boolean";
+export type OptionMetadata =
+    BooleanOptionMetadata
+    | StringOptionMetadata
+    | StringArrayOptionMetadata
+    | NumberOptionMetadata;
+
+function initialValue(option: OptionMetadata): any {
+    if (option.initialValue === undefined || option.initialValue === null) {
+        if (option.type === "boolean") {
+            return false;
+        } else if (option.type === "string") {
+            return "";
+        } else if (option.type === "number") {
+            return 0;
+        } else if (option.type === "stringArray") {
+            return [];
+        }
+    } else {
+        return option.initialValue
+    }
+}
 
 
 export interface GenerationOptionsMetadata {
-    ragDocs: OptionMetadata;
-    settings: {
-        educationalLevel: OptionMetadata;
-        faculty: OptionMetadata;
-    };
-    parameters: {
-        problemSolving: OptionMetadata;
-        informationAndDataLiteracy: OptionMetadata;
-        communicationAndCollaboration: OptionMetadata;
-        digitalContentCreation: OptionMetadata;
-        safety: OptionMetadata;
-
-    };
-    customInputs: {
-        inputs: OptionMetadata;
-        instruction: OptionMetadata;
-    };
-    outputOptions: {
-        bulletPoints: OptionMetadata;
-    };
+    ragDocs: StringArrayOptionMetadata;
+    settings: OptionMetadata[];
+    parameters: OptionMetadata[];
+    customInputs: OptionMetadata[];
+    outputOptions: OptionMetadata[];
 }
 
 /**
  * Corresponds to backend/models.py:GenerationOptions.
  */
-export interface GenerationOptions {
+export class GenerationOptions {
     [key: string]: any;
 
-    ragDocs: string[];
-    settings: {
-        educationalLevel: string,
-        faculty: string,
-        educationName: string
-    }
-    parameters: {
-        problemSolving: number,
-        informationAndDataLiteracy: number,
-        communicationAndCollaboration: number,
-        digitalContentCreation: number,
-        safety: number
+    ragDocs: string[]
+    settings: any
+    parameters: any
+    customInputs: any
+    outputOptions: any
 
-    },
-    customInputs: {
-        inputs: string[],
-        instruction: string
+    constructor(metadata: GenerationOptionsMetadata) {
+
+        this.ragDocs = metadata.ragDocs.initialValue ?? [];
+        this.settings = Object.fromEntries(metadata.settings.map(v => [v.name, initialValue(v)]))
+        this.parameters = Object.fromEntries(metadata.parameters.map(v => [v.name, initialValue(v)]))
+        this.customInputs = Object.fromEntries(metadata.customInputs.map(v => [v.name, initialValue(v)]))
+        this.outputOptions = Object.fromEntries(metadata.outputOptions.map(v => [v.name, initialValue(v)]))
     }
-    outputOptions: {
-        bulletPoints: boolean
-    }
+
 }
 
 export interface GenerationService {
@@ -77,80 +89,30 @@ export interface GenerationService {
 }
 
 export class GenerationServiceMockup implements GenerationService {
-    getGenerationOptionsMetadata(): Promise<GenerationOptionsMetadata> {
-        let returnValue: GenerationOptionsMetadata = {
-            ragDocs: {
-                type: "string",
-                multiple: true,
-                options: ["Document 1", "Document 2", "Document 3", "Document 4"]
-            },
-            settings: {
-                educationalLevel: {
-                    type: "string",
-                    options: ["Bachelor", "Master", "PhD"]
-                },
-                faculty: {
-                    type: "string",
+    async getGenerationOptionsMetadata(): Promise<GenerationOptionsMetadata> {
+        try {
+            const response = await fetch(
+                "http://localhost:8000/generation_options_metadata"
+            );
 
-                    options: ["ARTS", "NAT", "TECH", "BSS", "HEALTH"]
-                }
-            },
-            parameters: {
-                communicationAndCollaboration: {
-                    type: "number",
-                    min: 1,
-                    max: 5,
-                },
-                digitalContentCreation: {
-                    type: "number",
-                    min: 1,
-                    max: 5,
-                },
-                informationAndDataLiteracy: {
-                    type: "number",
-                    min: 1,
-                    max: 5,
-                },
-                problemSolving: {
-                    type: "number",
-                    min: 1,
-                    max: 5,
-                },
-                safety: {
-                    type: "number",
-                    min: 1,
-                    max: 5,
-                }
-
-            },
-            customInputs: {
-                inputs: {
-                    type: "string",
-                    multiple: true
-                },
-                instruction: {
-                    type: "string"
-                }
-            },
-            outputOptions: {
-                bulletPoints: 'boolean'
-            }
+            return await response.json();
+        } catch (error) {
+            console.error("Failed to get options metadata:", error);
+            throw error;
         }
-
-        return Promise.resolve(returnValue);
     }
 
-    async generate(options: GenerationOptions | {}): Promise<string> {
+    async generate(options: GenerationOptions): Promise<string> {
         try {
             console.log(options)
             const response = await fetch(
                 "http://localhost:8000/generate_outcomes",
                 {
-                    method: 'POST', // Specify the method explicitly
+                    method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json' // Set the Content-Type header
+                        'Content-Type': 'application/json'
                     },
-                    body: JSON.stringify(options) // Stringify the body payload
+                    body: JSON.stringify(options)
                 }
             );
 
@@ -158,7 +120,7 @@ export class GenerationServiceMockup implements GenerationService {
             return json["response"];
         } catch (error) {
             console.error("Failed to generate:", error);
-            throw error; // Rethrow the error after logging or handling it
+            throw error;
         }
     }
 

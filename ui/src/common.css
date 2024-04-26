@@ -5,6 +5,33 @@ h2 {
     font-size: 16px;
 }
 
+button {
+    border: none;
+    background: deepskyblue;
+    padding: 7px;
+    margin: 3px;
+    border-radius: 7px;
+    min-width: 60px;
+    box-shadow: 2px 2px 2px gray;
+}
+
+button:active {
+    box-shadow: none;
+}
+
+input[type=text] {
+    border-width: 1px;
+    padding: 5px;
+    border-radius: 3px;
+}
+
+textarea {
+    min-height: 15px;
+    height: 15px;
+    resize: vertical;
+    padding: 5px;
+}
+
 .shadow-border {
     box-shadow: 1px 1px 4px gray;
 }
@@ -21,6 +48,7 @@ h2 {
 
 .flex-container--horiz {
     display: flex;
+    flex-wrap: wrap;
     gap: 10px;
 }
 
