@@ -9,6 +9,7 @@ class GenerationOptions(CamelModel):
     """
     Corresponds to ui/src/generate/GenerationService.ts:GenerationOptions.
     """
+
     rag_docs: list[str]
     settings: dict[str, Any]
     parameters: dict[str, Any]
@@ -47,8 +48,13 @@ class NumberOptionMetadata(OptionMetadataBase):
 
 
 OptionMetadata = Annotated[
-    Union[BooleanOptionMetadata, StringOptionMetadata, StringArrayOptionMetadata, NumberOptionMetadata],
-    Field(discriminator="type")
+    Union[
+        BooleanOptionMetadata,
+        StringOptionMetadata,
+        StringArrayOptionMetadata,
+        NumberOptionMetadata,
+    ],
+    Field(discriminator="type"),
 ]
 
 
@@ -58,3 +64,7 @@ class GenerationOptionsMetadata(CamelModel):
     parameters: list[OptionMetadata]
     custom_inputs: list[OptionMetadata]
     output_options: list[OptionMetadata]
+
+
+class EvaluationRequest(CamelModel):
+    learning_outcomes: str

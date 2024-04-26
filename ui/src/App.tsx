@@ -2,6 +2,7 @@ import './App.css';
 import React from "react";
 import {BrowserRouter, Link, Route, Routes} from "react-router-dom";
 import {GeneratorPage} from "./generate/GeneratorPage";
+import {EvaluationPage} from "./evaluate/EvaluationPage";
 
 
 const NavBar = () => {
@@ -22,7 +23,7 @@ const App = () => {
                     <Routes>
                         <Route path="/" element={<p>Frontpage</p>}/>
                         <Route path="/generate" element={<GeneratorPage/>}/>
-                        <Route path="/evaluate" element={<p>Evaluate</p>}/>
+                        <Route path="/evaluate" element={<EvaluationPage />}/>
                         <Route path="/about" element={<p>Evaluate</p>}/>
                     </Routes>
                 </div>

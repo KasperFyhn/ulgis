@@ -32,12 +32,20 @@ textarea {
     padding: 5px;
 }
 
+.height-400px {
+    height: 400px;
+}
+
 .shadow-border {
     box-shadow: 1px 1px 4px gray;
 }
 
 .padded {
     padding: 20px;
+}
+
+.with-margin {
+    margin: 30px;
 }
 
 .flex-container--vert {
@@ -50,6 +58,10 @@ textarea {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
+}
+
+.flex-container__box--small {
+    flex-grow: 0;
 }
 
 .flex-container__box {

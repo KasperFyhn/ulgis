@@ -115,8 +115,7 @@ export class GenerationServiceMockup implements GenerationService {
                 }
             );
 
-            const json = await response.json()
-            return json;
+            return response.json()
         } catch (error) {
             console.error("Failed to generate:", error);
             throw error;
