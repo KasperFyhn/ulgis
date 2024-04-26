@@ -60,7 +60,7 @@ export interface GenerationOptionsMetadata {
 }
 
 /**
- * Corresponds to backend/models.py:GenerationOptions.
+ * Corresponds to app/models.py:GenerationOptions.
  */
 export class GenerationOptions {
     [key: string]: any;

@@ -1,7 +1,7 @@
 import logging
 import sys
 
-from backend.models import GenerationOptions
+from app.models import GenerationOptions
 
 
 def build_prompt(options: GenerationOptions) -> str:

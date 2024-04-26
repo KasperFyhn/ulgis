@@ -6,9 +6,9 @@ from pydantic import BaseModel
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
-from backend import llm
-from backend.models import GenerationOptions, GenerationOptionsMetadata, StringArrayOptionMetadata
-from backend.prompt import build_prompt
+from app import llm
+from app.models import GenerationOptions, GenerationOptionsMetadata, StringArrayOptionMetadata
+from app.prompt import build_prompt
 
 app = FastAPI()
 app.add_middleware(
@@ -126,11 +126,11 @@ async def generation_options_metadata():
 
 @app.post('/generate_outcomes')
 async def generate_outcomes(request: GenerationOptions):
-    logger.info(request)
+    logger.debug(request)
     prompt = build_prompt(request)
     response = await llm.generate(prompt)
     return response
 
 
 if __name__ == "__main__":
-    uvicorn.run("backend.app:app", host='localhost', port=8000, reload=True)
+    uvicorn.run("app.main:app", host='localhost', port=8000, reload=True)
