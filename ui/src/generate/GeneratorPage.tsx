@@ -51,14 +51,16 @@ export const GeneratorPage = () => {
 
     const createResponse = () => {
         setCreatingResponse(true);
-        setResponse("Generating learning outcomes ...");
-        service.generate(options!).then(
-            responseString => {
-                setResponse(responseString);
-                setCreatingResponse(false);
-
-            }
-        );
+        setResponse(() => "");
+        service.generateAsStream(options!,
+            (event: MessageEvent) => {
+                setResponse((prevResponse) => prevResponse +
+                    (event.data.toString()
+                            .replaceAll("\\n", "\n")
+                            .replaceAll("•", "-")
+                    ));
+            },
+            () => setCreatingResponse(false));
     }
 
     const createPrompt = () => {
@@ -68,7 +70,6 @@ export const GeneratorPage = () => {
             prompt => {
                 setResponse(prompt);
                 setCreatingResponse(false);
-
             }
         );
     }
@@ -101,6 +102,7 @@ export const GeneratorPage = () => {
             </div>
             <div className={"shadow-border flex-container__box size_40percent padded"}>
                 {response && <Markdown>{response}</Markdown>}
+                {creatingResponse && response === "" && <p>Connecting ...</p>}
                 {!creatingResponse && (<>
                         <button onClick={createResponse}>Generate learning outcomes</button>
                         <button onClick={createPrompt}>Create prompt</button>

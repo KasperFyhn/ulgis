@@ -1,10 +1,12 @@
 import json
 import logging
 import sys
+import uuid
 
 import uvicorn
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import StreamingResponse
 from sqlalchemy.orm import Session
 
 from app import llm
@@ -132,6 +134,32 @@ async def generate_outcomes(request: GenerationOptions):
     prompt = build_prompt(request)
     response = await llm.generate(prompt)
     return response
+
+
+_streaming_responses = dict()
+
+
+@app.post("/start_stream")
+async def start_stream(request: GenerationOptions):
+    logger.debug(request)
+    prompt = build_prompt(request)
+    token = str(uuid.uuid4())
+    _streaming_responses[token] = llm.generate(prompt, stream=True)
+    return {"token": token}
+
+
+@app.get("/stream_response/{token}")
+async def stream_response(token: str):
+
+    async def generator_function():
+        stream = _streaming_responses[token]
+        async for chunk in await stream:
+            t = chunk["response"].replace("\n", "\\n")
+            yield f"data: {t}\n\n"
+        logger.debug("Removing stream with token '%s' from streaming responses.", token)
+        del _streaming_responses[token]
+
+    return StreamingResponse(generator_function(), media_type="text/event-stream")
 
 
 @app.post("/create_prompt")

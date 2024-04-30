@@ -90,57 +90,82 @@ export interface GenerationService {
 
 export class GenerationServiceMockup implements GenerationService {
     async getGenerationOptionsMetadata(): Promise<GenerationOptionsMetadata> {
-        try {
-            const response = await fetch(
-                "http://localhost:8000/generation_options_metadata"
-            );
+        const response = await fetch(
+            "http://localhost:8000/generation_options_metadata"
+        );
 
-            return await response.json();
-        } catch (error) {
-            console.error("Failed to get options metadata:", error);
-            throw error;
-        }
+        return await response.json();
+
     }
 
     async createPrompt(options: GenerationOptions): Promise<string> {
-        try {
-            const response = await fetch(
-                "http://localhost:8000/create_prompt",
-                {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(options)
-                }
-            );
 
-            return response.json()
-        } catch (error) {
-            console.error("Failed to generate:", error);
-            throw error;
-        }
+        const response = await fetch(
+            "http://localhost:8000/create_prompt",
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(options)
+            }
+        );
+
+        return response.json()
+
     }
 
     async generate(options: GenerationOptions): Promise<string> {
-        try {
-            const response = await fetch(
-                "http://localhost:8000/generate_outcomes",
-                {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(options)
-                }
-            );
+        const response = await fetch(
+            "http://localhost:8000/generate_outcomes",
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify(options)
+            }
+        );
 
-            const json = await response.json();
-            return json["response"];
-        } catch (error) {
-            console.error("Failed to generate:", error);
-            throw error;
-        }
+        const json = await response.json();
+        return json["response"];
+    }
+
+    generateAsStream(options: GenerationOptions,
+                     onMessage: (event: MessageEvent<any>) => void,
+                     onClose?: () => void): void {
+
+        fetch(
+            "http://localhost:8000/start_stream",
+            {
+                method: 'POST',
+                headers: {'Content-Type': 'application/json'},
+                body: JSON.stringify(options)
+            }
+        ).then(
+            response => {
+                if (response.ok) {
+                    response.json().then(
+                        json => {
+                            console.log("Successfully generated stream:", json)
+                            const eventSource = new EventSource(
+                                "http://localhost:8000/stream_response/" + json["token"]
+                            );
+                            eventSource.onmessage = onMessage;
+                            eventSource.onerror = () => {
+                                console.log("Closing event source.")
+                                eventSource.close()
+                                if (onClose) {
+                                    onClose();
+                                }
+                            };
+                        }
+                    )
+                } else {
+                    throw new Error('Failed to generate stream');
+                }
+            }
+        )
     }
 
 }
