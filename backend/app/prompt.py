@@ -5,7 +5,7 @@ def build_prompt(options: GenerationOptions) -> str:
     prompt = ""
 
     # background knowledge
-    if options.rag_docs:
+    if options.rag_docs["ragDocs"]:
         prompt += "Here is some background context:\n\n"
         for rag_doc in options.rag_docs:
             prompt += rag_doc + "\n"

@@ -1,123 +1,221 @@
-import {OptionMetadata} from "./GenerationService";
+import React from 'react';
+import {
+  NumberOptionMetadata,
+  OptionMetadata,
+  OptionType,
+} from './GenerationService';
 
-
-const BooleanToggle = ({getAndSet}: {
-    getAndSet: [() => boolean, (value: boolean) => void]
-}) => {
-    let [get, set] = getAndSet;
-    return <input type={"checkbox"} checked={get()} onChange={event => set(event.target.checked)}/>
+interface BooleanToggleProps {
+  getAndSet: [() => boolean, (value: boolean) => void];
 }
 
+const BooleanToggle: React.FC<BooleanToggleProps> = ({
+  getAndSet,
+}: BooleanToggleProps) => {
+  const [get, set] = getAndSet;
+  return (
+    <input
+      type={'checkbox'}
+      checked={get()}
+      onChange={(event) => set(event.target.checked)}
+    />
+  );
+};
 
-const StringOptions = ({options, getAndSet}: {
-    options: string[];
-    getAndSet: [() => string, (value: string) => void]
-}) => {
-    let [get, set] = getAndSet;
-    let name: string = options.join("_");
-    return <div>
-        {options.map(option => (
-            <div key={option}>
-                <input type={"radio"}
-                       name={name}
-                       checked={get() === option}
-                       onChange={() => set(option)}/>
-                <label>{option}</label>
-            </div>))}
+interface StringOptionsProps {
+  options: string[];
+  getAndSet: [() => string, (value: string) => void];
+}
+
+const StringOptions: React.FC<StringOptionsProps> = ({
+  options,
+  getAndSet,
+}: StringOptionsProps) => {
+  const [get, set] = getAndSet;
+  const name: string = options.join('_');
+  return (
+    <div>
+      {options.map((option) => (
+        <div key={option}>
+          <input
+            type={'radio'}
+            name={name}
+            checked={get() === option}
+            onChange={() => set(option)}
+          />
+          <label>{option}</label>
+        </div>
+      ))}
     </div>
+  );
+};
+
+interface MultipleStringOptionsProps {
+  options: string[];
+  getAndSet: [() => string[], (value: string[]) => void];
 }
 
-
-const MultipleStringOptions = ({options, getAndSet}: {
-    options: string[];
-    getAndSet: [() => string[], (value: string[]) => void]
-}) => {
-    let [get, set] = getAndSet;
-    return <div className={"flex-container--horiz"}>
-        {options.map(option =>
-            <span key={option}>
-                <input type={"checkbox"} onChange={(event) => {
-                    let picked = get();
-                    if (event.target.checked) {
-                        picked.push(option)
-                    } else {
-                        picked = picked.filter(o => o !== option)
-                    }
-                    set([...picked])
-                }}/>
-                {option}
-            </span>)}
+const MultipleStringOptions: React.FC<MultipleStringOptionsProps> = ({
+  options,
+  getAndSet,
+}: MultipleStringOptionsProps) => {
+  const [get, set] = getAndSet;
+  return (
+    <div className={'flex-container--horiz'}>
+      {options.map((option) => (
+        <span key={option}>
+          <input
+            type={'checkbox'}
+            onChange={(event) => {
+              let picked = get();
+              if (event.target.checked) {
+                picked.push(option);
+              } else {
+                picked = picked.filter((o) => o !== option);
+              }
+              set([...picked]);
+            }}
+          />
+          {option}
+        </span>
+      ))}
     </div>
+  );
+};
+
+interface TextFieldProps {
+  short: boolean;
+  getAndSet: [() => string, (value: string) => void];
 }
 
-const TextField  = ({short, getAndSet}: {
-    short: boolean,
-    getAndSet: [() => string, (value: string) => void]
-}) => {
-    let [get, set] = getAndSet;
-    if (short) {
-        return <input type={"text"} value={get()} onChange={(event) => set(event.target.value)}/>
-    } else {
-            return <div className={"flex-container--vert"}>
-        <textarea value={get()} onChange={(event) => set(event.target.value)}/>
+const TextField: React.FC<TextFieldProps> = ({
+  short,
+  getAndSet,
+}: TextFieldProps) => {
+  const [get, set] = getAndSet;
+  if (short) {
+    return (
+      <input
+        type={'text'}
+        value={get()}
+        onChange={(event) => set(event.target.value)}
+      />
+    );
+  } else {
+    return (
+      <div className={'flex-container--vert'}>
+        <textarea value={get()} onChange={(event) => set(event.target.value)} />
+      </div>
+    );
+  }
+};
+
+interface MultipleTextFieldsProps {
+  getAndSet: [() => string[], (value: string[]) => void];
+}
+
+const MultipleTextFields: React.FC<MultipleTextFieldsProps> = ({
+  getAndSet,
+}: MultipleTextFieldsProps) => {
+  const [get, set] = getAndSet;
+  return (
+    <div className={'flex-container--vert'}>
+      {get().map((v, i) => (
+        <textarea
+          key={i}
+          value={v}
+          onChange={(event) => {
+            const textFields = get();
+            textFields[i] = event.target.value;
+            set([...textFields]);
+          }}
+        />
+      ))}
+      <button onClick={() => set([...get(), ''])}>+</button>
     </div>
-    }
+  );
+};
 
+interface NumberSliderProps {
+  metadata: NumberOptionMetadata;
+  getAndSet: [() => number, (value: number) => void];
 }
 
-const MultipleTextFields = (props: { getter: () => string[], setter: (v: any) => void }) => {
-    return <div className={"flex-container--vert"}>
-        {props.getter().map(
-            (v, i) =>
-                <textarea key={i} value={v} onChange={(event) => {
-                    let textFields = props.getter();
-                    textFields[i] = event.target.value;
-                    props.setter([...textFields])
-                }}/>)
-        }
-        <button onClick={() => props.setter([...props.getter(), ""])}>+</button>
+const NumberSlider: React.FC<NumberSliderProps> = ({
+  metadata,
+  getAndSet,
+}: NumberSliderProps) => {
+  const [get, set] = getAndSet;
+  return (
+    <div>
+      <input
+        type={'range'}
+        value={get()}
+        min={metadata.min}
+        max={metadata.max}
+        step={metadata.step}
+        onChange={(event) => set(Number(event.target.value))}
+      />
     </div>
+  );
+};
+
+interface OptionsProps<T extends OptionType> {
+  metadata: OptionMetadata;
+  getAndSet: [() => T, (value: T) => void];
 }
 
-const NumberSlider = ({min, max, step, getAndSet}: {
-    min: number;
-    max: number;
-    step: number;
-    getAndSet: [() => number, (value: number) => void];
-}) => {
-    let [get, set] = getAndSet;
-    return <div>
-        <input type={"range"} value={get()} min={min} max={max} step={step}
-               onChange={(event) => set(Number(event.target.value))}/>
-    </div>
-}
+export const Options: React.FC<OptionsProps<OptionType>> = ({
+  metadata,
+  getAndSet,
+}: OptionsProps<OptionType>) => {
+  switch (metadata.type) {
+    case 'boolean':
+      return (
+        <BooleanToggle
+          getAndSet={getAndSet as [() => boolean, (value: boolean) => void]}
+        />
+      );
+    case 'string':
+      if (metadata.options) {
+        return (
+          <StringOptions
+            options={metadata.options}
+            getAndSet={getAndSet as [() => string, (value: string) => void]}
+          />
+        );
+      } else {
+        return (
+          <TextField
+            short={metadata.short ?? false}
+            getAndSet={getAndSet as [() => string, (value: string) => void]}
+          />
+        );
+      }
+    case 'stringArray':
+      if (metadata.options) {
+        return (
+          <MultipleStringOptions
+            options={metadata.options}
+            getAndSet={getAndSet as [() => string[], (value: string[]) => void]}
+          />
+        );
+      } else {
+        return (
+          <MultipleTextFields
+            getAndSet={getAndSet as [() => string[], (value: string[]) => void]}
+          />
+        );
+      }
+    case 'number':
+      return (
+        <NumberSlider
+          metadata={metadata}
+          getAndSet={getAndSet as [() => number, (value: number) => void]}
+        />
+      );
 
-interface OptionsProps {
-    metadata: OptionMetadata;
-    getAndSet: [() => any, (value: any) => void]
-}
-
-
-export const Options = ({metadata, getAndSet}: OptionsProps) => {
-    let [get, set] = getAndSet;
-    if (metadata.type === 'boolean') {
-        return <BooleanToggle getAndSet={getAndSet}/>
-    } else if (metadata.type === "string") {
-        if (metadata.options) {
-            return <StringOptions options={metadata.options} getAndSet={getAndSet}/>
-        } else {
-            return <TextField short={metadata.short ?? false} getAndSet={getAndSet} />
-        }
-    } else if (metadata.type === "stringArray") {
-        if (metadata.options) {
-            return <MultipleStringOptions options={metadata.options} getAndSet={getAndSet}/>
-        } else {
-            return <MultipleTextFields getter={get} setter={set}/>
-        }
-    } else if (metadata.type === "number") {
-        return <NumberSlider min={metadata.min} max={metadata.max} step={metadata.step ?? 1}
-                             getAndSet={getAndSet}/>
-    } else {
-        return <div>Unknown input</div>
-    }
-}
+    default:
+      return <div>Unknown input</div>;
+  }
+};

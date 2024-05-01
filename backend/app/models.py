@@ -10,7 +10,7 @@ class GenerationOptions(CamelModel):
     Corresponds to ui/src/generate/GenerationService.ts:GenerationOptions.
     """
 
-    rag_docs: list[str]
+    rag_docs: dict[str, list[str]]
     settings: dict[str, Any]
     parameters: dict[str, Any]
     custom_inputs: dict[str, Any]
