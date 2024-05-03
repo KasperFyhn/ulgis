@@ -1,103 +1,149 @@
-export type OptionType = boolean | string | number | string[];
-
-export interface OptionMetadataBase<T extends OptionType> {
-  name: string;
-  initialValue?: T;
-}
-
-export interface BooleanOptionMetadata extends OptionMetadataBase<boolean> {
-  type: 'boolean';
-}
-
-export interface StringOptionMetadata extends OptionMetadataBase<string> {
-  type: 'string';
-  options?: string[];
-  short?: boolean;
-}
-
-export interface StringArrayOptionMetadata
-  extends OptionMetadataBase<string[]> {
-  type: 'stringArray';
-  options?: string[];
-}
-
-export interface NumberOptionMetadata extends OptionMetadataBase<number> {
-  type: 'number';
-  min: number;
-  max: number;
-  step?: number;
-}
-
-export type OptionMetadata =
-  | BooleanOptionMetadata
-  | StringOptionMetadata
-  | StringArrayOptionMetadata
-  | NumberOptionMetadata;
-
-function getInitialValue(option: OptionMetadata): OptionType {
-  if (option.initialValue === undefined || option.initialValue === null) {
-    switch (option.type) {
-      case 'boolean':
-        return false;
-      case 'number':
-        return 0;
-      case 'string':
-        return '';
-      case 'stringArray':
-        return [];
-    }
-  } else {
-    return option.initialValue;
-  }
-}
-
-export interface GenerationOptionsMetadata {
-  ragDocs: StringArrayOptionMetadata;
-  settings: OptionMetadata[];
-  parameters: OptionMetadata[];
-  customInputs: OptionMetadata[];
-  outputOptions: OptionMetadata[];
-}
-
-export class GenerationSubOptions {
-  [key: string]: OptionType;
-}
-
-export class GenerationOptions {
-  [key: string]: GenerationSubOptions;
-
-  ragDocs: GenerationSubOptions = {};
-  settings: GenerationSubOptions = {};
-  parameters: GenerationSubOptions = {};
-  customInputs: GenerationSubOptions = {};
-  outputOptions: GenerationSubOptions = {};
-
-  constructor(metadata?: GenerationOptionsMetadata) {
-    if (metadata !== undefined) {
-      this.ragDocs = { ragDocs: metadata.ragDocs.initialValue ?? [] };
-      this.settings = Object.fromEntries(
-        metadata.settings.map((v) => [v.name, getInitialValue(v)]),
-      );
-      this.parameters = Object.fromEntries(
-        metadata.parameters.map((v) => [v.name, getInitialValue(v)]),
-      );
-      this.customInputs = Object.fromEntries(
-        metadata.customInputs.map((v) => [v.name, getInitialValue(v)]),
-      );
-      this.outputOptions = Object.fromEntries(
-        metadata.outputOptions.map((v) => [v.name, getInitialValue(v)]),
-      );
-    }
-  }
-}
+import { GenerationOptions, GenerationOptionsMetadata } from './models';
 
 export interface GenerationService {
   getGenerationOptionsMetadata(): Promise<GenerationOptionsMetadata>;
 
+  createPrompt(options: GenerationOptions): Promise<string>;
+
   generate(options: GenerationOptions): Promise<string>;
+
+  generateAsStream(
+    options: GenerationOptions,
+    onMessage: (event: MessageEvent<string>) => void,
+    onClose?: () => void,
+  ): void;
 }
 
-export class GenerationServiceMockup implements GenerationService {
+export class MockGenerationService implements GenerationService {
+  getGenerationOptionsMetadata(): Promise<GenerationOptionsMetadata> {
+    const generationOptions: GenerationOptionsMetadata = {
+      taxonomies: {
+        name: 'Taxonomies',
+        description: 'Taxonomies to choose from',
+        multiple: true,
+        groups: {
+          taxonomy1: {
+            name: 'Taxonomy 1',
+            description: 'Description of first Taxonomy 1',
+            initialValue: true,
+            group: {
+              parameter1: {
+                name: 'Parameter 1',
+                type: 'number',
+                min: 1,
+                max: 100,
+              },
+            },
+          },
+          taxonomy2: {
+            name: 'Taxonomy 2',
+            description: 'Description of first Taxonomy 1',
+            initialValue: true,
+            group: {
+              parameter1: {
+                name: 'Parameter 1',
+                type: 'number',
+                min: 1,
+                max: 100,
+              },
+              parameter2: {
+                name: 'Parameter 1',
+                type: 'boolean',
+              },
+            },
+          },
+        },
+      },
+
+      customInputs: {
+        name: 'Custom Inputs',
+        initialValue: true,
+        group: {
+          customInput: {
+            name: 'Custom input',
+            type: 'string',
+          },
+        },
+      },
+      outputOptions: {
+        name: 'Output Options',
+        description: 'Various output options',
+        multiple: false,
+        groups: {
+          option1: {
+            name: 'Option 1',
+            description: 'Description of option 1',
+            initialValue: true,
+            group: {
+              parameter1: {
+                name: 'Sub-option 1',
+                type: 'number',
+                min: 1,
+                max: 100,
+              },
+            },
+          },
+        },
+      },
+
+      settings: {
+        name: 'Settings',
+        group: {
+          setting1: {
+            name: 'Setting 1',
+            type: 'string',
+            options: ['1', '2', '3'],
+          },
+        },
+      },
+    };
+    return Promise.resolve(generationOptions);
+  }
+
+  createPrompt(options: GenerationOptions): Promise<string> {
+    return Promise.resolve(
+      'This prompt is from a mock generation service. Options:\n\n' +
+        JSON.stringify(options, null, 2).replaceAll('\n', '\n\n\t'),
+    );
+  }
+
+  generate(options: GenerationOptions): Promise<string> {
+    return Promise.resolve(
+      'This response is from a mock generation service. Options:\n\n\t' +
+        JSON.stringify(options, null, 2).replaceAll('\n', '\n\n\t'),
+    );
+  }
+
+  generateAsStream(
+    options: GenerationOptions,
+    onMessage: (event: MessageEvent<string>) => void,
+    onClose?: () => void,
+  ): void {
+    const responseChunks = (
+      'This response is from a mock generation service. Options:\n\n\t' +
+      JSON.stringify(options, null, 2).replaceAll('\n', '\n\n\t')
+    ).split(' ');
+    let index = 0;
+    let timeoutId: number;
+    const sendMessage: () => void = () => {
+      if (index < responseChunks.length) {
+        // Simulate sending a message every 0.5 seconds
+        const message = responseChunks[index] + ' ';
+        onMessage(new MessageEvent('message', { data: message }));
+        index++;
+        timeoutId = window.setTimeout(sendMessage, 50);
+      } else {
+        if (onClose) {
+          onClose();
+        }
+        window.clearTimeout(timeoutId);
+      }
+    };
+    timeoutId = window.setTimeout(sendMessage, 500);
+  }
+}
+
+export class LocalGenerationService implements GenerationService {
   async getGenerationOptionsMetadata(): Promise<GenerationOptionsMetadata> {
     const response = await fetch(
       'http://localhost:8000/generation_options_metadata',

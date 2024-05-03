@@ -1,9 +1,6 @@
 import React from 'react';
-import {
-  NumberOptionMetadata,
-  OptionMetadata,
-  OptionType,
-} from './GenerationService';
+import { NumberOptionMetadata, OptionMetadata, OptionType } from './models';
+import './Options.css';
 
 interface BooleanToggleProps {
   getAndSet: [() => boolean, (value: boolean) => void];
@@ -23,16 +20,17 @@ const BooleanToggle: React.FC<BooleanToggleProps> = ({
 };
 
 interface StringOptionsProps {
+  name: string;
   options: string[];
   getAndSet: [() => string, (value: string) => void];
 }
 
 const StringOptions: React.FC<StringOptionsProps> = ({
+  name,
   options,
   getAndSet,
 }: StringOptionsProps) => {
   const [get, set] = getAndSet;
-  const name: string = options.join('_');
   return (
     <div>
       {options.map((option) => (
@@ -180,6 +178,7 @@ export const Options: React.FC<OptionsProps<OptionType>> = ({
       if (metadata.options) {
         return (
           <StringOptions
+            name={metadata.name}
             options={metadata.options}
             getAndSet={getAndSet as [() => string, (value: string) => void]}
           />

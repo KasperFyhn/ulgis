@@ -1,16 +1,18 @@
 import '../common.css';
+import { MockGenerationService } from './GenerationService';
+import React, { useEffect, useState } from 'react';
 import {
   GenerationOptions,
   GenerationOptionsMetadata,
-  GenerationServiceMockup,
-  OptionType,
-} from './GenerationService';
-import React, { useEffect, useState } from 'react';
+  initGenerationOptions,
+} from './models';
 import Markdown from 'react-markdown';
-import { Options } from './Options';
+import { ToggledOptionGroupArrayPanel } from './ToggledOptionGroupArrayPanel';
+import { OptionGroupPanel } from './OptionGroupPanel';
+import { ToggledOptionGroupPanel } from './ToggledOptionGroupPanel';
 
 export const GeneratorPage: React.FC = () => {
-  const service = new GenerationServiceMockup();
+  const service = new MockGenerationService();
 
   const [optionsMetadata, setOptionsMetadata] = useState<
     GenerationOptionsMetadata | undefined
@@ -19,29 +21,12 @@ export const GeneratorPage: React.FC = () => {
   const [options, setOptions] = useState<GenerationOptions>(
     new GenerationOptions(),
   );
-  const optionGetterAndSetter: <T extends OptionType>(
-    field: string,
-    key: string,
-  ) => [() => OptionType, (v: T) => void] = <T extends OptionType>(
-    field: string,
-    key: string,
-  ) => {
-    const getter: () => OptionType = () => {
-      return options[field][key];
-    };
-    const setter: (v: T) => void = (value) => {
-      const updated: GenerationOptions = { ...options };
-      updated[field][key] = value;
-      setOptions(updated);
-    };
-    return [getter, setter];
-  };
 
   useEffect(() => {
     if (optionsMetadata === undefined) {
       service.getGenerationOptionsMetadata().then((metadata) => {
         setOptionsMetadata(() => metadata);
-        setOptions(() => new GenerationOptions(metadata));
+        setOptions(() => initGenerationOptions(metadata));
       });
     }
   });
@@ -81,34 +66,32 @@ export const GeneratorPage: React.FC = () => {
     <div className={'flex-container--vert'}>
       <div className={'shadow-border flex-container__box padded'}>
         <h1>Taxonomies</h1>
-        <Options
-          metadata={optionsMetadata.ragDocs}
-          getAndSet={optionGetterAndSetter('ragDocs', 'ragDocs')}
-        />
+        <div className={'flex-container--horiz'}>
+          <ToggledOptionGroupArrayPanel
+            metadata={optionsMetadata.taxonomies}
+            getAndSet={[
+              () => options.taxonomies,
+              (v) =>
+                setOptions({
+                  ...options,
+                  taxonomies: v,
+                }),
+            ]}
+          />
+        </div>
       </div>
       <div className={'flex-container--horiz'}>
         <div className={'shadow-border flex-container__box padded'}>
           <h1>Settings</h1>
-          {optionsMetadata.settings.map((setting) => (
-            <div key={setting.name}>
-              <h2>{setting.name}</h2>
-              <Options
-                metadata={setting}
-                getAndSet={optionGetterAndSetter('settings', setting.name)}
-              />
-            </div>
-          ))}
-          <h1>Parameters</h1>
-          {optionsMetadata.parameters.map((parameter) => (
-            <div key={parameter.name}>
-              <h2>{parameter.name}</h2>
-              <Options
-                metadata={parameter}
-                getAndSet={optionGetterAndSetter('parameters', parameter.name)}
-              />
-            </div>
-          ))}
+          <OptionGroupPanel
+            metadata={optionsMetadata.settings}
+            getAndSet={[
+              () => options.settings,
+              (v) => setOptions({ ...options, settings: v }),
+            ]}
+          />
         </div>
+
         <div
           className={'shadow-border flex-container__box size_40percent padded'}
         >
@@ -125,31 +108,25 @@ export const GeneratorPage: React.FC = () => {
         </div>
         <div className={'shadow-border flex-container__box--big padded'}>
           <h1>Custom Input</h1>
-          {optionsMetadata.customInputs.map((customInput) => (
-            <div key={customInput.name}>
-              <h2>{customInput.name}</h2>
-              <Options
-                metadata={customInput}
-                getAndSet={optionGetterAndSetter(
-                  'customInputs',
-                  customInput.name,
-                )}
-              />
-            </div>
-          ))}
+          <ToggledOptionGroupPanel
+            metadata={optionsMetadata.customInputs}
+            getAndSet={[
+              () => options.customInputs,
+              (v) => setOptions({ ...options, customInputs: v }),
+            ]}
+          />
           <h1>Output Formatting</h1>
-          {optionsMetadata.outputOptions.map((outputOption) => (
-            <div key={outputOption.name}>
-              <span>{outputOption.name}: </span>
-              <Options
-                metadata={outputOption}
-                getAndSet={optionGetterAndSetter(
-                  'outputOptions',
-                  outputOption.name,
-                )}
-              />
-            </div>
-          ))}
+          <ToggledOptionGroupArrayPanel
+            metadata={optionsMetadata.outputOptions}
+            getAndSet={[
+              () => options.outputOptions,
+              (v) =>
+                setOptions({
+                  ...options,
+                  outputOptions: v,
+                }),
+            ]}
+          />
         </div>
       </div>
     </div>
