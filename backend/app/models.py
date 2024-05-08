@@ -26,7 +26,9 @@ class ToggledOptionGroupArray(CamelModel):
 
 
 class Taxonomies(ToggledOptionGroupArray):
-    model_config = ConfigDict(extra="allow")
+    model_config = ConfigDict(
+        extra="allow",
+    )
     pass
 
 
@@ -270,7 +272,18 @@ class GenerationOptionsMetadata(CamelModel):
                 multiple=True,
                 groups={
                     taxonomy.name: ToggledOptionGroupMetadata(
-                        name=taxonomy.name, initial_value=False, group={}
+                        name=taxonomy.name,
+                        initial_value=False,
+                        group={
+                            param.name: NumberOptionMetadata(
+                                name=param.name,
+                                initial_value=param.default,
+                                min=param.min,
+                                max=param.max,
+                                step=param.step,
+                            )
+                            for param in taxonomy.parameters
+                        },
                     )
                     for taxonomy in taxonomies
                 },

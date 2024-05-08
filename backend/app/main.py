@@ -8,7 +8,7 @@ from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
 from fastapi_camelcase import CamelModel
-from sqlalchemy.orm import Session
+from sqlalchemy.orm import Session, subqueryload
 
 from app import llm
 from app.db.base import SessionLocal
@@ -45,7 +45,7 @@ def get_db():
 
 @app.get("/taxonomies")
 def get_taxonomies(db: Session = Depends(get_db)):
-    return db.query(Taxonomy).all()
+    return db.query(Taxonomy).options(subqueryload(Taxonomy.parameters)).all()
 
 
 @app.get("/generation_options_metadata")

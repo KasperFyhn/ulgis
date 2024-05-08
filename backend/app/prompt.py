@@ -12,7 +12,12 @@ def build_prompt(options: GenerationOptions) -> str:
         ).items():
             if not taxonomy_params["enabled"]:
                 continue
-            prompt += "- " + taxonomy_name + "\n\n"
+            prompt += "- " + taxonomy_name + "\n"
+            for param_name, param_value in taxonomy_params.items():
+                if param_name == "enabled":
+                    continue
+                prompt += "\t - " + param_name + " = " + str(param_value) + "\n"
+
         prompt += "\n"
 
     # educational settings
