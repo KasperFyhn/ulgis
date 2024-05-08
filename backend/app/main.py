@@ -7,12 +7,13 @@ import uvicorn
 from fastapi import FastAPI, Depends
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import StreamingResponse
+from fastapi_camelcase import CamelModel
 from sqlalchemy.orm import Session
 
 from app import llm
 from app.db.base import SessionLocal
 from app.db.models import Taxonomy
-from app.models import GenerationOptions, GenerationOptionsMetadata, EvaluationRequest
+from app.models import GenerationOptions, GenerationOptionsMetadata
 from app.prompt import build_prompt
 
 app = FastAPI()
@@ -49,83 +50,89 @@ def get_taxonomies(db: Session = Depends(get_db)):
 
 @app.get("/generation_options_metadata")
 async def generation_options_metadata(db: Session = Depends(get_db)):
-    return GenerationOptionsMetadata.model_validate(
-        {
-            "rag_docs": {
-                "name": "Taxonomies",
-                "type": "stringArray",
-                "options": [taxonomy.name for taxonomy in get_taxonomies(db=db)],
-            },
-            "settings": [
-                {
-                    "name": "Education Level",
-                    "type": "string",
-                    "initial_value": "Master",
-                    "options": ["Bachelor", "Master", "PhD"],
-                },
-                {
-                    "name": "Faculty",
-                    "type": "string",
-                    "initial_value": "ARTS",
-                    "options": ["ARTS", "NAT", "TECH", "BSS", "HEALTH"],
-                },
-                {"name": "Education Name", "type": "string", "short": True},
-            ],
-            "parameters": [
-                {
-                    "name": "Communication and Collaboration",
-                    "type": "number",
-                    "initial_value": 3,
-                    "min": 1,
-                    "max": 5,
-                },
-                {
-                    "name": "Digital Content Creation",
-                    "type": "number",
-                    "initial_value": 3,
-                    "min": 1,
-                    "max": 5,
-                },
-                {
-                    "name": "Information and Data Literacy",
-                    "type": "number",
-                    "initial_value": 3,
-                    "min": 1,
-                    "max": 5,
-                },
-                {
-                    "name": "Problem Solving",
-                    "type": "number",
-                    "initial_value": 3,
-                    "min": 1,
-                    "max": 5,
-                },
-                {
-                    "name": "Safety",
-                    "type": "number",
-                    "initial_value": 3,
-                    "min": 1,
-                    "max": 5,
-                },
-            ],
-            "custom_inputs": [
-                {"name": "Extra Inputs", "type": "stringArray"},
-                {"name": "Instruction", "type": "string"},
-            ],
-            "output_options": [
-                {
-                    "name": "Prose Description",
-                    "type": "boolean",
-                    "initial_value": False,
-                },
-                {
-                    "name": "Bullet Points",
-                    "type": "boolean",
-                    "initial_value": True,
-                },
-            ],
-        }
-    )
+    return GenerationOptionsMetadata.create(get_taxonomies(db))
+    # return GenerationOptionsMetadata.model_validate(
+    #     {
+    #         "rag_docs": {
+    #             "name": "Taxonomies",
+    #             "type": "stringArray",
+    #             "options": [taxonomy.name for taxonomy in get_taxonomies(db=db)],
+    #         },
+    #         "settings": [
+    #             {
+    #                 "name": "Education Level",
+    #                 "type": "string",
+    #                 "initial_value": "Master",
+    #                 "options": ["Bachelor", "Master", "PhD"],
+    #             },
+    #             {
+    #                 "name": "Faculty",
+    #                 "type": "string",
+    #                 "initial_value": "ARTS",
+    #                 "options": ["ARTS", "NAT", "TECH", "BSS", "HEALTH"],
+    #             },
+    #             {"name": "Education Name", "type": "string", "short": True},
+    #         ],
+    #         "parameters": [
+    #             {
+    #                 "name": "Communication and Collaboration",
+    #                 "type": "number",
+    #                 "initial_value": 3,
+    #                 "min": 1,
+    #                 "max": 5,
+    #             },
+    #             {
+    #                 "name": "Digital Content Creation",
+    #                 "type": "number",
+    #                 "initial_value": 3,
+    #                 "min": 1,
+    #                 "max": 5,
+    #             },
+    #             {
+    #                 "name": "Information and Data Literacy",
+    #                 "type": "number",
+    #                 "initial_value": 3,
+    #                 "min": 1,
+    #                 "max": 5,
+    #             },
+    #             {
+    #                 "name": "Problem Solving",
+    #                 "type": "number",
+    #                 "initial_value": 3,
+    #                 "min": 1,
+    #                 "max": 5,
+    #             },
+    #             {
+    #                 "name": "Safety",
+    #                 "type": "number",
+    #                 "initial_value": 3,
+    #                 "min": 1,
+    #                 "max": 5,
+    #             },
+    #         ],
+    #         "custom_inputs": [
+    #             {"name": "Extra Inputs", "type": "stringArray"},
+    #             {"name": "Instruction", "type": "string"},
+    #         ],
+    #         "output_options": [
+    #             {
+    #                 "name": "Prose Description",
+    #                 "type": "boolean",
+    #                 "initial_value": False,
+    #             },
+    #             {
+    #                 "name": "Bullet Points",
+    #                 "type": "boolean",
+    #                 "initial_value": True,
+    #             },
+    #         ],
+    #     }
+    # )
+
+
+@app.get("/generation_options_schema")
+async def generation_options_schema(db: Session = Depends(get_db)):
+    return GenerationOptions.model_json_schema()
 
 
 @app.post("/generate_outcomes")
@@ -167,6 +174,10 @@ async def create_prompt(request: GenerationOptions):
     logger.debug(request)
     prompt = build_prompt(request)
     return prompt
+
+
+class EvaluationRequest(CamelModel):
+    learning_outcomes: str
 
 
 evaluation_prompt = """

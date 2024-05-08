@@ -1,5 +1,8 @@
 import '../common.css';
-import { MockGenerationService } from './GenerationService';
+import {
+  LocalGenerationService,
+  MockGenerationService,
+} from './GenerationService';
 import React, { useEffect, useState } from 'react';
 import {
   GenerationOptions,
@@ -12,7 +15,7 @@ import { OptionGroupPanel } from './OptionGroupPanel';
 import { ToggledOptionGroupPanel } from './ToggledOptionGroupPanel';
 
 export const GeneratorPage: React.FC = () => {
-  const service = new MockGenerationService();
+  const service = new LocalGenerationService();
 
   const [optionsMetadata, setOptionsMetadata] = useState<
     GenerationOptionsMetadata | undefined
@@ -25,6 +28,7 @@ export const GeneratorPage: React.FC = () => {
   useEffect(() => {
     if (optionsMetadata === undefined) {
       service.getGenerationOptionsMetadata().then((metadata) => {
+        console.log(metadata);
         setOptionsMetadata(() => metadata);
         setOptions(() => initGenerationOptions(metadata));
       });
@@ -58,6 +62,15 @@ export const GeneratorPage: React.FC = () => {
       setCreatingResponse(false);
     });
   };
+
+  // const getJsonSchema: () => void = () => {
+  //   setCreatingResponse(true);
+  //   setResponse('Creating prompt ...');
+  //   service.getGenerationOptionsSchema().then((schema) => {
+  //     setResponse(JSON.stringify(schema, null, 2).replaceAll('\n', '\n\n\t'));
+  //     setCreatingResponse(false);
+  //   });
+  // };
 
   if (optionsMetadata === undefined) {
     return <div>Loading...</div>;
@@ -103,6 +116,7 @@ export const GeneratorPage: React.FC = () => {
                 Generate learning outcomes
               </button>
               <button onClick={createPrompt}>Create prompt</button>
+              {/*<button onClick={getJsonSchema}>JSON Schema</button>*/}
             </>
           )}
         </div>

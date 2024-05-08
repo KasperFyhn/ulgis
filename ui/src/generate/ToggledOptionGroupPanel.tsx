@@ -4,32 +4,51 @@ import {
   ToggledOptionGroup,
   ToggledOptionGroupMetadata,
 } from './models';
-import { Options } from './Options';
 import { OptionGroupPanel } from './OptionGroupPanel';
 
 export interface ToggledOptionGroupPanelProps {
   metadata: ToggledOptionGroupMetadata;
+  radioButtonName?: string;
+  disableAll?: () => void;
   getAndSet: [() => ToggledOptionGroup, (value: ToggledOptionGroup) => void];
 }
 
 export const ToggledOptionGroupPanel: React.FC<
   ToggledOptionGroupPanelProps
-> = ({ metadata, getAndSet }: ToggledOptionGroupPanelProps) => {
+> = ({
+  metadata,
+  radioButtonName,
+  disableAll,
+  getAndSet,
+}: ToggledOptionGroupPanelProps) => {
   const [getOptionGroup, setOptionGroup] = getAndSet;
   return (
     <div className={'flex-container__box'}>
       {metadata.name}
-      <Options
-        metadata={{ ...metadata, type: 'boolean' }}
-        getAndSet={[
-          () => getOptionGroup().enabled ?? false,
-          (value) => {
+      {!radioButtonName && (
+        <input
+          type={'checkbox'}
+          checked={getOptionGroup().enabled ?? false}
+          onChange={(event) => {
             const obj = getOptionGroup();
-            obj.enabled = value as boolean;
+            obj.enabled = event.target.checked;
             setOptionGroup({ ...obj });
-          },
-        ]}
-      />
+          }}
+        />
+      )}
+      {radioButtonName && (
+        <input
+          type={'radio'}
+          name={radioButtonName}
+          checked={getOptionGroup().enabled ?? false}
+          onChange={(event) => {
+            if (disableAll) disableAll();
+            const obj = getOptionGroup();
+            obj.enabled = event.target.checked;
+            setOptionGroup({ ...obj });
+          }}
+        />
+      )}
 
       {getOptionGroup().enabled && (
         <div className={'padded'}>
