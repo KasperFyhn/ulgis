@@ -79,19 +79,17 @@ export const GeneratorPage: React.FC = () => {
     <div className={'flex-container--vert'}>
       <div className={'shadow-border flex-container__box padded'}>
         <h1>Taxonomies</h1>
-        <div className={'flex-container--horiz'}>
-          <ToggledOptionGroupArrayPanel
-            metadata={optionsMetadata.taxonomies}
-            getAndSet={[
-              () => options.taxonomies,
-              (v) =>
-                setOptions({
-                  ...options,
-                  taxonomies: v,
-                }),
-            ]}
-          />
-        </div>
+        <ToggledOptionGroupArrayPanel
+          metadata={optionsMetadata.taxonomies}
+          getAndSet={[
+            () => options.taxonomies,
+            (v) =>
+              setOptions({
+                ...options,
+                taxonomies: v,
+              }),
+          ]}
+        />
       </div>
       <div className={'flex-container--horiz'}>
         <div className={'shadow-border flex-container__box padded'}>
@@ -131,6 +129,7 @@ export const GeneratorPage: React.FC = () => {
           />
           <h1>Output Formatting</h1>
           <ToggledOptionGroupArrayPanel
+            vertical
             metadata={optionsMetadata.outputOptions}
             getAndSet={[
               () => options.outputOptions,

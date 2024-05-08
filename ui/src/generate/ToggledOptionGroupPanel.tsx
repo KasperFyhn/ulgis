@@ -11,6 +11,7 @@ export interface ToggledOptionGroupPanelProps {
   radioButtonName?: string;
   disableAll?: () => void;
   getAndSet: [() => ToggledOptionGroup, (value: ToggledOptionGroup) => void];
+  equalSize?: boolean;
 }
 
 export const ToggledOptionGroupPanel: React.FC<
@@ -20,10 +21,15 @@ export const ToggledOptionGroupPanel: React.FC<
   radioButtonName,
   disableAll,
   getAndSet,
+  equalSize,
 }: ToggledOptionGroupPanelProps) => {
   const [getOptionGroup, setOptionGroup] = getAndSet;
   return (
-    <div className={'flex-container__box'}>
+    <div
+      className={
+        equalSize ? 'flex-container__box--equal-size' : 'flex-container__box'
+      }
+    >
       {metadata.name}
       {!radioButtonName && (
         <input

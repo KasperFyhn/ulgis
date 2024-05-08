@@ -69,6 +69,10 @@ textarea {
   flex-grow: 1;
 }
 
+.flex-container__box--equal-size {
+  flex: 1 1 0;
+}
+
 .flex-container__box--big {
   flex-grow: 2;
 }

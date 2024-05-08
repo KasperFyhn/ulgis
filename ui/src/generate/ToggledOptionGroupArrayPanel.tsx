@@ -11,16 +11,21 @@ export interface ToggledOptionGroupArrayPanelProps {
     () => ToggledOptionGroupArray,
     (value: ToggledOptionGroupArray) => void,
   ];
+  vertical?: boolean;
+  split?: boolean;
 }
 
 export const ToggledOptionGroupArrayPanel: React.FC<
   ToggledOptionGroupArrayPanelProps
-> = ({ metadata, getAndSet }: ToggledOptionGroupArrayPanelProps) => {
+> = ({ metadata, getAndSet, vertical }: ToggledOptionGroupArrayPanelProps) => {
   const [getOptionGroupArray, setOptionGroupArray] = getAndSet;
   return (
-    <div className={'flex-container--horiz'}>
+    <div
+      className={vertical ? 'flex-container--vert' : 'flex-container--horiz'}
+    >
       {Object.entries(metadata.groups).map(([key, taxonomyMetadata]) => (
         <ToggledOptionGroupPanel
+          equalSize
           key={key}
           metadata={taxonomyMetadata}
           radioButtonName={metadata.multiple ? undefined : metadata.name}
