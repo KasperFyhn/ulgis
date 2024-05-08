@@ -1,0 +1,12 @@
+.circled-question-mark {
+  display: inline-block;
+  border: gray 1px solid;
+  color: inherit;
+  border-radius: 50%;
+  width: 12px;
+  height: 12px;
+  padding: 1px;
+  text-align: center;
+  font-size: 12px;
+  margin: 2px;
+}

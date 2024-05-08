@@ -273,6 +273,7 @@ class GenerationOptionsMetadata(CamelModel):
                 groups={
                     taxonomy.name: ToggledOptionGroupMetadata(
                         name=taxonomy.name,
+                        description=taxonomy.short_description,
                         initial_value=False,
                         group={
                             param.name: NumberOptionMetadata(
