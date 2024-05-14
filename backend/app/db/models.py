@@ -21,9 +21,6 @@ class Parameter(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String, unique=True, index=True)
     short_description = Column(String)
-    min = Column(Integer)
-    max = Column(Integer)
-    step = Column(Integer)
     default = Column(Integer)
 
     taxonomy_id = Column(Integer, ForeignKey("taxonomies.id"))

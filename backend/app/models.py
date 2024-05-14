@@ -168,13 +168,13 @@ class StringArrayOptionMetadata(OptionMetadataBase):
 
 class NumberOptionMetadata(OptionMetadataBase):
     class Config:
-        orm_mode = True
+        from_attributes = True
 
     type: Literal["number"] = "number"
     default: int | float = None
-    min: int | float
-    max: int | float
-    step: Optional[int | float] = 1.0
+    min: int | float = 0
+    max: int | float = 5
+    step: int | float = 1.0
 
 
 OptionMetadata = Annotated[
@@ -209,7 +209,7 @@ class ToggledOptionGroupArrayMetadata(OptionMetadataBase):
 
 class TaxonomyMetadata(ToggledOptionGroupMetadata):
     class Config:
-        orm_mode = True
+        from_attributes = True
 
     description: str = Field(validation_alias="short_description")
     default: bool = False

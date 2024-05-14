@@ -52,6 +52,12 @@ def get_taxonomies(db: Session = Depends(get_db)) -> list[TaxonomyMetadata]:
     ]
 
 
+@app.get("/taxonomy_descriptions", response_model=dict[str, str])
+def get_taxonomy_texts(db: Session = Depends(get_db)) -> dict[str, str]:
+    name_and_text = db.query(Taxonomy).add_columns(Taxonomy.name, Taxonomy.text).all()
+    return {taxonomy.name: taxonomy.text for taxonomy in name_and_text}
+
+
 @app.get("/generation_options_metadata")
 async def generation_options_metadata(db: Session = Depends(get_db)):
     return GenerationOptionsMetadata.create(get_taxonomies(db))
@@ -63,9 +69,9 @@ async def generation_options_schema(db: Session = Depends(get_db)):
 
 
 @app.post("/generate_outcomes")
-async def generate_outcomes(request: GenerationOptions):
+async def generate_outcomes(request: GenerationOptions, db: Session = Depends(get_db)):
     logger.debug(request)
-    prompt = build_prompt(request)
+    prompt = build_prompt(request, get_taxonomy_texts(db))
     response = await llm.generate(prompt)
     return response
 
@@ -74,9 +80,9 @@ _streaming_responses = dict()
 
 
 @app.post("/start_stream")
-async def start_stream(request: GenerationOptions):
+async def start_stream(request: GenerationOptions, db: Session = Depends(get_db)):
     logger.debug(request)
-    prompt = build_prompt(request)
+    prompt = build_prompt(request, get_taxonomy_texts(db))
     token = str(uuid.uuid4())
     _streaming_responses[token] = llm.generate(prompt, stream=True)
     return {"token": token}
@@ -97,9 +103,9 @@ async def stream_response(token: str):
 
 
 @app.post("/create_prompt")
-async def create_prompt(request: GenerationOptions):
+async def create_prompt(request: GenerationOptions, db: Session = Depends(get_db)):
     logger.debug(request)
-    prompt = build_prompt(request)
+    prompt = build_prompt(request, get_taxonomy_texts(db))
     return prompt
 
 

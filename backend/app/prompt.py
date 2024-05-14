@@ -1,38 +1,35 @@
 from app.models import GenerationOptions
 
 
-def build_prompt(options: GenerationOptions) -> str:
+_attention_dict = {
+    0: "no",
+    1: "very low",
+    2: "low",
+    3: "moderate",
+    4: "high",
+    5: "very high",
+}
+
+
+def build_prompt(
+    options: GenerationOptions, taxonomy_texts: dict[str, str] = None
+) -> str:
     prompt = ""
 
     # background knowledge
     if options.taxonomies.is_any_enabled():
-        prompt += "Here is some background context:\n\n"
+        prompt += "Below are some descriptions of educational taxonomies:\n\n"
         for taxonomy_name, taxonomy_params in options.taxonomies.iter_taxonomies():
             if not taxonomy_params.enabled:
                 continue
-            prompt += (
-                "- "
-                + taxonomy_name
-                + ". Pay attention to these aspects to the given degree: \n"
-            )
+            prompt += f"Title: {taxonomy_name}\n\n"
+            if taxonomy_texts:
+                prompt += f"{taxonomy_texts[taxonomy_name]}"
+            prompt += "\n"
             for param_name, param_value in taxonomy_params.iter_options():
-                prompt += "\t - " + param_name + " = " + str(param_value) + "\n"
+                prompt += f"- Pay {_attention_dict[param_value]} attention to '{param_name}'.\n"
 
         prompt += "\n"
-
-    # educational settings
-    prompt += "Shape your response such that it suits the following education:\n\n"
-    prompt += f"Education level: {options.settings.education_level}\n\n"
-    if options.settings.education_name:
-        prompt += f"Education name: {options.settings.education_name}\n\n"
-    prompt += "\n\n"
-
-    # tuned parameters
-    # prompt += "Shape your response according to the EU's DigComp 2.2 framework which outlines digital competencies.\n\n"
-    # scale_instr = "On a scale from 1 to 5, pay {} attention to '{}'.\n\n"
-    # for parameter, value in options.parameters.items():
-    #     prompt += scale_instr.format(value, parameter)
-    # prompt += "\n\n"
 
     # custom inputs
     if options.custom_inputs.extra_inputs:
@@ -41,24 +38,23 @@ def build_prompt(options: GenerationOptions) -> str:
             if value:
                 prompt += f"{value}:\n\n"
 
-    prompt += "Provide learning outcomes that fit with the education and its level."
+    education = options.settings.education_name or "an education"
+    prompt += f"Provide learning outcomes that fit with {education} at {options.settings.education_level} level."
     if options.taxonomies.is_any_enabled():
-        prompt += (
-            "They should be based on the theories in the provided background context."
-        )
+        prompt += " They should be based on the provided taxonomies."
     prompt += "\n\n"
 
     # output formatting
     if options.output_options.as_bullet_points.enabled:
         prompt += (
-            f"The output should be in {options.output_options.as_bullet_points.number_of_bullets} bullet points"
+            f"The output should be in {options.output_options.as_bullet_points.number_of_bullets} bullet points "
             f"which can {'' if options.output_options.as_bullet_points.nested else 'NOT'} be nested.\n\n"
         )
     elif options.output_options.prose_description.enabled:
         prompt += (
             f"The output should be a prose description of {options.output_options.prose_description.number_of_words} "
             f"words and NOT bullet points. "
-            f"{'Include' if options.output_options.prose_description.headings else 'Do NOT include'} heading.\n\n"
+            f"{'Include' if options.output_options.prose_description.headings else 'Do NOT include'} headings.\n\n"
         )
 
     if options.custom_inputs.custom_instruction:
