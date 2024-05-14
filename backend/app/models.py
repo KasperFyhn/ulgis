@@ -1,35 +1,54 @@
-from typing import Literal, Optional, Union
+from typing import Literal, Optional, Union, Any, Callable, Iterable
 
 from annotated_types import Ge, Le
 from fastapi_camelcase import CamelModel
-from pydantic import Field, ConfigDict
+from pydantic import Field, Extra, field_validator
 from pydantic.fields import FieldInfo
 from typing_extensions import Annotated
 
-from app.db.models import Taxonomy
-
 # DATA CLASSES
-OptionType = bool | str | float | list[str]
+OptionType = bool | str | float | int | list[str]
 
 
 class OptionGroup(CamelModel):
+    """An Abstract class. Child classes should contain fields of type OptionType."""
+
     pass
 
 
 class ToggledOptionGroup(CamelModel):
+    """An Abstract class. Child classes should contain fields of type OptionType."""
+
     enabled: bool = False
 
 
 class ToggledOptionGroupArray(CamelModel):
+    """An Abstract class. Child classes should contain fields of type ToggledOptionGroup."""
+
     multiple: bool = True
     pass
 
 
+class Taxonomy(ToggledOptionGroup):
+
+    class Config:
+        extra = Extra.allow
+
+    def iter_options(self) -> Iterable[tuple[str, OptionType]]:
+        return ((name, d) for name, d in self.model_extra.items())
+
+
 class Taxonomies(ToggledOptionGroupArray):
-    model_config = ConfigDict(
-        extra="allow",
-    )
-    pass
+    class Config:
+        extra = Extra.allow
+
+    def is_any_enabled(self) -> bool:
+        return any(taxonomy.enabled for _, taxonomy in self.iter_taxonomies())
+
+    def iter_taxonomies(self) -> Iterable[tuple[str, Taxonomy]]:
+        return (
+            (name, Taxonomy.model_validate(d)) for name, d in self.model_extra.items()
+        )
 
 
 class Settings(OptionGroup):
@@ -49,11 +68,11 @@ class Settings(OptionGroup):
 
 class CustomInputs(ToggledOptionGroup):
     enabled: bool = False
-    extra_inputs: list[str] = Field(title="Extra Inputs", description="Extra inputs")
     custom_instruction: str = Field(
         title="Custom Instruction",
         description="Custom Instruction",
     )
+    extra_inputs: list[str] = Field(title="Extra Inputs", description="Extra inputs")
 
 
 class BulletPointOptions(ToggledOptionGroup):
@@ -122,33 +141,40 @@ class GenerationOptions(CamelModel):
 # METADATA CLASSES
 class OptionMetadataBase(CamelModel):
     name: str
-    description: Optional[str] = None
+    description: Optional[str] = Field(
+        default=None,
+        title="Description",
+        validation_alias="short_description",
+    )
 
 
 class BooleanOptionMetadata(OptionMetadataBase):
     type: Literal["boolean"] = "boolean"
-    initial_value: Optional[bool] = None
+    default: Optional[bool] = None
 
 
 class StringOptionMetadata(OptionMetadataBase):
     type: Literal["string"] = "string"
-    initial_value: Optional[str] = None
+    default: Optional[str] = None
     options: Optional[list[str]] = None
     short: Optional[bool] = None
 
 
 class StringArrayOptionMetadata(OptionMetadataBase):
     type: Literal["stringArray"] = "stringArray"
-    initial_value: Optional[list[str]] = None
+    default: Optional[list[str]] = None
     options: Optional[list[str]] = None
 
 
 class NumberOptionMetadata(OptionMetadataBase):
+    class Config:
+        orm_mode = True
+
     type: Literal["number"] = "number"
-    initial_value: float = None
-    min: float
-    max: float
-    step: Optional[float] = 1.0
+    default: int | float = None
+    min: int | float
+    max: int | float
+    step: Optional[int | float] = 1.0
 
 
 OptionMetadata = Annotated[
@@ -165,9 +191,15 @@ OptionMetadata = Annotated[
 class OptionGroupMetadata(OptionMetadataBase):
     group: dict[str, OptionMetadata]
 
+    @field_validator("group", mode="before")
+    def group_validator(cls, group):
+        if isinstance(group, list):
+            return {v.name: v for v in group}
+        return group
+
 
 class ToggledOptionGroupMetadata(OptionGroupMetadata):
-    initial_value: bool
+    default: bool
 
 
 class ToggledOptionGroupArrayMetadata(OptionMetadataBase):
@@ -175,27 +207,51 @@ class ToggledOptionGroupArrayMetadata(OptionMetadataBase):
     groups: dict[str, ToggledOptionGroupMetadata]
 
 
+class TaxonomyMetadata(ToggledOptionGroupMetadata):
+    class Config:
+        orm_mode = True
+
+    description: str = Field(validation_alias="short_description")
+    default: bool = False
+    group: dict[str, NumberOptionMetadata] = Field(validation_alias="parameters")
+
+
+class TaxonomyArrayMetadata(ToggledOptionGroupArrayMetadata):
+    multiple: bool = True
+    groups: dict[str, TaxonomyMetadata]
+
+
+def _get_from_metadata(
+    metadata: list[Any], clazz: type, cast: Callable[[Any], Any] = lambda x: x
+) -> Optional[Any]:
+    for field in metadata:
+        if isinstance(field, clazz):
+            return cast(field)
+
+
 def create_metadata(field: FieldInfo):
     if field.annotation == bool:
         return BooleanOptionMetadata(
             name=field.title or "No name",
             description=field.description,
-            initial_value=field.default,
+            default=field.default,
         )
     elif field.annotation == float or field.annotation == int:
         return NumberOptionMetadata(
             name=field.title or "No name",
             description=field.description,
-            initial_value=field.default,
-            min=float([e for e in field.metadata if isinstance(e, Ge)][0].ge),
-            max=float([e for e in field.metadata if isinstance(e, Le)][0].le),
-            step=1.0,
+            default=field.default,
+            min=_get_from_metadata(field.metadata, Ge, lambda ge: float(ge.ge)),
+            max=_get_from_metadata(field.metadata, Le, lambda le: float(le.le)),
+            step=(
+                field.json_schema_extra.get("step") if field.json_schema_extra else None
+            ),
         )
     elif field.annotation == str:
         return StringOptionMetadata(
             name=field.title or "No name",
             description=field.description,
-            initial_value=field.default,
+            default=field.default,
             options=(
                 field.json_schema_extra.get("options")
                 if field.json_schema_extra
@@ -211,7 +267,7 @@ def create_metadata(field: FieldInfo):
         return StringArrayOptionMetadata(
             name=field.title or "No name",
             description=field.description,
-            initial_value=field.default,
+            default=field.default,
             options=(
                 field.json_schema_extra.get("options")
                 if field.json_schema_extra
@@ -230,7 +286,7 @@ def create_metadata(field: FieldInfo):
         return ToggledOptionGroupMetadata(
             name=field.title or "No name",
             description=field.description,
-            initial_value=field.annotation.model_fields["enabled"].default,
+            default=field.annotation.model_fields["enabled"].default,
             group={
                 k: create_metadata(v)
                 for k, v in field.annotation.model_fields.items()
@@ -263,31 +319,11 @@ class GenerationOptionsMetadata(CamelModel):
     output_options: ToggledOptionGroupArrayMetadata
 
     @classmethod
-    def create(cls, taxonomies: list[Taxonomy]):
+    def create(cls, taxonomies: list[TaxonomyMetadata]):
 
         return cls(
-            taxonomies=ToggledOptionGroupArrayMetadata(
-                name="Taxonomies",
-                description=None,
-                multiple=True,
-                groups={
-                    taxonomy.name: ToggledOptionGroupMetadata(
-                        name=taxonomy.name,
-                        description=taxonomy.short_description,
-                        initial_value=False,
-                        group={
-                            param.name: NumberOptionMetadata(
-                                name=param.name,
-                                initial_value=param.default,
-                                min=param.min,
-                                max=param.max,
-                                step=param.step,
-                            )
-                            for param in taxonomy.parameters
-                        },
-                    )
-                    for taxonomy in taxonomies
-                },
+            taxonomies=TaxonomyArrayMetadata(
+                name="Taxonomies", multiple=True, groups={t.name: t for t in taxonomies}
             ),
             settings=create_metadata(GenerationOptions.model_fields["settings"]),
             custom_inputs=create_metadata(

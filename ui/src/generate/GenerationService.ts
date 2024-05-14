@@ -31,7 +31,7 @@ export class MockGenerationService implements GenerationService {
           taxonomy1: {
             name: 'Taxonomy 1',
             description: 'Description of first Taxonomy 1',
-            initialValue: true,
+            default: true,
             group: {
               parameter1: {
                 name: 'Parameter 1',
@@ -44,7 +44,7 @@ export class MockGenerationService implements GenerationService {
           taxonomy2: {
             name: 'Taxonomy 2',
             description: 'Description of first Taxonomy 1',
-            initialValue: true,
+            default: true,
             group: {
               parameter1: {
                 name: 'Parameter 1',
@@ -63,7 +63,7 @@ export class MockGenerationService implements GenerationService {
 
       customInputs: {
         name: 'Custom Inputs',
-        initialValue: true,
+        default: true,
         group: {
           customInput: {
             name: 'Custom input',
@@ -79,7 +79,7 @@ export class MockGenerationService implements GenerationService {
           option1: {
             name: 'Option 1',
             description: 'Description of option 1',
-            initialValue: true,
+            default: true,
             group: {
               parameter1: {
                 name: 'Sub-option 1',
@@ -92,7 +92,7 @@ export class MockGenerationService implements GenerationService {
           option2: {
             name: 'Option 2',
             description: 'Description of option 2',
-            initialValue: false,
+            default: false,
             group: {
               parameter1: {
                 name: 'Sub-option 1',

@@ -1,8 +1,5 @@
 import '../common.css';
-import {
-  LocalGenerationService,
-  MockGenerationService,
-} from './GenerationService';
+import { LocalGenerationService } from './GenerationService';
 import React, { useEffect, useState } from 'react';
 import {
   GenerationOptions,

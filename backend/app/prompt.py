@@ -5,17 +5,17 @@ def build_prompt(options: GenerationOptions) -> str:
     prompt = ""
 
     # background knowledge
-    if options.taxonomies:
+    if options.taxonomies.is_any_enabled():
         prompt += "Here is some background context:\n\n"
-        for taxonomy_name, taxonomy_params in options.taxonomies.dict(
-            exclude={"multiple"}
-        ).items():
-            if not taxonomy_params["enabled"]:
+        for taxonomy_name, taxonomy_params in options.taxonomies.iter_taxonomies():
+            if not taxonomy_params.enabled:
                 continue
-            prompt += "- " + taxonomy_name + "\n"
-            for param_name, param_value in taxonomy_params.items():
-                if param_name == "enabled":
-                    continue
+            prompt += (
+                "- "
+                + taxonomy_name
+                + ". Pay attention to these aspects to the given degree: \n"
+            )
+            for param_name, param_value in taxonomy_params.iter_options():
                 prompt += "\t - " + param_name + " = " + str(param_value) + "\n"
 
         prompt += "\n"
@@ -41,10 +41,12 @@ def build_prompt(options: GenerationOptions) -> str:
             if value:
                 prompt += f"{value}:\n\n"
 
-    prompt += (
-        "Provide learning outcomes that fit with the education and its level. They should be based on the theories in"
-        " the provided taxonomies. \n\n"
-    )
+    prompt += "Provide learning outcomes that fit with the education and its level."
+    if options.taxonomies.is_any_enabled():
+        prompt += (
+            "They should be based on the theories in the provided background context."
+        )
+    prompt += "\n\n"
 
     # output formatting
     if options.output_options.as_bullet_points.enabled:

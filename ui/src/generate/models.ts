@@ -36,7 +36,7 @@ interface OptionMetadataBase {
 
 interface PrimitiveOptionMetadataBase<T extends OptionType>
   extends OptionMetadataBase {
-  initialValue?: T;
+  default?: T;
 }
 
 export interface BooleanOptionMetadata
@@ -76,7 +76,7 @@ export interface OptionGroupMetadata extends OptionMetadataBase {
 }
 
 export interface ToggledOptionGroupMetadata extends OptionGroupMetadata {
-  initialValue: boolean;
+  default: boolean;
 }
 
 export interface ToggledOptionGroupArrayMetadata extends OptionMetadataBase {
@@ -179,20 +179,20 @@ export function resolveSchema(schemaRoot: SchemaRoot): ObjectSchema {
 
 // INITIALIZERS
 
-function getInitialValue(metadata: OptionMetadata): OptionType {
+function getdefault(metadata: OptionMetadata): OptionType {
   switch (metadata.type) {
     case 'boolean':
-      return metadata.initialValue ?? false;
+      return metadata.default ?? false;
     case 'number':
-      return metadata.initialValue ?? 0;
+      return metadata.default ?? 0;
     case 'string':
       if (metadata.options) {
-        return metadata.initialValue ?? metadata.options[0];
+        return metadata.default ?? metadata.options[0];
       } else {
-        return metadata.initialValue ?? '';
+        return metadata.default ?? '';
       }
     case 'stringArray':
-      return metadata.initialValue ?? [];
+      return metadata.default ?? [];
   }
 }
 
@@ -200,7 +200,7 @@ function initOptionGroup(metadata: OptionGroupMetadata): OptionGroup {
   return Object.fromEntries(
     Object.entries(metadata.group).map(([key, member]) => [
       key,
-      getInitialValue(member) as OptionType,
+      getdefault(member) as OptionType,
     ]),
   );
 }
@@ -209,11 +209,11 @@ function initToggledOptionGroup(
   metadata: ToggledOptionGroupMetadata,
 ): ToggledOptionGroup {
   return {
-    enabled: metadata.initialValue,
+    enabled: metadata.default,
     ...Object.fromEntries(
       Object.entries(metadata.group).map(([key, member]) => [
         key,
-        getInitialValue(member),
+        getdefault(member),
       ]),
     ),
   };

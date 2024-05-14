@@ -57,7 +57,7 @@ export const ToggledOptionGroupPanel: React.FC<
       )}
 
       {getOptionGroup().enabled && (
-        <div className={'padded'}>
+        <div className={'group'}>
           <OptionGroupPanel
             metadata={metadata}
             getAndSet={[
