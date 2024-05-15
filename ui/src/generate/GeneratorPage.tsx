@@ -9,7 +9,7 @@ import {
 import Markdown from 'react-markdown';
 import { ToggledOptionGroupArrayPanel } from './ToggledOptionGroupArrayPanel';
 import { OptionGroupPanel } from './OptionGroupPanel';
-import { ToggledOptionGroupPanel } from './ToggledOptionGroupPanel';
+import { ExpandableContainer } from '../common/ExpandableContainer';
 
 export const GeneratorPage: React.FC = () => {
   const service = new LocalGenerationService();
@@ -116,14 +116,19 @@ export const GeneratorPage: React.FC = () => {
           )}
         </div>
         <div className={'shadow-border flex-container__box--big padded'}>
-          <h1>Custom Input</h1>
-          <ToggledOptionGroupPanel
-            metadata={optionsMetadata.customInputs}
-            getAndSet={[
-              () => options.customInputs,
-              (v) => setOptions({ ...options, customInputs: v }),
-            ]}
-          />
+          <ExpandableContainer
+            header={<h1>Custom Input</h1>}
+            startExpanded={false}
+          >
+            <OptionGroupPanel
+              metadata={optionsMetadata.customInputs}
+              getAndSet={[
+                () => options.customInputs,
+                (v) => setOptions({ ...options, customInputs: v }),
+              ]}
+            />
+          </ExpandableContainer>
+
           <h1>Output Formatting</h1>
           <ToggledOptionGroupArrayPanel
             vertical

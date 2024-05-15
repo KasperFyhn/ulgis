@@ -12,6 +12,14 @@ export interface ToggledOptionGroup extends OptionGroup {
   enabled: boolean;
 }
 
+export function isEmptyOptionGroup(
+  optionGroup: OptionGroup | ToggledOptionGroup,
+): boolean {
+  return (
+    Object.entries(optionGroup).filter(([k, v]) => k !== 'enabled').length == 0
+  );
+}
+
 export interface ToggledOptionGroupArray {
   [key: string]: ToggledOptionGroup;
 }
@@ -21,9 +29,7 @@ export class GenerationOptions {
 
   taxonomies: ToggledOptionGroupArray = {};
   settings: OptionGroup = {};
-  customInputs: ToggledOptionGroup = {
-    enabled: true,
-  };
+  customInputs: OptionGroup = {};
   outputOptions: ToggledOptionGroupArray = {};
 }
 
@@ -236,9 +242,7 @@ export function initGenerationOptions(
   if (metadata === undefined) {
     return {
       taxonomies: {},
-      customInputs: {
-        enabled: false,
-      },
+      customInputs: {},
       outputOptions: {},
       settings: {},
     };

@@ -2,18 +2,25 @@
   background-color: midnightblue;
   color: white;
   display: flex;
-  align-items: center;
-  padding: 0 25px;
+  align-items: baseline;
+  padding: 5px 0px;
   position: fixed; /* Fix navbar at the top */
-  height: 35px;
+  height: 25px;
   width: 100%; /* Ensure it spans the full width */
+  min-width: 800px; /* Just some number to avoid wrapping of content */
   top: 0; /* Align to the top */
   left: 0; /* Align to the left */
   z-index: 1000; /* Make sure it stays on top of other content */
 }
 
 .navbar span {
+  font-weight: lighter;
+  font-size: large;
+}
+
+.navbar span b {
   font-weight: bold;
+  font-size: x-large;
 }
 
 .navbar a {
@@ -25,6 +32,26 @@
 
 .navbar a:hover {
   color: lightgray;
+}
+
+.sidebar-toggle {
+  all: unset;
+  font-size: x-large;
+  margin-left: 10px;
+  cursor: pointer;
+}
+
+.frontpage {
+  text-align: center;
+}
+
+.frontpage p {
+}
+
+.frontpage img {
+  display: block;
+  margin: auto;
+  width: min(600px, 95%);
 }
 
 .app {

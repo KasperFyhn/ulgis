@@ -66,8 +66,7 @@ class Settings(OptionGroup):
     )
 
 
-class CustomInputs(ToggledOptionGroup):
-    enabled: bool = False
+class CustomInputs(OptionGroup):
     custom_instruction: str = Field(
         title="Custom Instruction",
         description="Custom Instruction",
@@ -75,13 +74,20 @@ class CustomInputs(ToggledOptionGroup):
     extra_inputs: list[str] = Field(title="Extra Inputs", description="Extra inputs")
 
 
-class BulletPointOptions(ToggledOptionGroup):
+class SixLearningGoals(ToggledOptionGroup):
     enabled: bool = True
+
+
+class CompetencyProfile(ToggledOptionGroup):
+    pass
+
+
+class BulletPointOptions(ToggledOptionGroup):
     number_of_bullets: int = Field(
         10,
         title="Number of Bullets",
         description="The number of bullets that the LLM is instructed to write out.",
-        ge=0,
+        ge=1,
         le=25,
         json_schema_extra=dict(step=1),
     )
@@ -96,7 +102,7 @@ class ProseDescriptionOptions(ToggledOptionGroup):
         250,
         title="Number of Words",
         description="The number of words that the LLM is instructed to write out.",
-        ge=0,
+        ge=10,
         le=500,
         json_schema_extra=dict(step=1),
     )
@@ -109,7 +115,15 @@ class ProseDescriptionOptions(ToggledOptionGroup):
 
 class OutputOptions(ToggledOptionGroupArray):
     multiple: bool = False
-    as_bullet_points: BulletPointOptions = Field(
+    six_learning_goals: SixLearningGoals = Field(
+        title="6 Learning Goals",
+        description="Instruct the LLM to write out six learning goals.",
+    )
+    competency_profile: CompetencyProfile = Field(
+        title="Competency Profile",
+        description="Instruct the LLM to write out a competency profile.",
+    )
+    bullet_points: BulletPointOptions = Field(
         title="Bullet Points",
         description="Instruct the LLM to write in bullet points.",
     )
@@ -315,7 +329,7 @@ def create_metadata(field: FieldInfo):
 class GenerationOptionsMetadata(CamelModel):
     taxonomies: ToggledOptionGroupArrayMetadata
     settings: OptionGroupMetadata
-    custom_inputs: ToggledOptionGroupMetadata
+    custom_inputs: OptionGroupMetadata
     output_options: ToggledOptionGroupArrayMetadata
 
     @classmethod

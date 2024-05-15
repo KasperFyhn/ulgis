@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  isEmptyOptionGroup,
   OptionGroup,
   ToggledOptionGroup,
   ToggledOptionGroupMetadata,
@@ -30,11 +31,10 @@ export const ToggledOptionGroupPanel: React.FC<
         equalSize ? 'flex-container__box--equal-size' : 'flex-container__box'
       }
     >
-      {metadata.name}
       {!radioButtonName && (
         <input
           type={'checkbox'}
-          checked={getOptionGroup().enabled ?? false}
+          checked={getOptionGroup().enabled}
           onChange={(event) => {
             const obj = getOptionGroup();
             obj.enabled = event.target.checked;
@@ -46,7 +46,7 @@ export const ToggledOptionGroupPanel: React.FC<
         <input
           type={'radio'}
           name={radioButtonName}
-          checked={getOptionGroup().enabled ?? false}
+          checked={getOptionGroup().enabled}
           onChange={(event) => {
             if (disableAll) disableAll();
             const obj = getOptionGroup();
@@ -55,8 +55,9 @@ export const ToggledOptionGroupPanel: React.FC<
           }}
         />
       )}
+      <span>{metadata.name}</span>
 
-      {getOptionGroup().enabled && (
+      {getOptionGroup().enabled && !isEmptyOptionGroup(getOptionGroup()) && (
         <div className={'group'}>
           <OptionGroupPanel
             metadata={metadata}

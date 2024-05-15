@@ -45,19 +45,24 @@ def build_prompt(
     prompt += "\n\n"
 
     # output formatting
-    if options.output_options.as_bullet_points.enabled:
+    if options.output_options.six_learning_goals.enabled:
+        prompt += "The output should be six learning goals."
+    elif options.output_options.competency_profile.enabled:
+        prompt += "The output should be a 200 word competency profile."
+    elif options.output_options.bullet_points.enabled:
         prompt += (
-            f"The output should be in {options.output_options.as_bullet_points.number_of_bullets} bullet points "
-            f"which can {'' if options.output_options.as_bullet_points.nested else 'NOT'} be nested.\n\n"
+            f"The output should be in {options.output_options.bullet_points.number_of_bullets} bullet points "
+            f"which can {'' if options.output_options.bullet_points.nested else 'NOT'} be nested."
         )
     elif options.output_options.prose_description.enabled:
         prompt += (
             f"The output should be a prose description of {options.output_options.prose_description.number_of_words} "
             f"words and NOT bullet points. "
-            f"{'Include' if options.output_options.prose_description.headings else 'Do NOT include'} headings.\n\n"
+            f"{'Include' if options.output_options.prose_description.headings else 'Do NOT include'} headings."
         )
 
     if options.custom_inputs.custom_instruction:
-        prompt += options.custom_inputs.custom_instruction + "\n\n"
+        prompt += "\n\n"
+        prompt += options.custom_inputs.custom_instruction
 
     return prompt

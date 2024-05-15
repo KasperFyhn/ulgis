@@ -3,30 +3,41 @@ import React from 'react';
 import { BrowserRouter, Link, Route, Routes } from 'react-router-dom';
 import { GeneratorPage } from './generate/GeneratorPage';
 import { EvaluationPage } from './evaluate/EvaluationPage';
-import { ExpandableContainer } from './common/ExpandableContainer';
 
 const NavBar: React.FC = () => {
+  // TODO: create toggled sidebar instead of top navbar
+  // const [showSidebar, setShowSidebar] = React.useState(false);
+
   return (
     <header className={'navbar shadow-border'}>
-      <span>Outcome Synthesizer</span>
+      {/*<button*/}
+      {/*  className={'sidebar-toggle'}*/}
+      {/*  onClick={() => setShowSidebar(!showSidebar)}*/}
+      {/*>*/}
+      {/*  &equiv;*/}
+      {/*</button>*/}
+      <Link to={'/'}>
+        <span>
+          <b>U</b>niversal <b>L</b>earning <b>G</b>oal <b>I</b>nspirational{' '}
+          <b>S</b>ynthesizer
+        </span>
+      </Link>
       <Link to={'/generate'}>Generate</Link>
       <Link to={'/evaluate'}>Evaluate</Link>
-      <Link to={'/test'}>Test</Link>
       <Link to={'/about'}>About</Link>
+      {/*{showSidebar && <div>SideBar</div>}*/}
     </header>
   );
 };
 
-const TestPage: React.FC = () => {
+const FrontPage: React.FC = () => {
   return (
-    <div>
-      <ExpandableContainer
-        className={'shadow-border padded'}
-        header={<h2>test</h2>}
-      >
-        <p>Hello there</p>
-        <p>How are you?</p>
-      </ExpandableContainer>
+    <div className={'frontpage'}>
+      <img src={'img.png'} alt={'ULGIS Logo'} />
+      <p>
+        Welcome to ULGIS. Go to the <Link to={'/generate'}>generate</Link> page
+        to generate learning outcomes.
+      </p>
     </div>
   );
 };
@@ -38,11 +49,10 @@ const App: React.FC = () => {
       <div className="app">
         <div className={'app__content'}>
           <Routes>
-            <Route path="/" element={<p>Frontpage</p>} />
+            <Route path="/" element={<FrontPage />} />
             <Route path="/generate" element={<GeneratorPage />} />
             <Route path="/evaluate" element={<EvaluationPage />} />
-            <Route path="/test" element={<TestPage />} />
-            <Route path="/about" element={<p>Evaluate</p>} />
+            <Route path="/about" element={<p>Wow. Such empty.</p>} />
           </Routes>
         </div>
       </div>

@@ -3,15 +3,17 @@ import './ExpandableContainer.css';
 
 export interface ExpandableContainerProps extends React.PropsWithChildren {
   header?: React.ReactElement;
+  startExpanded?: boolean;
   className?: string;
 }
 
 export const ExpandableContainer: React.FC<ExpandableContainerProps> = ({
   children,
   header,
+  startExpanded,
   className,
 }) => {
-  const [expanded, setExpanded] = useState(false);
+  const [expanded, setExpanded] = useState(startExpanded === true);
   const toggleExpanded: () => void = () => setExpanded(!expanded);
 
   const renderHeader: () => React.ReactElement = () => {

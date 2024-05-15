@@ -154,6 +154,7 @@ const NumberSlider: React.FC<NumberSliderProps> = ({
         step={metadata.step}
         onChange={(event) => set(Number(event.target.value))}
       />
+      {metadata.max >= 10 && <>{get()}</>}
     </div>
   );
 };

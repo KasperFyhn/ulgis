@@ -16,7 +16,7 @@ export const OptionGroupPanel: React.FC<OptionGroupPanelProps> = ({
     <div>
       {Object.entries(metadata.group).map(([paramKey, paramMetadata]) => (
         <div key={paramKey}>
-          {paramMetadata.name}
+          <span>{paramMetadata.name} </span>
           <Options
             metadata={paramMetadata}
             getAndSet={[
