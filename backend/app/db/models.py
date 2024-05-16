@@ -4,7 +4,7 @@ from sqlalchemy.orm import Mapped, relationship
 from app.db.base import Base
 
 
-class Taxonomy(Base):
+class TaxonomyOrm(Base):
     __tablename__ = "taxonomies"
 
     id = Column(Integer, primary_key=True)
@@ -12,16 +12,17 @@ class Taxonomy(Base):
     short_description = Column(String)
     text = Column(Text)
 
-    parameters: Mapped[list["Parameter"]] = relationship(back_populates="taxonomy")
+    group: Mapped[list["ParameterOrm"]] = relationship(back_populates="taxonomy")
 
 
-class Parameter(Base):
+class ParameterOrm(Base):
     __tablename__ = "parameters"
 
+    type = "number"  # for Pydantic discrimination between option metadata types
     id = Column(Integer, primary_key=True)
     name = Column(String, unique=True, index=True)
     short_description = Column(String)
     default = Column(Integer)
 
     taxonomy_id = Column(Integer, ForeignKey("taxonomies.id"))
-    taxonomy: Mapped[Taxonomy] = relationship(back_populates="parameters")
+    taxonomy: Mapped[TaxonomyOrm] = relationship(back_populates="group")

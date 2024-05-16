@@ -12,8 +12,9 @@ from sqlalchemy.orm import Session, subqueryload
 
 from app import llm
 from app.db.base import SessionLocal
-from app.db.models import Taxonomy
-from app.models import GenerationOptions, GenerationOptionsMetadata, TaxonomyMetadata
+from app.db.models import TaxonomyOrm
+from app.models.metadata import create_metadata
+from app.models.models import GenerationOptions
 from app.prompt import build_prompt
 
 app = FastAPI()
@@ -43,24 +44,22 @@ def get_db():
         db.close()
 
 
-@app.get("/taxonomies", response_model=list[TaxonomyMetadata])
-def get_taxonomies(db: Session = Depends(get_db)) -> list[TaxonomyMetadata]:
-    taxonomies = db.query(Taxonomy).options(subqueryload(Taxonomy.parameters)).all()
-    return [
-        TaxonomyMetadata.model_validate(taxonomy, from_attributes=True)
-        for taxonomy in taxonomies
-    ]
+@app.get("/taxonomies")
+def get_taxonomies(db: Session = Depends(get_db)):
+    return db.query(TaxonomyOrm).options(subqueryload(TaxonomyOrm.group)).all()
 
 
 @app.get("/taxonomy_descriptions", response_model=dict[str, str])
 def get_taxonomy_texts(db: Session = Depends(get_db)) -> dict[str, str]:
-    name_and_text = db.query(Taxonomy).add_columns(Taxonomy.name, Taxonomy.text).all()
+    name_and_text = (
+        db.query(TaxonomyOrm).add_columns(TaxonomyOrm.name, TaxonomyOrm.text).all()
+    )
     return {taxonomy.name: taxonomy.text for taxonomy in name_and_text}
 
 
 @app.get("/generation_options_metadata")
 async def generation_options_metadata(db: Session = Depends(get_db)):
-    return GenerationOptionsMetadata.create(get_taxonomies(db))
+    return create_metadata(GenerationOptions, db)
 
 
 @app.get("/generation_options_schema")

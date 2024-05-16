@@ -1,5 +1,4 @@
-from app.models import GenerationOptions
-
+from app.models.models import GenerationOptions
 
 _attention_dict = {
     0: "no",
@@ -29,7 +28,7 @@ def build_prompt(
             for param_name, param_value in taxonomy_params.iter_options():
                 prompt += f"- Pay {_attention_dict[param_value]} attention to '{param_name}'.\n"
 
-        prompt += "\n"
+            prompt += "\n\n"
 
     # custom inputs
     if options.custom_inputs.extra_inputs:
