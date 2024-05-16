@@ -32,7 +32,7 @@ const StringOptions: React.FC<StringOptionsProps> = ({
 }: StringOptionsProps) => {
   const [get, set] = getAndSet;
   return (
-    <div>
+    <div className={'small-vert-margin'}>
       {options.map((option) => (
         <div key={option}>
           <input
@@ -44,6 +44,42 @@ const StringOptions: React.FC<StringOptionsProps> = ({
           <label>{option}</label>
         </div>
       ))}
+    </div>
+  );
+};
+
+interface NestedStringOptionsProps {
+  name: string;
+  nestedOptions: { [key: string]: string[] };
+  getAndSet: [() => string, (value: string) => void];
+}
+
+const NestedStringOptions: React.FC<NestedStringOptionsProps> = ({
+  name,
+  nestedOptions,
+  getAndSet,
+}: NestedStringOptionsProps) => {
+  const [get, set] = getAndSet;
+  return (
+    <div className={'flex-container--horiz small-vert-margin'}>
+      {Object.entries(nestedOptions).map(([optionName, options]) => {
+        return (
+          <div key={optionName}>
+            {optionName}
+            {options.map((option) => (
+              <div key={option}>
+                <input
+                  type={'radio'}
+                  name={name}
+                  checked={get() === option + ' (' + optionName + ')'}
+                  onChange={() => set(option + ' (' + optionName + ')')}
+                />
+                <label>{option}</label>
+              </div>
+            ))}
+          </div>
+        );
+      })}
     </div>
   );
 };
@@ -177,13 +213,23 @@ export const Options: React.FC<OptionsProps<OptionType>> = ({
       );
     case 'string':
       if (metadata.options) {
-        return (
-          <StringOptions
-            name={metadata.name}
-            options={metadata.options}
-            getAndSet={getAndSet as [() => string, (value: string) => void]}
-          />
-        );
+        if (Array.isArray(metadata.options)) {
+          return (
+            <StringOptions
+              name={metadata.name}
+              options={metadata.options}
+              getAndSet={getAndSet as [() => string, (value: string) => void]}
+            />
+          );
+        } else {
+          return (
+            <NestedStringOptions
+              name={metadata.name}
+              nestedOptions={metadata.options}
+              getAndSet={getAndSet as [() => string, (value: string) => void]}
+            />
+          );
+        }
       } else {
         return (
           <TextField

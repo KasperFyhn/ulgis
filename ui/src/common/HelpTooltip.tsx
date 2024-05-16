@@ -15,7 +15,7 @@ export const HelpTooltip: React.FC<HelpTooltipProps> = ({
   return (
     <span className={'circled-question-mark'} data-tooltip-id={tooltipId}>
       ?
-      <Tooltip id={tooltipId} delayShow={500}>
+      <Tooltip id={tooltipId} delayShow={500} style={{ maxWidth: '400px' }}>
         {content}
       </Tooltip>
     </span>

@@ -107,10 +107,8 @@ export const GeneratorPage: React.FC = () => {
           {creatingResponse && response === '' && <p>Connecting ...</p>}
           {!creatingResponse && (
             <>
-              <button onClick={createResponse}>
-                Generate learning outcomes
-              </button>
-              <button onClick={createPrompt}>Create prompt</button>
+              <button onClick={createResponse}>Run prompt on ULGIS</button>
+              <button onClick={createPrompt}>Show prompt</button>
               {/*<button onClick={getJsonSchema}>JSON Schema</button>*/}
             </>
           )}

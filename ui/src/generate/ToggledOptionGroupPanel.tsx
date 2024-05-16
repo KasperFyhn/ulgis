@@ -6,6 +6,7 @@ import {
   ToggledOptionGroupMetadata,
 } from './models';
 import { OptionGroupPanel } from './OptionGroupPanel';
+import { HelpTooltip } from '../common/HelpTooltip';
 
 export interface ToggledOptionGroupPanelProps {
   metadata: ToggledOptionGroupMetadata;
@@ -56,7 +57,9 @@ export const ToggledOptionGroupPanel: React.FC<
         />
       )}
       <span>{metadata.name}</span>
-
+      {metadata.description && (
+        <HelpTooltip tooltipId={metadata.name} content={metadata.description} />
+      )}
       {getOptionGroup().enabled && !isEmptyOptionGroup(getOptionGroup()) && (
         <div className={'group'}>
           <OptionGroupPanel

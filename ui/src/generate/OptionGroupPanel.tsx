@@ -1,6 +1,7 @@
 import { OptionGroup, OptionGroupMetadata } from './models';
 import { Options } from './Options';
 import React from 'react';
+import { HelpTooltip } from '../common/HelpTooltip';
 
 export interface OptionGroupPanelProps {
   metadata: OptionGroupMetadata;
@@ -16,7 +17,13 @@ export const OptionGroupPanel: React.FC<OptionGroupPanelProps> = ({
     <div>
       {Object.entries(metadata.group).map(([paramKey, paramMetadata]) => (
         <div key={paramKey}>
-          <span>{paramMetadata.name} </span>
+          <span>{paramMetadata.name}</span>
+          {paramMetadata.description && (
+            <HelpTooltip
+              tooltipId={paramMetadata.name}
+              content={paramMetadata.description}
+            />
+          )}
           <Options
             metadata={paramMetadata}
             getAndSet={[

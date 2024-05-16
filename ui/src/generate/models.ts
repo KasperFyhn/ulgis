@@ -53,7 +53,7 @@ export interface BooleanOptionMetadata
 export interface StringOptionMetadata
   extends PrimitiveOptionMetadataBase<string> {
   type: 'string';
-  options?: string[];
+  options?: string[] | { [key: string]: string[] };
   short?: boolean;
 }
 
@@ -185,17 +185,23 @@ export function resolveSchema(schemaRoot: SchemaRoot): ObjectSchema {
 
 // INITIALIZERS
 
-function getdefault(metadata: OptionMetadata): OptionType {
+function getDefault(metadata: OptionMetadata): OptionType {
   switch (metadata.type) {
     case 'boolean':
       return metadata.default ?? false;
     case 'number':
       return metadata.default ?? 0;
     case 'string':
-      if (metadata.options) {
-        return metadata.default ?? metadata.options[0];
+      if (metadata.default) {
+        return metadata.default;
+      } else if (metadata.options) {
+        if (Array.isArray(metadata.options)) {
+          return metadata.options[0];
+        } else {
+          return Object.values(metadata.options)[0][0];
+        }
       } else {
-        return metadata.default ?? '';
+        return '';
       }
     case 'stringArray':
       return metadata.default ?? [];
@@ -206,7 +212,7 @@ function initOptionGroup(metadata: OptionGroupMetadata): OptionGroup {
   return Object.fromEntries(
     Object.entries(metadata.group).map(([key, member]) => [
       key,
-      getdefault(member) as OptionType,
+      getDefault(member) as OptionType,
     ]),
   );
 }
@@ -219,7 +225,7 @@ function initToggledOptionGroup(
     ...Object.fromEntries(
       Object.entries(metadata.group).map(([key, member]) => [
         key,
-        getdefault(member),
+        getDefault(member),
       ]),
     ),
   };

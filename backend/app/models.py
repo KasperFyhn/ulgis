@@ -53,10 +53,15 @@ class Taxonomies(ToggledOptionGroupArray):
 
 class Settings(OptionGroup):
     education_level: str = Field(
+        default="Bachelor (Degree)",
         title="Education Level",
         description="Education level",
         json_schema_extra=dict(
-            options=["Bachelor", "Master", "PhD"],
+            options={
+                "Degree": ["Bachelor", "Master", "PhD"],
+                "NQF (DK)": ["1", "2", "3", "4", "5", "6", "7", "8"],
+                "NQF (EU)": ["1", "2", "3", "4", "5", "6", "7", "8"],
+            },
         ),
     )
     education_name: str = Field(
@@ -69,9 +74,13 @@ class Settings(OptionGroup):
 class CustomInputs(OptionGroup):
     custom_instruction: str = Field(
         title="Custom Instruction",
-        description="Custom Instruction",
+        description="Custom instructions for the LLM, for example: a specific context, language, situation, etc.",
     )
-    extra_inputs: list[str] = Field(title="Extra Inputs", description="Extra inputs")
+    extra_inputs: list[str] = Field(
+        title="Extra Inputs",
+        description="Extra inputs akin to taxonomies that the LLM should take into account, for example: previous "
+        "learning outcomes from study regulations, programme or course descriptions, etc.",
+    )
 
 
 class SixLearningGoals(ToggledOptionGroup):
@@ -170,7 +179,7 @@ class BooleanOptionMetadata(OptionMetadataBase):
 class StringOptionMetadata(OptionMetadataBase):
     type: Literal["string"] = "string"
     default: Optional[str] = None
-    options: Optional[list[str]] = None
+    options: Optional[list[str] | dict[str, list[str]]] = None
     short: Optional[bool] = None
 
 

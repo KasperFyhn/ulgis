@@ -45,6 +45,10 @@ textarea {
   padding: 20px;
 }
 
+.small-vert-margin {
+  margin: 5px 0;
+}
+
 .with-margin {
   margin: 30px;
 }
