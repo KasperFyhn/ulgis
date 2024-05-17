@@ -1,8 +1,8 @@
-from setuptools import setup
+from setuptools import setup, find_packages
 
 setup(
     name="app",
-    packages=["app"],
+    packages=find_packages(),
     install_requires=[
         "fastapi~=0.110.1",
         "fastapi_camelcase~=2.0.0",

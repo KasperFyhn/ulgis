@@ -30,6 +30,7 @@ def seed_database():
 
     parent_dir = os.path.dirname(__file__)
     seed_data_file = os.path.join(parent_dir, "seed_data.json")
+
     with open(seed_data_file) as in_file:
         seed_data = json.load(in_file)
         for name, taxonomy in seed_data.items():
