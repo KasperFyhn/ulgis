@@ -35,9 +35,12 @@ export class GenerationOptions {
 
 // METADATA CLASSES
 
+export type UiLevel = 'simple' | 'standard' | 'advanced';
+
 interface OptionMetadataBase {
   name: string;
   description?: string;
+  uiLevel: UiLevel;
 }
 
 interface PrimitiveOptionMetadataBase<T extends OptionType>
@@ -95,6 +98,65 @@ export interface GenerationOptionsMetadata {
   settings: OptionGroupMetadata;
   customInputs: ToggledOptionGroupMetadata;
   outputOptions: ToggledOptionGroupArrayMetadata;
+}
+
+const UiLevels = {
+  simple: 0,
+  standard: 1,
+  advanced: 2,
+} as const;
+
+function filterGroupByLevel(
+  metadata: OptionGroupMetadata,
+  uiLevel: UiLevel,
+): OptionGroupMetadata {
+  return {
+    ...metadata,
+    group: Object.fromEntries(
+      Object.entries(metadata.group).filter(
+        ([k, v]) => UiLevels[v.uiLevel] <= UiLevels[uiLevel],
+      ),
+    ),
+  };
+}
+
+function filterToggledGroupByLevel(
+  metadata: ToggledOptionGroupMetadata,
+  uiLevel: UiLevel,
+): ToggledOptionGroupMetadata {
+  return {
+    ...metadata,
+    ...filterGroupByLevel(metadata, uiLevel),
+  };
+}
+
+function filterToggledGroupArrayByLevel(
+  metadata: ToggledOptionGroupArrayMetadata,
+  uiLevel: UiLevel,
+): ToggledOptionGroupArrayMetadata {
+  return {
+    ...metadata,
+    groups: Object.fromEntries(
+      Object.entries(metadata.groups)
+        .filter(([k, v]) => UiLevels[v.uiLevel] <= UiLevels[uiLevel])
+        .map(([k, v]) => [k, filterToggledGroupByLevel(v, uiLevel)]),
+    ),
+  };
+}
+
+export function filterByLevel(
+  metadata: GenerationOptionsMetadata,
+  uiLevel: UiLevel,
+): GenerationOptionsMetadata {
+  return {
+    customInputs: filterToggledGroupByLevel(metadata.customInputs, uiLevel),
+    outputOptions: filterToggledGroupArrayByLevel(
+      metadata.outputOptions,
+      uiLevel,
+    ),
+    settings: filterGroupByLevel(metadata.settings, uiLevel),
+    taxonomies: filterToggledGroupArrayByLevel(metadata.taxonomies, uiLevel),
+  };
 }
 
 // METADATA CREATION

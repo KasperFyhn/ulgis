@@ -1,12 +1,41 @@
 import './App.css';
-import React from 'react';
+import React, { createContext, ReactNode, useContext, useState } from 'react';
 import { BrowserRouter, Link, Route, Routes } from 'react-router-dom';
 import { GeneratorPage } from './generate/GeneratorPage';
 import { EvaluationPage } from './evaluate/EvaluationPage';
+import { UiLevel } from './generate/models';
+
+const UiLevelContext = createContext<{
+  uiLevel: UiLevel;
+  setUiLevel: (level: UiLevel) => void;
+}>({
+  uiLevel: 'simple',
+  // eslint-disable-next-line @typescript-eslint/no-empty-function
+  setUiLevel: () => {},
+});
+
+const UiLevelProvider: React.FC<{
+  children: ReactNode;
+}> = ({ children }) => {
+  const [uiLevel, setUiLevel] = useState<UiLevel>('standard');
+
+  return (
+    <UiLevelContext.Provider value={{ uiLevel, setUiLevel }}>
+      {children}
+    </UiLevelContext.Provider>
+  );
+};
+
+export const useUiLevel: () => {
+  uiLevel: UiLevel;
+  setUiLevel: (level: UiLevel) => void;
+} = () => useContext(UiLevelContext);
 
 const NavBar: React.FC = () => {
   // TODO: create toggled sidebar instead of top navbar
   // const [showSidebar, setShowSidebar] = React.useState(false);
+
+  const { uiLevel, setUiLevel } = useUiLevel();
 
   return (
     <header className={'navbar shadow-border'}>
@@ -16,16 +45,32 @@ const NavBar: React.FC = () => {
       {/*>*/}
       {/*  &equiv;*/}
       {/*</button>*/}
-      <Link to={'/'}>
-        <span>
-          <b>U</b>niversal <b>L</b>earning <b>G</b>oal <b>I</b>nspirational{' '}
-          <b>S</b>ynthesizer
-        </span>
-      </Link>
-      <Link to={'/generate'}>Generate</Link>
-      <Link to={'/evaluate'}>Evaluate</Link>
-      <Link to={'/about'}>About</Link>
-      {/*{showSidebar && <div>SideBar</div>}*/}
+      <div className={'link-container'}>
+        <Link to={'/'}>
+          <span>
+            <b>U</b>niversal <b>L</b>earning <b>G</b>oal <b>I</b>nspirational{' '}
+            <b>S</b>ynthesizer
+          </span>
+        </Link>
+        <Link to={'/generate'}>Generate</Link>
+        <Link to={'/evaluate'}>Evaluate</Link>
+        <Link to={'/about'}>About</Link>
+        {/*{showSidebar && <div>SideBar</div>}*/}
+      </div>
+
+      <div className={'ui-level-selector'}>
+        UI Level:
+        <select
+          onChange={(event) => setUiLevel(event.target.value as UiLevel)}
+          value={uiLevel}
+        >
+          {['simple', 'standard', 'advanced'].map((level) => (
+            <option key={level} value={level}>
+              {level}
+            </option>
+          ))}
+        </select>
+      </div>
     </header>
   );
 };
@@ -45,17 +90,19 @@ const FrontPage: React.FC = () => {
 const App: React.FC = () => {
   return (
     <BrowserRouter>
-      <NavBar />
-      <div className="app">
-        <div className={'app__content'}>
-          <Routes>
-            <Route path="/" element={<FrontPage />} />
-            <Route path="/generate" element={<GeneratorPage />} />
-            <Route path="/evaluate" element={<EvaluationPage />} />
-            <Route path="/about" element={<p>Wow. Such empty.</p>} />
-          </Routes>
+      <UiLevelProvider>
+        <NavBar />
+        <div className="app">
+          <div className={'app__content'}>
+            <Routes>
+              <Route path="/" element={<FrontPage />} />
+              <Route path="/generate" element={<GeneratorPage />} />
+              <Route path="/evaluate" element={<EvaluationPage />} />
+              <Route path="/about" element={<p>Wow. Such empty.</p>} />
+            </Routes>
+          </div>
         </div>
-      </div>
+      </UiLevelProvider>
     </BrowserRouter>
   );
 };

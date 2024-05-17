@@ -92,7 +92,7 @@ class BulletPointOptions(ToggledOptionGroup):
         description="The number of bullets that the LLM is instructed to write out.",
         ge=1,
         le=25,
-        json_schema_extra=dict(step=1),
+        json_schema_extra=dict(step=1, ui_level="advanced"),
     )
     nested: bool = Field(
         title="Nested",
@@ -129,10 +129,12 @@ class OutputOptions(ToggledOptionGroupArray):
     bullet_points: BulletPointOptions = Field(
         title="Bullet Points",
         description="Instruct the LLM to write in bullet points.",
+        json_schema_extra=dict(ui_level="advanced"),
     )
     prose_description: ProseDescriptionOptions = Field(
         title="Prose Description",
         description="Instruct the LLM to write a prose description.",
+        json_schema_extra=dict(ui_level="advanced"),
     )
 
 

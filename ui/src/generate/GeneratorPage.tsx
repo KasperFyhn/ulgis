@@ -2,18 +2,28 @@ import '../common.css';
 import { LocalGenerationService } from './GenerationService';
 import React, { useEffect, useState } from 'react';
 import {
+  filterByLevel,
   GenerationOptions,
   GenerationOptionsMetadata,
   initGenerationOptions,
+  UiLevel,
 } from './models';
 import Markdown from 'react-markdown';
 import { ToggledOptionGroupArrayPanel } from './ToggledOptionGroupArrayPanel';
 import { OptionGroupPanel } from './OptionGroupPanel';
 import { ExpandableContainer } from '../common/ExpandableContainer';
+import { Options } from './Options';
+
+import { useUiLevel } from '../App';
 
 export const GeneratorPage: React.FC = () => {
   const service = new LocalGenerationService();
 
+  const { uiLevel, setUiLevel } = useUiLevel();
+
+  const [cachedOptionsMetadata, setCachedOptionsMetadata] = useState<
+    GenerationOptionsMetadata | undefined
+  >(undefined);
   const [optionsMetadata, setOptionsMetadata] = useState<
     GenerationOptionsMetadata | undefined
   >(undefined);
@@ -23,10 +33,17 @@ export const GeneratorPage: React.FC = () => {
   );
 
   useEffect(() => {
+    if (cachedOptionsMetadata !== undefined) {
+      setOptionsMetadata(() => filterByLevel(cachedOptionsMetadata, uiLevel));
+    }
+  }, [uiLevel]);
+
+  useEffect(() => {
     if (optionsMetadata === undefined) {
       service.getGenerationOptionsMetadata().then((metadata) => {
         console.log(metadata);
-        setOptionsMetadata(() => metadata);
+        setCachedOptionsMetadata(() => metadata);
+        setOptionsMetadata(() => filterByLevel(metadata, uiLevel));
         setOptions(() => initGenerationOptions(metadata));
       });
     }

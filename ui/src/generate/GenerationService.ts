@@ -1,9 +1,9 @@
 import {
   GenerationOptions,
   GenerationOptionsMetadata,
+  ObjectSchema,
   resolveSchema,
   SchemaRoot,
-  ObjectSchema,
 } from './models';
 
 export interface GenerationService {
@@ -38,8 +38,10 @@ export class MockGenerationService implements GenerationService {
                 type: 'number',
                 min: 1,
                 max: 100,
+                uiLevel: 'simple',
               },
             },
+            uiLevel: 'simple',
           },
           taxonomy2: {
             name: 'Taxonomy 2',
@@ -51,14 +53,18 @@ export class MockGenerationService implements GenerationService {
                 type: 'number',
                 min: 1,
                 max: 100,
+                uiLevel: 'simple',
               },
               parameter2: {
                 name: 'Parameter 1',
                 type: 'boolean',
+                uiLevel: 'simple',
               },
             },
+            uiLevel: 'advanced',
           },
         },
+        uiLevel: 'simple',
       },
 
       customInputs: {
@@ -68,8 +74,10 @@ export class MockGenerationService implements GenerationService {
           customInput: {
             name: 'Custom input',
             type: 'string',
+            uiLevel: 'advanced',
           },
         },
+        uiLevel: 'advanced',
       },
       outputOptions: {
         name: 'Output Options',
@@ -86,8 +94,10 @@ export class MockGenerationService implements GenerationService {
                 type: 'number',
                 min: 1,
                 max: 100,
+                uiLevel: 'simple',
               },
             },
+            uiLevel: 'simple',
           },
           option2: {
             name: 'Option 2',
@@ -99,10 +109,13 @@ export class MockGenerationService implements GenerationService {
                 type: 'number',
                 min: 1,
                 max: 100,
+                uiLevel: 'simple',
               },
             },
+            uiLevel: 'standard',
           },
         },
+        uiLevel: 'simple',
       },
 
       settings: {
@@ -112,8 +125,10 @@ export class MockGenerationService implements GenerationService {
             name: 'Setting 1',
             type: 'string',
             options: ['1', '2', '3'],
+            uiLevel: 'simple',
           },
         },
+        uiLevel: 'simple',
       },
     };
     return Promise.resolve(generationOptions);

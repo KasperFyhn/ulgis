@@ -1,13 +1,11 @@
 from typing import Optional, Literal, Union, Any, Callable, Type
 
 from annotated_types import Ge, Le
-from pydantic.fields import FieldInfo
-
-from sqlalchemy.orm import Session
-from typing_extensions import Annotated
-
 from fastapi_camelcase import CamelModel
 from pydantic import Field, field_validator, BaseModel
+from pydantic.fields import FieldInfo
+from sqlalchemy.orm import Session
+from typing_extensions import Annotated
 
 from app.models.models import (
     OptionGroup,
@@ -25,6 +23,7 @@ class OptionMetadataBase(CamelModel):
         default=None,
         validation_alias="short_description",
     )
+    ui_level: Literal["simple", "standard", "advanced"] = "simple"
 
 
 class BooleanOptionMetadata(OptionMetadataBase):
@@ -135,12 +134,22 @@ def _create_field_metadata(
         return BooleanOptionMetadata(
             name=field.title or "No name",
             description=field.description,
+            ui_level=(
+                field.json_schema_extra.get("ui_level", "simple")
+                if field.json_schema_extra
+                else "simple"
+            ),
             default=field.default,
         )
     elif field.annotation == float or field.annotation == int:
         return NumberOptionMetadata(
             name=field.title or "No name",
             description=field.description,
+            ui_level=(
+                field.json_schema_extra.get("ui_level", "simple")
+                if field.json_schema_extra
+                else "simple"
+            ),
             default=field.default,
             min=_get_from_metadata(field.metadata, Ge, lambda ge: float(ge.ge)),
             max=_get_from_metadata(field.metadata, Le, lambda le: float(le.le)),
@@ -152,6 +161,11 @@ def _create_field_metadata(
         return StringOptionMetadata(
             name=field.title or "No name",
             description=field.description,
+            ui_level=(
+                field.json_schema_extra.get("ui_level", "simple")
+                if field.json_schema_extra
+                else "simple"
+            ),
             default=field.default,
             options=(
                 field.json_schema_extra.get("options")
@@ -168,6 +182,11 @@ def _create_field_metadata(
         return StringArrayOptionMetadata(
             name=field.title or "No name",
             description=field.description,
+            ui_level=(
+                field.json_schema_extra.get("ui_level", "simple")
+                if field.json_schema_extra
+                else "simple"
+            ),
             default=field.default,
             options=(
                 field.json_schema_extra.get("options")
@@ -179,6 +198,11 @@ def _create_field_metadata(
         return OptionGroupMetadata(
             name=field.title or "No name",
             description=field.description,
+            ui_level=(
+                field.json_schema_extra.get("ui_level", "simple")
+                if field.json_schema_extra
+                else "simple"
+            ),
             group={
                 # alias to get camelCase naming
                 v.alias: _create_field_metadata(v, db)
@@ -190,6 +214,11 @@ def _create_field_metadata(
         return ToggledOptionGroupMetadata(
             name=field.title or "No name",
             description=field.description,
+            ui_level=(
+                field.json_schema_extra.get("ui_level", "simple")
+                if field.json_schema_extra
+                else "simple"
+            ),
             default=field.annotation.model_fields["enabled"].default,
             group={
                 v.alias: _create_field_metadata(v, db)
@@ -202,6 +231,11 @@ def _create_field_metadata(
         return ToggledOptionGroupArrayMetadata(
             name=field.title or "No name",
             description=field.description,
+            ui_level=(
+                field.json_schema_extra.get("ui_level", "simple")
+                if field.json_schema_extra
+                else "simple"
+            ),
             multiple=field.annotation.model_fields["multiple"].default,
             groups={
                 # alias to get camelCase naming
