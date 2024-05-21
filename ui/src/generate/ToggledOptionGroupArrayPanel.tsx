@@ -49,13 +49,16 @@ export const ToggledOptionGroupArrayPanel: React.FC<
           equalSize
           key={key}
           metadata={taxonomyMetadata}
-          radioButtonName={metadata.multiple ? undefined : metadata.name}
-          disableAll={() => {
-            for (const optionGroupKey in getOptionGroupArray()) {
-              const optionGroup = getOptionGroupArray()[optionGroupKey];
-              optionGroup.enabled = false;
-            }
-          }}
+          disableAll={
+            metadata.multiple
+              ? undefined
+              : () => {
+                  for (const optionGroupKey in getOptionGroupArray()) {
+                    const optionGroup = getOptionGroupArray()[optionGroupKey];
+                    optionGroup.enabled = false;
+                  }
+                }
+          }
           getAndSet={[
             () => getOptionGroupArray()[key],
             (value) => {

@@ -1,0 +1,15 @@
+.toggle-button {
+  box-shadow: unset;
+  color: unset;
+  background-color: white;
+  border: 1px solid deepskyblue;
+  border-radius: 50px;
+  padding: 4px 8px;
+  cursor: pointer;
+  transition: all 0.5s ease;
+}
+
+.toggle-button.toggled {
+  background-color: deepskyblue;
+  color: white;
+}

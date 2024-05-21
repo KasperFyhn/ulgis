@@ -1,21 +1,29 @@
 import React from 'react';
 import { NumberOptionMetadata, OptionMetadata, OptionType } from './models';
 import './Options.css';
+import { ToggleButton } from '../common/ToggleButton';
+import 'react-tooltip/dist/react-tooltip.css';
 
 interface BooleanToggleProps {
+  text: string;
+  tooltipText?: string;
   getAndSet: [() => boolean, (value: boolean) => void];
 }
 
 const BooleanToggle: React.FC<BooleanToggleProps> = ({
+  text,
+  tooltipText,
   getAndSet,
 }: BooleanToggleProps) => {
   const [get, set] = getAndSet;
   return (
-    <input
-      type={'checkbox'}
+    <ToggleButton
       checked={get()}
-      onChange={(event) => set(event.target.checked)}
-    />
+      onChange={(value) => set(value)}
+      tooltipText={tooltipText}
+    >
+      {text}
+    </ToggleButton>
   );
 };
 
@@ -98,18 +106,18 @@ const MultipleStringOptions: React.FC<MultipleStringOptionsProps> = ({
     <div className={'flex-container--horiz'}>
       {options.map((option) => (
         <span key={option}>
-          <input
-            type={'checkbox'}
-            onChange={(event) => {
+          <ToggleButton
+            checked={option in get()}
+            onChange={(value) => {
               let picked = get();
-              if (event.target.checked) {
+              if (value) {
                 picked.push(option);
               } else {
                 picked = picked.filter((o) => o !== option);
               }
               set([...picked]);
             }}
-          />
+          ></ToggleButton>
           {option}
         </span>
       ))}
@@ -208,6 +216,8 @@ export const Options: React.FC<OptionsProps<OptionType>> = ({
     case 'boolean':
       return (
         <BooleanToggle
+          text={metadata.name}
+          tooltipText={metadata.description}
           getAndSet={getAndSet as [() => boolean, (value: boolean) => void]}
         />
       );

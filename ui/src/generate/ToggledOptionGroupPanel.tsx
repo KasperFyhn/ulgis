@@ -6,11 +6,10 @@ import {
   ToggledOptionGroupMetadata,
 } from './models';
 import { OptionGroupPanel } from './OptionGroupPanel';
-import { HelpTooltip } from '../common/HelpTooltip';
+import { ToggleButton } from '../common/ToggleButton';
 
 export interface ToggledOptionGroupPanelProps {
   metadata: ToggledOptionGroupMetadata;
-  radioButtonName?: string;
   disableAll?: () => void;
   getAndSet: [() => ToggledOptionGroup, (value: ToggledOptionGroup) => void];
   equalSize?: boolean;
@@ -20,7 +19,6 @@ export const ToggledOptionGroupPanel: React.FC<
   ToggledOptionGroupPanelProps
 > = ({
   metadata,
-  radioButtonName,
   disableAll,
   getAndSet,
   equalSize,
@@ -32,34 +30,20 @@ export const ToggledOptionGroupPanel: React.FC<
         equalSize ? 'flex-container__box--equal-size' : 'flex-container__box'
       }
     >
-      {!radioButtonName && (
-        <input
-          type={'checkbox'}
-          checked={getOptionGroup().enabled}
-          onChange={(event) => {
-            const obj = getOptionGroup();
-            obj.enabled = event.target.checked;
-            setOptionGroup({ ...obj });
-          }}
-        />
-      )}
-      {radioButtonName && (
-        <input
-          type={'radio'}
-          name={radioButtonName}
-          checked={getOptionGroup().enabled}
-          onChange={(event) => {
-            if (disableAll) disableAll();
-            const obj = getOptionGroup();
-            obj.enabled = event.target.checked;
-            setOptionGroup({ ...obj });
-          }}
-        />
-      )}
-      <span>{metadata.name}</span>
-      {metadata.description && (
-        <HelpTooltip tooltipId={metadata.name} content={metadata.description} />
-      )}
+      <ToggleButton
+        checked={getOptionGroup().enabled}
+        onChange={(value) => {
+          if (disableAll && !value) return;
+          if (disableAll) disableAll();
+          const obj = getOptionGroup();
+          obj.enabled = value;
+          setOptionGroup({ ...obj });
+        }}
+        tooltipText={metadata.description}
+      >
+        {metadata.name}
+      </ToggleButton>
+
       {getOptionGroup().enabled && !isEmptyOptionGroup(getOptionGroup()) && (
         <div className={'group'}>
           <OptionGroupPanel

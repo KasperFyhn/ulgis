@@ -11,7 +11,7 @@
   min-width: 800px; /* Just some number to avoid wrapping of content */
   top: 0; /* Align to the top */
   left: 0; /* Align to the left */
-  z-index: 1000; /* Make sure it stays on top of other content */
+  z-index: 10; /* Make sure it stays on top of other content */
 }
 
 .navbar span {
