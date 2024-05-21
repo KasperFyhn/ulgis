@@ -48,8 +48,8 @@ const NavBar: React.FC = () => {
       <div className={'link-container'}>
         <Link to={'/'}>
           <span>
-            <b>U</b>niversal <b>L</b>earning <b>G</b>oal <b>I</b>nspirational{' '}
-            <b>S</b>ynthesizer
+            <b>U</b>niversal <b>L</b>earning <b>G</b>oal <b>I</b>
+            nspirational <b>S</b>ynthesizer
           </span>
         </Link>
         <Link to={'/generate'}>Generate</Link>

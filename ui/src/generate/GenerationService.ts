@@ -1,10 +1,4 @@
-import {
-  GenerationOptions,
-  GenerationOptionsMetadata,
-  ObjectSchema,
-  resolveSchema,
-  SchemaRoot,
-} from './models';
+import { GenerationOptions, GenerationOptionsMetadata } from './models';
 
 export interface GenerationService {
   getGenerationOptionsMetadata(): Promise<GenerationOptionsMetadata>;
@@ -139,16 +133,6 @@ export class MockGenerationService implements GenerationService {
       'This prompt is from a mock generation service. Options:\n\n' +
         JSON.stringify(options, null, 2).replaceAll('\n', '\n\n\t'),
     );
-  }
-
-  async getGenerationOptionsSchema(): Promise<ObjectSchema> {
-    const response = await fetch(
-      'http://localhost:8000/generation_options_schema',
-    );
-
-    return await response
-      .json()
-      .then((json: SchemaRoot) => resolveSchema(json));
   }
 
   generate(options: GenerationOptions): Promise<string> {

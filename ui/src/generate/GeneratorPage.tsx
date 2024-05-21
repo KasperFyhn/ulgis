@@ -6,20 +6,18 @@ import {
   GenerationOptions,
   GenerationOptionsMetadata,
   initGenerationOptions,
-  UiLevel,
 } from './models';
 import Markdown from 'react-markdown';
 import { ToggledOptionGroupArrayPanel } from './ToggledOptionGroupArrayPanel';
 import { OptionGroupPanel } from './OptionGroupPanel';
 import { ExpandableContainer } from '../common/ExpandableContainer';
-import { Options } from './Options';
 
 import { useUiLevel } from '../App';
 
 export const GeneratorPage: React.FC = () => {
   const service = new LocalGenerationService();
 
-  const { uiLevel, setUiLevel } = useUiLevel();
+  const { uiLevel } = useUiLevel();
 
   const [cachedOptionsMetadata, setCachedOptionsMetadata] = useState<
     GenerationOptionsMetadata | undefined
@@ -36,7 +34,7 @@ export const GeneratorPage: React.FC = () => {
     if (cachedOptionsMetadata !== undefined) {
       setOptionsMetadata(() => filterByLevel(cachedOptionsMetadata, uiLevel));
     }
-  }, [uiLevel]);
+  }, [uiLevel, cachedOptionsMetadata]);
 
   useEffect(() => {
     if (optionsMetadata === undefined) {
@@ -76,15 +74,6 @@ export const GeneratorPage: React.FC = () => {
       setCreatingResponse(false);
     });
   };
-
-  // const getJsonSchema: () => void = () => {
-  //   setCreatingResponse(true);
-  //   setResponse('Creating prompt ...');
-  //   service.getGenerationOptionsSchema().then((schema) => {
-  //     setResponse(JSON.stringify(schema, null, 2).replaceAll('\n', '\n\n\t'));
-  //     setCreatingResponse(false);
-  //   });
-  // };
 
   if (optionsMetadata === undefined) {
     return <div>Loading...</div>;
@@ -126,37 +115,41 @@ export const GeneratorPage: React.FC = () => {
             <>
               <button onClick={createResponse}>Run prompt on ULGIS</button>
               <button onClick={createPrompt}>Show prompt</button>
-              {/*<button onClick={getJsonSchema}>JSON Schema</button>*/}
             </>
           )}
         </div>
         <div className={'shadow-border flex-container__box--big padded'}>
-          <ExpandableContainer
-            header={<h1>Custom Input</h1>}
-            startExpanded={false}
-          >
-            <OptionGroupPanel
-              metadata={optionsMetadata.customInputs}
-              getAndSet={[
-                () => options.customInputs,
-                (v) => setOptions({ ...options, customInputs: v }),
-              ]}
-            />
-          </ExpandableContainer>
-
-          <h1>Output Formatting</h1>
-          <ToggledOptionGroupArrayPanel
-            vertical
-            metadata={optionsMetadata.outputOptions}
-            getAndSet={[
-              () => options.outputOptions,
-              (v) =>
-                setOptions({
-                  ...options,
-                  outputOptions: v,
-                }),
-            ]}
-          />
+          {Object.keys(optionsMetadata.outputOptions.groups).length > 0 && (
+            <>
+              <h1>Output Formatting</h1>
+              <ToggledOptionGroupArrayPanel
+                vertical
+                metadata={optionsMetadata.outputOptions}
+                getAndSet={[
+                  () => options.outputOptions,
+                  (v) =>
+                    setOptions({
+                      ...options,
+                      outputOptions: v,
+                    }),
+                ]}
+              />
+            </>
+          )}
+          {Object.keys(optionsMetadata.customInputs.group).length > 0 && (
+            <ExpandableContainer
+              header={<h1>Custom Input</h1>}
+              startExpanded={false}
+            >
+              <OptionGroupPanel
+                metadata={optionsMetadata.customInputs}
+                getAndSet={[
+                  () => options.customInputs,
+                  (v) => setOptions({ ...options, customInputs: v }),
+                ]}
+              />
+            </ExpandableContainer>
+          )}
         </div>
       </div>
     </div>

@@ -15,9 +15,7 @@ export interface ToggledOptionGroup extends OptionGroup {
 export function isEmptyOptionGroup(
   optionGroup: OptionGroup | ToggledOptionGroup,
 ): boolean {
-  return (
-    Object.entries(optionGroup).filter(([k, v]) => k !== 'enabled').length == 0
-  );
+  return Object.keys(optionGroup).filter((k) => k !== 'enabled').length == 0;
 }
 
 export interface ToggledOptionGroupArray {
@@ -100,7 +98,10 @@ export interface GenerationOptionsMetadata {
   outputOptions: ToggledOptionGroupArrayMetadata;
 }
 
-const UiLevels = {
+const UiLevel = {
+  // TODO: consider this: being the lowest should ultimately be decided by its
+  //  parents, right?
+  inherit: -1,
   simple: 0,
   standard: 1,
   advanced: 2,
@@ -114,7 +115,7 @@ function filterGroupByLevel(
     ...metadata,
     group: Object.fromEntries(
       Object.entries(metadata.group).filter(
-        ([k, v]) => UiLevels[v.uiLevel] <= UiLevels[uiLevel],
+        (entry) => UiLevel[entry[1].uiLevel] <= UiLevel[uiLevel],
       ),
     ),
   };
@@ -138,7 +139,7 @@ function filterToggledGroupArrayByLevel(
     ...metadata,
     groups: Object.fromEntries(
       Object.entries(metadata.groups)
-        .filter(([k, v]) => UiLevels[v.uiLevel] <= UiLevels[uiLevel])
+        .filter((entry) => UiLevel[entry[1].uiLevel] <= UiLevel[uiLevel])
         .map(([k, v]) => [k, filterToggledGroupByLevel(v, uiLevel)]),
     ),
   };
@@ -156,92 +157,6 @@ export function filterByLevel(
     ),
     settings: filterGroupByLevel(metadata.settings, uiLevel),
     taxonomies: filterToggledGroupArrayByLevel(metadata.taxonomies, uiLevel),
-  };
-}
-
-// METADATA CREATION
-
-interface Field {
-  title?: string;
-  description?: string;
-}
-
-interface SchemaRef {
-  $ref: string;
-}
-
-interface FieldSchemaRef extends Field {
-  title?: string;
-  description?: string;
-  allOf?: SchemaRef[];
-  additionalProperties?: SchemaRef;
-}
-
-export interface ObjectSchema extends Field {
-  properties: {
-    [key: string]: ObjectSchema | OptionMetadata | SchemaRef | FieldSchemaRef;
-  };
-  additionalProperties?: ObjectSchema | SchemaRef;
-}
-
-export interface SchemaRoot extends ObjectSchema {
-  $defs: { [key: string]: ObjectSchema };
-}
-
-export function resolveSchema(schemaRoot: SchemaRoot): ObjectSchema {
-  const defs = schemaRoot.$defs;
-
-  const resolveRef = (ref: string): ObjectSchema => {
-    const split = ref.split('/');
-    if (split.length > 1) {
-      const name = split[split.length - 1];
-      return defs[name];
-    } else {
-      throw Error();
-    }
-  };
-
-  const resolveProperty = (
-    property: SchemaRef | FieldSchemaRef | ObjectSchema | OptionMetadata,
-  ) => {
-    if ('$ref' in property) {
-      property = resolveRef(property.$ref);
-    } else if ('allOf' in property && property.allOf !== undefined) {
-      property = {
-        ...resolveRef(property.allOf[0].$ref),
-        title: property.title,
-        description: property.description,
-      };
-      if (
-        'additionalProperties' in property &&
-        property.additionalProperties !== undefined &&
-        '$ref' in property.additionalProperties
-      ) {
-        property.additionalProperties = resolveRef(
-          property.additionalProperties.$ref,
-        );
-      }
-    }
-
-    if ('properties' in property && property.properties !== undefined) {
-      property.properties = Object.fromEntries(
-        Object.entries(property.properties).map(([key, prop]) => [
-          key,
-          resolveProperty(prop),
-        ]),
-      );
-    }
-
-    return property;
-  };
-
-  return {
-    properties: Object.fromEntries(
-      Object.entries(schemaRoot.properties).map(([key, prop]) => [
-        key,
-        resolveProperty(prop),
-      ]),
-    ),
   };
 }
 

@@ -62,11 +62,6 @@ async def generation_options_metadata(db: Session = Depends(get_db)):
     return create_metadata(GenerationOptions, db)
 
 
-@app.get("/generation_options_schema")
-async def generation_options_schema(db: Session = Depends(get_db)):
-    return GenerationOptions.model_json_schema()
-
-
 @app.post("/generate_outcomes")
 async def generate_outcomes(request: GenerationOptions, db: Session = Depends(get_db)):
     logger.debug(request)

@@ -11,6 +11,7 @@ class TaxonomyOrm(Base):
     name = Column(String, unique=True, index=True)
     short_description = Column(String)
     text = Column(Text)
+    ui_level = Column(String)
 
     group: Mapped[list["ParameterOrm"]] = relationship(back_populates="taxonomy")
 

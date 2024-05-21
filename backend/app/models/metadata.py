@@ -3,7 +3,7 @@ from typing import Optional, Literal, Union, Any, Callable, Type
 from annotated_types import Ge, Le
 from fastapi_camelcase import CamelModel
 from pydantic import Field, field_validator, BaseModel
-from pydantic.fields import FieldInfo
+from pydantic.fields import FieldInfo  # noqa
 from sqlalchemy.orm import Session
 from typing_extensions import Annotated
 
@@ -23,7 +23,7 @@ class OptionMetadataBase(CamelModel):
         default=None,
         validation_alias="short_description",
     )
-    ui_level: Literal["simple", "standard", "advanced"] = "simple"
+    ui_level: Literal["inherit", "simple", "standard", "advanced"] = "inherit"
 
 
 class BooleanOptionMetadata(OptionMetadataBase):
@@ -100,12 +100,38 @@ class ToggledOptionGroupArrayMetadata(OptionMetadataBase):
     groups: dict[str, ToggledOptionGroupMetadata]
 
 
-def _get_from_metadata(
-    metadata: list[Any], clazz: type, cast: Callable[[Any], Any] = lambda x: x
+def _get_from_field_metadata(
+    field: FieldInfo, clazz: type, cast: Callable[[Any], Any] = lambda x: x
 ) -> Optional[Any]:
-    for field in metadata:
-        if isinstance(field, clazz):
-            return cast(field)
+    for prop in field.metadata:
+        if isinstance(prop, clazz):
+            return cast(prop)
+
+
+def _get_from_json_schema_extra(
+    field: FieldInfo, property_name: str, default_value: Any
+) -> Any:
+    if field.json_schema_extra and property_name in field.json_schema_extra:
+        return field.json_schema_extra[property_name]
+    else:
+        return default_value
+
+
+def _model_fields_metadata(model: Type[BaseModel], db: Session, *exclude: str) -> dict[
+    str,
+    BooleanOptionMetadata
+    | NumberOptionMetadata
+    | StringOptionMetadata
+    | StringArrayOptionMetadata
+    | OptionGroupMetadata
+    | ToggledOptionGroupMetadata
+    | ToggledOptionGroupArrayMetadata,
+]:
+    return {
+        v.alias: _create_field_metadata(v, db)
+        for k, v in model.model_fields.items()
+        if k not in exclude
+    }
 
 
 def _populate_from_orm_dependencies(
@@ -132,40 +158,26 @@ def _create_field_metadata(
 ):
     if field.annotation == bool:
         return BooleanOptionMetadata(
-            name=field.title or "No name",
+            name=field.title or field.alias,
             description=field.description,
-            ui_level=(
-                field.json_schema_extra.get("ui_level", "simple")
-                if field.json_schema_extra
-                else "simple"
-            ),
+            ui_level=_get_from_json_schema_extra(field, "ui_level", "inherit"),
             default=field.default,
         )
     elif field.annotation == float or field.annotation == int:
         return NumberOptionMetadata(
-            name=field.title or "No name",
+            name=field.title or field.alias,
             description=field.description,
-            ui_level=(
-                field.json_schema_extra.get("ui_level", "simple")
-                if field.json_schema_extra
-                else "simple"
-            ),
+            ui_level=_get_from_json_schema_extra(field, "ui_level", "inherit"),
             default=field.default,
-            min=_get_from_metadata(field.metadata, Ge, lambda ge: float(ge.ge)),
-            max=_get_from_metadata(field.metadata, Le, lambda le: float(le.le)),
-            step=(
-                field.json_schema_extra.get("step") if field.json_schema_extra else None
-            ),
+            min=_get_from_field_metadata(field, Ge, lambda ge: float(ge.ge)),
+            max=_get_from_field_metadata(field, Le, lambda le: float(le.le)),
+            step=_get_from_json_schema_extra(field, "step", 1),
         )
     elif field.annotation == str:
         return StringOptionMetadata(
-            name=field.title or "No name",
+            name=field.title or field.alias,
             description=field.description,
-            ui_level=(
-                field.json_schema_extra.get("ui_level", "simple")
-                if field.json_schema_extra
-                else "simple"
-            ),
+            ui_level=_get_from_json_schema_extra(field, "ui_level", "inherit"),
             default=field.default,
             options=(
                 field.json_schema_extra.get("options")
@@ -180,13 +192,9 @@ def _create_field_metadata(
         )
     elif field.annotation == list[str]:
         return StringArrayOptionMetadata(
-            name=field.title or "No name",
+            name=field.title or field.alias,
             description=field.description,
-            ui_level=(
-                field.json_schema_extra.get("ui_level", "simple")
-                if field.json_schema_extra
-                else "simple"
-            ),
+            ui_level=_get_from_json_schema_extra(field, "ui_level", "inherit"),
             default=field.default,
             options=(
                 field.json_schema_extra.get("options")
@@ -196,53 +204,28 @@ def _create_field_metadata(
         )
     elif issubclass(field.annotation, OptionGroup):
         return OptionGroupMetadata(
-            name=field.title or "No name",
+            name=field.title or field.alias,
             description=field.description,
-            ui_level=(
-                field.json_schema_extra.get("ui_level", "simple")
-                if field.json_schema_extra
-                else "simple"
-            ),
-            group={
-                # alias to get camelCase naming
-                v.alias: _create_field_metadata(v, db)
-                for k, v in field.annotation.model_fields.items()
-            }
+            ui_level=_get_from_json_schema_extra(field, "ui_level", "inherit"),
+            group=_model_fields_metadata(field.annotation, db)
             | _populate_from_orm_dependencies(field.annotation, db),
         )
     elif issubclass(field.annotation, ToggledOptionGroup):
         return ToggledOptionGroupMetadata(
-            name=field.title or "No name",
+            name=field.title or field.alias,
             description=field.description,
-            ui_level=(
-                field.json_schema_extra.get("ui_level", "simple")
-                if field.json_schema_extra
-                else "simple"
-            ),
+            ui_level=_get_from_json_schema_extra(field, "ui_level", "inherit"),
             default=field.annotation.model_fields["enabled"].default,
-            group={
-                v.alias: _create_field_metadata(v, db)
-                for k, v in field.annotation.model_fields.items()
-                if k != "enabled"
-            }
+            group=_model_fields_metadata(field.annotation, db, "enabled")
             | _populate_from_orm_dependencies(field.annotation, db),
         )
     elif issubclass(field.annotation, ToggledOptionGroupArray):
         return ToggledOptionGroupArrayMetadata(
-            name=field.title or "No name",
+            name=field.title or field.alias,
             description=field.description,
-            ui_level=(
-                field.json_schema_extra.get("ui_level", "simple")
-                if field.json_schema_extra
-                else "simple"
-            ),
+            ui_level=_get_from_json_schema_extra(field, "ui_level", "inherit"),
             multiple=field.annotation.model_fields["multiple"].default,
-            groups={
-                # alias to get camelCase naming
-                v.alias: _create_field_metadata(v, db)
-                for k, v in field.annotation.model_fields.items()
-                if k != "multiple" and k != "extras"
-            }
+            groups=_model_fields_metadata(field.annotation, db, "multiple")
             | _populate_from_orm_dependencies(field.annotation, db),
         )
     else:

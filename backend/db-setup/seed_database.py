@@ -40,6 +40,7 @@ def seed_database():
                         name=name,
                         short_description=taxonomy["short_description"],
                         text=taxonomy["text"],
+                        ui_level=taxonomy["ui_level"],
                         group=[
                             default_param(param) for param in taxonomy["parameters"]
                         ],

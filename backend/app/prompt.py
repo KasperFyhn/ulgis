@@ -44,8 +44,8 @@ def build_prompt(
     prompt += "\n\n"
 
     # output formatting
-    if options.output_options.six_learning_goals.enabled:
-        prompt += "The output should be six learning goals."
+    if options.output_options.learning_goals.enabled:
+        prompt += "The output should be a list of minimum five learning goals."
     elif options.output_options.competency_profile.enabled:
         prompt += "The output should be a 200 word competency profile."
     elif options.output_options.bullet_points.enabled:

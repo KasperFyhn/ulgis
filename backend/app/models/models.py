@@ -51,17 +51,17 @@ class TaxonomyArray(ToggledOptionGroupArray):
 
 class Settings(OptionGroup):
     education_level: str = Field(
-        "Bachelor (Degree)",
+        "Bachelor",
         title="Education Level",
         description="Education level",
         json_schema_extra=dict(
-            options=["Bachelor", "Master", "PhD"], view_level="simple"
+            options=["Bachelor", "Master", "PhD"], ui_level="simple"
         ),
     )
     education_name: str = Field(
         title="Education Name",
         description="Education name",
-        json_schema_extra=dict(short=True),
+        json_schema_extra=dict(short=True, ui_level="simple"),
     )
 
 
@@ -69,15 +69,17 @@ class CustomInputs(OptionGroup):
     custom_instruction: str = Field(
         title="Custom Instruction",
         description="Custom instructions for the LLM, for example: a specific context, language, situation, etc.",
+        json_schema_extra=dict(ui_level="advanced"),
     )
     extra_inputs: list[str] = Field(
         title="Extra Inputs",
         description="Extra inputs akin to taxonomies that the LLM should take into account, for example: previous "
         "learning outcomes from study regulations, programme or course descriptions, etc.",
+        json_schema_extra=dict(ui_level="advanced"),
     )
 
 
-class SixLearningGoals(ToggledOptionGroup):
+class LearningGoals(ToggledOptionGroup):
     enabled: bool = True
 
 
@@ -118,9 +120,9 @@ class ProseDescriptionOptions(ToggledOptionGroup):
 
 class OutputOptions(ToggledOptionGroupArray):
     multiple: bool = False
-    six_learning_goals: SixLearningGoals = Field(
-        title="6 Learning Goals",
-        description="Instruct the LLM to write out six learning goals.",
+    learning_goals: LearningGoals = Field(
+        title="Learning Goals",
+        description="Instruct the LLM to write out learning goals.",
     )
     competency_profile: CompetencyProfile = Field(
         title="Competency Profile",
@@ -143,6 +145,7 @@ class GenerationOptions(CamelModel):
     settings: Settings = Field(
         title="Settings",
         description="Settings",
+        json_schema_extra=dict(ui_level="simple"),
     )
     custom_inputs: CustomInputs = Field(
         title="Custom Inputs",

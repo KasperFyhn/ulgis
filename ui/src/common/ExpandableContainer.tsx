@@ -22,7 +22,7 @@ export const ExpandableContainer: React.FC<ExpandableContainerProps> = ({
         header,
         {
           onClick: toggleExpanded,
-          style: { cursor: 'default', display: 'inline' },
+          style: { cursor: 'default', display: 'inline-block' },
         },
         <>
           {expanded ? <>&#9660; </> : <>&#9658; </>}
