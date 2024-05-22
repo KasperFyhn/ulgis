@@ -4,6 +4,7 @@ import { BrowserRouter, Link, Route, Routes } from 'react-router-dom';
 import { GeneratorPage } from './generate/GeneratorPage';
 import { EvaluationPage } from './evaluate/EvaluationPage';
 import { UiLevel } from './generate/models';
+import { MultiValueToggle } from './common/MultiValueToggle';
 
 const UiLevelContext = createContext<{
   uiLevel: UiLevel;
@@ -37,6 +38,8 @@ const NavBar: React.FC = () => {
 
   const { uiLevel, setUiLevel } = useUiLevel();
 
+  const [selected, setSelected] = useState('one');
+
   return (
     <header className={'navbar shadow-border'}>
       {/*<button*/}
@@ -59,17 +62,14 @@ const NavBar: React.FC = () => {
       </div>
 
       <div className={'ui-level-selector'}>
-        UI Level:
-        <select
-          onChange={(event) => setUiLevel(event.target.value as UiLevel)}
-          value={uiLevel}
-        >
-          {['simple', 'standard', 'advanced'].map((level) => (
-            <option key={level} value={level}>
-              {level}
-            </option>
-          ))}
-        </select>
+        View:
+        <MultiValueToggle
+          selected={uiLevel}
+          onChange={(s) => {
+            setUiLevel(s as UiLevel);
+          }}
+          options={['simple', 'standard', 'advanced']}
+        />
       </div>
     </header>
   );

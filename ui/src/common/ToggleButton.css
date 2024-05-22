@@ -1,6 +1,6 @@
 .toggle-button {
   box-shadow: unset;
-  color: unset;
+  color: darkslategray;
   background-color: white;
   border: 1px solid deepskyblue;
   border-radius: 50px;
@@ -11,5 +11,5 @@
 
 .toggle-button.toggled {
   background-color: deepskyblue;
-  color: white;
+  color: black;
 }

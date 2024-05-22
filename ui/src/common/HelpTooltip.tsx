@@ -44,7 +44,7 @@ export const HelpTooltip: React.FC<TooltipProps> = ({
 }: TooltipProps) => {
   return (
     <TooltipWrap tooltipId={tooltipId} content={content} delayShow={200}>
-      <span className={'circled-question-mark'}>?</span>
+      <div className={'circled-question-mark'}>?</div>
     </TooltipWrap>
   );
 };

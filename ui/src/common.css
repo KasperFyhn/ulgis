@@ -26,6 +26,11 @@ input[type='text'] {
   border-radius: 3px;
 }
 
+input[type='range'] {
+  accent-color: #166fc1;
+  height: 20px;
+}
+
 textarea {
   min-height: 15px;
   height: 40px;

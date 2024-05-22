@@ -118,7 +118,7 @@ export const GeneratorPage: React.FC = () => {
             </>
           )}
         </div>
-        <div className={'shadow-border flex-container__box--big padded'}>
+        <div className={'shadow-border flex-container__box padded'}>
           {Object.keys(optionsMetadata.outputOptions.groups).length > 0 && (
             <>
               <h1>Output Formatting</h1>

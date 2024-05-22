@@ -3,6 +3,7 @@ import { NumberOptionMetadata, OptionMetadata, OptionType } from './models';
 import './Options.css';
 import { ToggleButton } from '../common/ToggleButton';
 import 'react-tooltip/dist/react-tooltip.css';
+import { MultiValueToggle } from '../common/MultiValueToggle';
 
 interface BooleanToggleProps {
   text: string;
@@ -39,6 +40,13 @@ const StringOptions: React.FC<StringOptionsProps> = ({
   getAndSet,
 }: StringOptionsProps) => {
   const [get, set] = getAndSet;
+  if (options.length < 5) {
+    return (
+      <div className={'small-vert-margin'}>
+        <MultiValueToggle selected={get()} onChange={set} options={options} />
+      </div>
+    );
+  }
   return (
     <div className={'small-vert-margin'}>
       {options.map((option) => (
@@ -189,7 +197,7 @@ const NumberSlider: React.FC<NumberSliderProps> = ({
 }: NumberSliderProps) => {
   const [get, set] = getAndSet;
   return (
-    <div>
+    <div className={'flex-container--horiz'}>
       <input
         type={'range'}
         value={get()}
@@ -198,7 +206,7 @@ const NumberSlider: React.FC<NumberSliderProps> = ({
         step={metadata.step}
         onChange={(event) => set(Number(event.target.value))}
       />
-      {metadata.max >= 10 && <>{get()}</>}
+      {metadata.max >= 10 && <div className={'current-value'}>{get()}</div>}
     </div>
   );
 };

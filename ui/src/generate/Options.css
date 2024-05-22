@@ -11,3 +11,8 @@ input[type='text'] {
   padding: 5px;
   border-left: 2px solid lightgray;
 }
+
+.current-value {
+  border: 1px solid lightgray;
+  padding: 2px;
+}

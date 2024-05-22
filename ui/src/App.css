@@ -41,11 +41,8 @@
 
 .ui-level-selector {
   padding-right: 15px;
-}
-
-select {
-  padding-top: 2px;
-  margin: 5px;
+  display: flex;
+  gap: 10px;
 }
 
 .sidebar-toggle {
