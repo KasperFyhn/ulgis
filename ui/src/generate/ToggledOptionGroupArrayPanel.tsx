@@ -22,23 +22,29 @@ export const ToggledOptionGroupArrayPanel: React.FC<
 > = ({ metadata, getAndSet, vertical }: ToggledOptionGroupArrayPanelProps) => {
   const [getOptionGroupArray, setOptionGroupArray] = getAndSet;
 
-  if (Object.keys(metadata.groups).length == 1) {
-    console.log(metadata);
-    const [groupKey, groupMetadata] = Object.entries(metadata.groups)[0];
-    return (
-      <OptionGroupPanel
-        metadata={groupMetadata}
-        getAndSet={[
-          () => getOptionGroupArray()[groupKey],
-          (value) => {
-            const obj = getOptionGroupArray();
-            obj[groupKey] = value as ToggledOptionGroup;
-            setOptionGroupArray({ ...obj });
-          },
-        ]}
-      />
-    );
-  }
+  // if (Object.keys(metadata.groups).length == 1) {
+  //   // if only a single member is there, show it as a regular group
+  //   const [groupKey, groupMetadata] = Object.entries(metadata.groups)[0];
+  //   if (!getOptionGroupArray()[groupKey].enabled) {
+  //       // enable the one group if not already enabled
+  //       const groupArray = getOptionGroupArray()
+  //       groupArray[groupKey].enabled = true;
+  //       setOptionGroupArray({ ...groupArray });
+  //   }
+  //   return (
+  //     <OptionGroupPanel
+  //       metadata={groupMetadata}
+  //       getAndSet={[
+  //         () => getOptionGroupArray()[groupKey],
+  //         (value) => {
+  //           const obj = getOptionGroupArray();
+  //           obj[groupKey] = value as ToggledOptionGroup;
+  //           setOptionGroupArray({ ...obj });
+  //         },
+  //       ]}
+  //     />
+  //   );
+  // }
 
   return (
     <div

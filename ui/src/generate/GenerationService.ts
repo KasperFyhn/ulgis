@@ -174,26 +174,29 @@ export class MockGenerationService implements GenerationService {
 export class LocalGenerationService implements GenerationService {
   async getGenerationOptionsMetadata(): Promise<GenerationOptionsMetadata> {
     const response = await fetch(
-      'http://localhost:8000/generation_options_metadata',
+      'http://localhost:8000/generate/generation_options_metadata',
     );
 
     return await response.json();
   }
 
   async createPrompt(options: GenerationOptions): Promise<string> {
-    const response = await fetch('http://localhost:8000/create_prompt', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
+    const response = await fetch(
+      'http://localhost:8000/generate/create_prompt',
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(options),
       },
-      body: JSON.stringify(options),
-    });
+    );
 
     return response.json();
   }
 
   async generate(options: GenerationOptions): Promise<string> {
-    const response = await fetch('http://localhost:8000/generate_outcomes', {
+    const response = await fetch('http://localhost:8000/', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -210,7 +213,7 @@ export class LocalGenerationService implements GenerationService {
     onMessage: (event: MessageEvent<string>) => void,
     onClose?: () => void,
   ): void {
-    fetch('http://localhost:8000/start_stream', {
+    fetch('http://localhost:8000/generate/start_stream', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(options),
@@ -219,7 +222,7 @@ export class LocalGenerationService implements GenerationService {
         response.json().then((json) => {
           console.log('Successfully generated stream:', json);
           const eventSource = new EventSource(
-            'http://localhost:8000/stream_response/' + json['token'],
+            'http://localhost:8000/generate/stream_response/' + json['token'],
           );
           eventSource.onmessage = onMessage;
           eventSource.onerror = () => {

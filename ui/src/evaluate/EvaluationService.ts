@@ -8,7 +8,7 @@ interface Evaluation {
 
 export async function evaluate(text: string): Promise<Evaluation> {
   try {
-    const response = await fetch('http://localhost:8000/evaluate', {
+    const response = await fetch('http://localhost:8000/evaluate/evaluate', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
