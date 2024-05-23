@@ -112,7 +112,7 @@ export class MockGenerationService implements GenerationService {
         uiLevel: 'simple',
       },
 
-      settings: {
+      educationInfo: {
         name: 'Settings',
         group: {
           setting1: {

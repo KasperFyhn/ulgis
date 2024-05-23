@@ -2,12 +2,14 @@ import React from 'react';
 import './MultiValueToggle.css';
 
 export interface MultiValueToggleProps {
+  name: string;
   selected: string;
   onChange: (value: string) => void;
   options: string[];
 }
 
-export const MultiValueToggle = ({
+export const MultiValueToggle: React.FC<MultiValueToggleProps> = ({
+  name,
   selected,
   onChange,
   options,
@@ -18,12 +20,12 @@ export const MultiValueToggle = ({
         <div key={option}>
           <input
             type="radio"
-            name={options.join('_')}
-            id={option}
+            name={name}
+            id={name + option}
             checked={option === selected}
             onChange={() => onChange(option)}
           />
-          <label htmlFor={option}>{option}</label>
+          <label htmlFor={name + option}>{option}</label>
         </div>
       ))}
     </div>

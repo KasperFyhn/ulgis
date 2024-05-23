@@ -64,6 +64,7 @@ const NavBar: React.FC = () => {
       <div className={'ui-level-selector'}>
         View:
         <MultiValueToggle
+          name={'ui-level'}
           selected={uiLevel}
           onChange={(s) => {
             setUiLevel(s as UiLevel);

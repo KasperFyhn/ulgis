@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useRef } from 'react';
 import { NumberOptionMetadata, OptionMetadata, OptionType } from './models';
 import './Options.css';
 import { ToggleButton } from '../common/ToggleButton';
@@ -40,10 +40,15 @@ const StringOptions: React.FC<StringOptionsProps> = ({
   getAndSet,
 }: StringOptionsProps) => {
   const [get, set] = getAndSet;
-  if (options.length < 5) {
+  if (options.length < 6) {
     return (
       <div className={'small-vert-margin'}>
-        <MultiValueToggle selected={get()} onChange={set} options={options} />
+        <MultiValueToggle
+          name={name}
+          selected={get()}
+          onChange={set}
+          options={options}
+        />
       </div>
     );
   }
@@ -142,11 +147,13 @@ const TextField: React.FC<TextFieldProps> = ({
   short,
   getAndSet,
 }: TextFieldProps) => {
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
   const [get, set] = getAndSet;
   if (short) {
     return (
       <input
         type={'text'}
+        maxLength={50}
         value={get()}
         onChange={(event) => set(event.target.value)}
       />
@@ -154,7 +161,17 @@ const TextField: React.FC<TextFieldProps> = ({
   } else {
     return (
       <div className={'flex-container--vert'}>
-        <textarea value={get()} onChange={(event) => set(event.target.value)} />
+        <textarea
+          ref={textareaRef}
+          value={get()}
+          onChange={(event) => {
+            if (textareaRef.current) {
+              textareaRef.current.style.height = 'auto'; // Reset height
+              textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+            }
+            set(event.target.value);
+          }}
+        />
       </div>
     );
   }
@@ -186,6 +203,31 @@ const MultipleTextFields: React.FC<MultipleTextFieldsProps> = ({
   );
 };
 
+interface StepSliderProps {
+  steps: string[];
+  getAndSet: [() => number, (value: number) => void];
+}
+
+const StepSlider: React.FC<StepSliderProps> = ({
+  steps,
+  getAndSet,
+}: StepSliderProps) => {
+  const [get, set] = getAndSet;
+  return (
+    <div className={'flex-container--horiz'}>
+      <input
+        type={'range'}
+        value={get()}
+        min={0}
+        max={steps.length - 1}
+        step={1}
+        onChange={(event) => set(Number(event.target.value))}
+      />
+      {<div className={'current-value'}>{steps[get()]}</div>}
+    </div>
+  );
+};
+
 interface NumberSliderProps {
   metadata: NumberOptionMetadata;
   getAndSet: [() => number, (value: number) => void];
@@ -206,7 +248,9 @@ const NumberSlider: React.FC<NumberSliderProps> = ({
         step={metadata.step}
         onChange={(event) => set(Number(event.target.value))}
       />
-      {metadata.max >= 10 && <div className={'current-value'}>{get()}</div>}
+      {metadata.max && metadata.max >= 10 && (
+        <div className={'current-value'}>{get()}</div>
+      )}
     </div>
   );
 };
@@ -272,6 +316,14 @@ export const Options: React.FC<OptionsProps<OptionType>> = ({
         );
       }
     case 'number':
+      if (metadata.steps) {
+        return (
+          <StepSlider
+            steps={metadata.steps}
+            getAndSet={getAndSet as [() => number, (value: number) => void]}
+          />
+        );
+      }
       return (
         <NumberSlider
           metadata={metadata}

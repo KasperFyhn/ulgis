@@ -10,7 +10,6 @@ import {
 import Markdown from 'react-markdown';
 import { ToggledOptionGroupArrayPanel } from './ToggledOptionGroupArrayPanel';
 import { OptionGroupPanel } from './OptionGroupPanel';
-import { ExpandableContainer } from '../common/ExpandableContainer';
 
 import { useUiLevel } from '../App';
 
@@ -96,12 +95,12 @@ export const GeneratorPage: React.FC = () => {
       </div>
       <div className={'flex-container--horiz'}>
         <div className={'shadow-border flex-container__box padded'}>
-          <h1>Settings</h1>
+          <h1>Education Info</h1>
           <OptionGroupPanel
-            metadata={optionsMetadata.settings}
+            metadata={optionsMetadata.educationInfo}
             getAndSet={[
-              () => options.settings,
-              (v) => setOptions({ ...options, settings: v }),
+              () => options.educationInfo,
+              (v) => setOptions({ ...options, educationInfo: v }),
             ]}
           />
         </div>
@@ -121,7 +120,7 @@ export const GeneratorPage: React.FC = () => {
         <div className={'shadow-border flex-container__box padded'}>
           {Object.keys(optionsMetadata.outputOptions.groups).length > 0 && (
             <>
-              <h1>Output Formatting</h1>
+              <h1>Output Options</h1>
               <ToggledOptionGroupArrayPanel
                 vertical
                 metadata={optionsMetadata.outputOptions}
@@ -137,10 +136,8 @@ export const GeneratorPage: React.FC = () => {
             </>
           )}
           {Object.keys(optionsMetadata.customInputs.group).length > 0 && (
-            <ExpandableContainer
-              header={<h1>Custom Input</h1>}
-              startExpanded={false}
-            >
+            <>
+              <h1>Custom Input</h1>
               <OptionGroupPanel
                 metadata={optionsMetadata.customInputs}
                 getAndSet={[
@@ -148,7 +145,7 @@ export const GeneratorPage: React.FC = () => {
                   (v) => setOptions({ ...options, customInputs: v }),
                 ]}
               />
-            </ExpandableContainer>
+            </>
           )}
         </div>
       </div>

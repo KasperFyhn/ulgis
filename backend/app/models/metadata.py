@@ -56,9 +56,10 @@ class NumberOptionMetadata(OptionMetadataBase):
 
     type: Literal["number"] = "number"
     default: int | float = None
-    min: int | float = 0
-    max: int | float = 5
-    step: int | float = 1.0
+    min: Optional[int | float] = None
+    max: Optional[int | float] = None
+    step: Optional[int | float] = 1.0
+    steps: Optional[list[str]] = None
 
 
 OptionMetadata = Annotated[
@@ -172,6 +173,7 @@ def _create_field_metadata(
             min=_get_from_field_metadata(field, Ge, lambda ge: float(ge.ge)),
             max=_get_from_field_metadata(field, Le, lambda le: float(le.le)),
             step=_get_from_json_schema_extra(field, "step", 1),
+            steps=_get_from_json_schema_extra(field, "steps", None),
         )
     elif field.annotation == str:
         return StringOptionMetadata(

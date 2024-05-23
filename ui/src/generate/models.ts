@@ -26,7 +26,7 @@ export class GenerationOptions {
   [key: string]: OptionGroup | ToggledOptionGroupArray;
 
   taxonomies: ToggledOptionGroupArray = {};
-  settings: OptionGroup = {};
+  educationInfo: OptionGroup = {};
   customInputs: OptionGroup = {};
   outputOptions: ToggledOptionGroupArray = {};
 }
@@ -67,9 +67,10 @@ export interface StringArrayOptionMetadata
 export interface NumberOptionMetadata
   extends PrimitiveOptionMetadataBase<number> {
   type: 'number';
-  min: number;
-  max: number;
+  min?: number;
+  max?: number;
   step?: number;
+  steps?: string[];
 }
 
 export type OptionMetadata =
@@ -93,7 +94,7 @@ export interface ToggledOptionGroupArrayMetadata extends OptionMetadataBase {
 
 export interface GenerationOptionsMetadata {
   taxonomies: ToggledOptionGroupArrayMetadata;
-  settings: OptionGroupMetadata;
+  educationInfo: OptionGroupMetadata;
   customInputs: ToggledOptionGroupMetadata;
   outputOptions: ToggledOptionGroupArrayMetadata;
 }
@@ -155,7 +156,7 @@ export function filterByLevel(
       metadata.outputOptions,
       uiLevel,
     ),
-    settings: filterGroupByLevel(metadata.settings, uiLevel),
+    educationInfo: filterGroupByLevel(metadata.educationInfo, uiLevel),
     taxonomies: filterToggledGroupArrayByLevel(metadata.taxonomies, uiLevel),
   };
 }
@@ -227,13 +228,13 @@ export function initGenerationOptions(
       taxonomies: {},
       customInputs: {},
       outputOptions: {},
-      settings: {},
+      educationInfo: {},
     };
   } else {
     return {
       taxonomies: initToggledOptionGroupArray(metadata.taxonomies),
       customInputs: initToggledOptionGroup(metadata.customInputs),
-      settings: initOptionGroup(metadata.settings),
+      educationInfo: initOptionGroup(metadata.educationInfo),
       outputOptions: initToggledOptionGroupArray(metadata.outputOptions),
     };
   }

@@ -19,11 +19,16 @@ class TaxonomyOrm(Base):
 class ParameterOrm(Base):
     __tablename__ = "parameters"
 
+    # static setup for parameters
     type = "number"  # for Pydantic discrimination between option metadata types
+    steps = ["disabled", "fundamental", "intermediate", "advanced", "specialised"]
+    default = 2
+
+    # fields
     id = Column(Integer, primary_key=True)
     name = Column(String, unique=True, index=True)
     short_description = Column(String)
-    default = Column(Integer)
+    # default = Column(Integer)
 
     taxonomy_id = Column(Integer, ForeignKey("taxonomies.id"))
     taxonomy: Mapped[TaxonomyOrm] = relationship(back_populates="group")

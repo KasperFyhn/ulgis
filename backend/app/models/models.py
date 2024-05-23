@@ -49,7 +49,7 @@ class TaxonomyArray(ToggledOptionGroupArray):
         )
 
 
-class Settings(OptionGroup):
+class EducationInfo(OptionGroup):
     education_level: str = Field(
         "Bachelor",
         title="Education Level",
@@ -62,6 +62,16 @@ class Settings(OptionGroup):
         title="Education Name",
         description="Education name",
         json_schema_extra=dict(short=True, ui_level="simple"),
+    )
+    education_description: str = Field(
+        title="Education Description",
+        description="Education Description",
+        json_schema_extra=dict(ui_level="standard"),
+    )
+    previous_learning_goals: str = Field(
+        title="Previous Learning Goals",
+        description="Previous Learning Goals",
+        json_schema_extra=dict(ui_level="advanced"),
     )
 
 
@@ -142,9 +152,9 @@ class OutputOptions(ToggledOptionGroupArray):
 
 class GenerationOptions(CamelModel):
     taxonomies: TaxonomyArray = Field(title="Taxonomies", description="Taxonomies")
-    settings: Settings = Field(
-        title="Settings",
-        description="Settings",
+    education_info: EducationInfo = Field(
+        title="Education Information",
+        description="Education Information",
         json_schema_extra=dict(ui_level="simple"),
     )
     custom_inputs: CustomInputs = Field(

@@ -33,7 +33,7 @@ input[type='range'] {
 
 textarea {
   min-height: 15px;
-  height: 40px;
+  max-height: 500px;
   resize: vertical;
   padding: 5px;
 }
