@@ -17,12 +17,19 @@
   text-align: center;
   cursor: pointer;
   flex: 1;
-  padding: 2px 8px;
+  padding: 2px 5px;
   transition: all 0.3s ease;
+}
+
+.multi-value-toggle div:first-child label {
+  padding-left: 8px;
+}
+
+.multi-value-toggle div:last-child label {
+  padding-right: 8px;
 }
 
 .multi-value-toggle input[type='radio']:checked + label {
   background-color: deepskyblue;
   color: black;
-  border-radius: 50px;
 }

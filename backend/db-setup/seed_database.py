@@ -8,7 +8,7 @@ from app.db.models import TaxonomyOrm, ParameterOrm
 def default_param(name: str) -> ParameterOrm:
     return ParameterOrm(
         name=name,
-        default=3,
+        # default=3,
     )
 
 

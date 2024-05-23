@@ -38,8 +38,6 @@ const NavBar: React.FC = () => {
 
   const { uiLevel, setUiLevel } = useUiLevel();
 
-  const [selected, setSelected] = useState('one');
-
   return (
     <header className={'navbar shadow-border'}>
       {/*<button*/}

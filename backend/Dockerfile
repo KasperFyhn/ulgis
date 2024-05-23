@@ -4,6 +4,7 @@ WORKDIR /app
 
 # app installation
 COPY app app
+COPY requirements.txt .
 COPY setup.py .
 RUN pip3 install -e .
 

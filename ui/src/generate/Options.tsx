@@ -167,7 +167,8 @@ const TextField: React.FC<TextFieldProps> = ({
           onChange={(event) => {
             if (textareaRef.current) {
               textareaRef.current.style.height = 'auto'; // Reset height
-              textareaRef.current.style.height = `${textareaRef.current.scrollHeight}px`;
+              const scrollHeight = textareaRef.current.scrollHeight;
+              textareaRef.current.style.height = `${scrollHeight}px`;
             }
             set(event.target.value);
           }}

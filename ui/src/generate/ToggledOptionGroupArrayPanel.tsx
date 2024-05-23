@@ -1,11 +1,9 @@
 import React from 'react';
 import {
-  ToggledOptionGroup,
   ToggledOptionGroupArray,
   ToggledOptionGroupArrayMetadata,
 } from './models';
 import { ToggledOptionGroupPanel } from './ToggledOptionGroupPanel';
-import { OptionGroupPanel } from './OptionGroupPanel';
 
 export interface ToggledOptionGroupArrayPanelProps {
   metadata: ToggledOptionGroupArrayMetadata;
