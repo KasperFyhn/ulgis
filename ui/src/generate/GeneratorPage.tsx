@@ -1,5 +1,5 @@
 import '../common.css';
-import { LocalGenerationService } from './GenerationService';
+import { DefaultGenerationService } from './GenerationService';
 import React, { useEffect, useState } from 'react';
 import {
   filterByLevel,
@@ -14,7 +14,7 @@ import { OptionGroupPanel } from './OptionGroupPanel';
 import { useUiLevel } from '../App';
 
 export const GeneratorPage: React.FC = () => {
-  const service = new LocalGenerationService();
+  const service = new DefaultGenerationService();
 
   const { uiLevel } = useUiLevel();
 

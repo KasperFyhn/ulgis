@@ -171,32 +171,39 @@ export class MockGenerationService implements GenerationService {
   }
 }
 
-export class LocalGenerationService implements GenerationService {
+export class DefaultGenerationService implements GenerationService {
+  private readonly url: string;
+
+  constructor() {
+    if (process.env.BACKEND_URL) {
+      this.url = process.env.BACKEND_URL;
+    } else {
+      this.url = 'http://localhost:8000';
+    }
+  }
+
   async getGenerationOptionsMetadata(): Promise<GenerationOptionsMetadata> {
     const response = await fetch(
-      'http://localhost:8000/generate/generation_options_metadata',
+      this.url + '/generate/generation_options_metadata',
     );
 
     return await response.json();
   }
 
   async createPrompt(options: GenerationOptions): Promise<string> {
-    const response = await fetch(
-      'http://localhost:8000/generate/create_prompt',
-      {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(options),
+    const response = await fetch(this.url + '/generate/create_prompt', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
       },
-    );
+      body: JSON.stringify(options),
+    });
 
     return response.json();
   }
 
   async generate(options: GenerationOptions): Promise<string> {
-    const response = await fetch('http://localhost:8000/', {
+    const response = await fetch(this.url + '/generate/generate_response', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -213,7 +220,7 @@ export class LocalGenerationService implements GenerationService {
     onMessage: (event: MessageEvent<string>) => void,
     onClose?: () => void,
   ): void {
-    fetch('http://localhost:8000/generate/start_stream', {
+    fetch(this.url + '/generate/start_stream', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(options),
@@ -222,7 +229,7 @@ export class LocalGenerationService implements GenerationService {
         response.json().then((json) => {
           console.log('Successfully generated stream:', json);
           const eventSource = new EventSource(
-            'http://localhost:8000/generate/stream_response/' + json['token'],
+            this.url + '/generate/stream_response/' + json['token'],
           );
           eventSource.onmessage = onMessage;
           eventSource.onerror = () => {

@@ -1,0 +1,16 @@
+services:
+  backend:
+    build: ./backend
+    volumes:
+      - ./backend/db:/app/db
+    ports:
+      - "8000:8000" # Map the Docker internal port to the host
+    environment:
+      - DATABASE_URL=sqlite:////app/db/database.db
+
+  frontend:
+    build: ./ui
+    ports:
+      - "3000:3000"
+    environment:
+      - REACT_APP_BACKEND_URL=http://localhost:8000

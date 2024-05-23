@@ -4,5 +4,8 @@
 # python
 __pycache__
 
+/backend/db
 *.db
 /backend/app.egg-info/
+
+.env*

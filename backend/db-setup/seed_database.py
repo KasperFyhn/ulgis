@@ -13,7 +13,13 @@ def default_param(name: str) -> ParameterOrm:
 
 
 def seed_database():
-    session = SessionLocal()
+    try:
+        session = SessionLocal()
+    except Exception as e:
+        print(f"Exception while initializing database: {e}")
+        print(
+            "Maybe you need to create a .env file with a DATABASE_URL environment variable?"
+        )
 
     if session.query(TaxonomyOrm).count() != 0:
         if (
