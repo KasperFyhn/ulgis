@@ -9,7 +9,7 @@ from app.logger import create_logger
 
 logger = create_logger(__name__)
 
-evaluate_router = APIRouter(prefix="/evaluate")
+evaluate_router = APIRouter()
 
 
 class EvaluationRequest(CamelModel):
@@ -39,7 +39,7 @@ Answer in a JSON and nothing else:
 """
 
 
-@evaluate_router.post("/evaluate")
+@evaluate_router.post("/evaluate/evaluate")
 async def evaluate(request: EvaluationRequest):
     logger.debug(request)
     prompt = evaluation_prompt.format(request.learning_outcomes)

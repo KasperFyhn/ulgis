@@ -1,3 +1,5 @@
+import dotenv
+import os
 import uvicorn
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
@@ -11,9 +13,12 @@ app.include_router(data_router)
 app.include_router(generate_router)
 app.include_router(evaluate_router)
 
+dotenv.load_dotenv()
+allowed_origins = os.environ.get("ALLOWED_ORIGINS").split(",")
+
 app.add_middleware(
     CORSMiddleware,  # noqa
-    allow_origins=["http://localhost:3000"],
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
