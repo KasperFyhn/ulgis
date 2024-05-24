@@ -175,10 +175,12 @@ export class DefaultGenerationService implements GenerationService {
   private readonly url: string;
 
   constructor() {
-    if (process.env.BACKEND_URL) {
-      this.url = process.env.BACKEND_URL;
+    if (process.env.REACT_APP_BACKEND_URL) {
+      this.url = process.env.REACT_APP_BACKEND_URL;
     } else {
-      this.url = 'http://localhost:8000';
+      throw Error(
+        'No default generation service configured for this ' + 'environment.',
+      );
     }
   }
 
