@@ -51,11 +51,9 @@ async def start_stream(request: GenerationOptions, db: Session = Depends(get_db)
 
 @generate_router.get("/generate/stream_response/{token}")
 async def stream_response(token: str):
-
     async def generator_function():
         stream = _streaming_responses[token]
-        async for chunk in await stream:
-            t = chunk["response"].replace("\n", "\\n")
+        async for t in await stream:
             yield f"data: {t}\n\n"
         logger.debug("Removing stream with token '%s' from streaming responses.", token)
         del _streaming_responses[token]

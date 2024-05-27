@@ -26,14 +26,6 @@ def build_prompt(
             if value:
                 prompt += f"{value}:\n\n"
 
-    education = options.education_info.education_name or "any education"
-
-    prompt += f"Your output should fit with {education} at {options.education_info.education_level} level."
-    if options.education_info.education_description:
-        prompt += "\n\n"
-        prompt += f"It is described as follows: {options.education_info.education_description}"
-    prompt += "\n\n"
-
     if options.taxonomies.is_any_enabled():
         prompt += (
             "It should be based on the provided taxonomies where you aim for the following levels of "
@@ -51,6 +43,15 @@ def build_prompt(
                     prompt += f"\t- Aim for a {ParameterOrm.steps[param_value]} level for '{param_name}'.\n"
         prompt += "\n\n"
 
+    education = options.education_info.education_name or "any education"
+    level = options.education_info.education_level
+
+    prompt += f"It should fit with {education} at {level} level."
+    if options.education_info.education_description:
+        prompt += "\n\n"
+        prompt += f"It is described as follows: {options.education_info.education_description}"
+    prompt += "\n\n"
+
     if options.education_info.previous_learning_goals:
         prompt += "Take into account these previous learning goals:\n"
         prompt += options.education_info.previous_learning_goals
@@ -62,18 +63,21 @@ def build_prompt(
 
     # output formatting
     if options.output_options.learning_goals.enabled:
-        prompt += "Create a list of learning goals."
+        prompt += f"Create a list of learning goals for {education} at {level} level."
     elif options.output_options.competency_profile.enabled:
-        prompt += "Create a 200 word competency profile."
+        prompt += (
+            f"Create a 200 word competency profile for {education} at {level} level."
+        )
     elif options.output_options.bullet_points.enabled:
         prompt += (
             f"Create learning outcomes in {options.output_options.bullet_points.number_of_bullets} bullet points "
-            f"which can {'' if options.output_options.bullet_points.nested else 'NOT'} be nested."
+            f"which can {'' if options.output_options.bullet_points.nested else 'NOT'} be nested "
+            f"for {education} at {level} level."
         )
     elif options.output_options.prose_description.enabled:
         prompt += (
             f"Create a prose description of {options.output_options.prose_description.number_of_words} "
-            f"words and NOT bullet points which addresses learning outcomes. "
+            f"words and NOT bullet points which addresses learning outcomes for {education} at {level} level. "
             f"{'Include' if options.output_options.prose_description.headings else 'Do NOT include'} headings."
         )
     prompt += "\n\n"
