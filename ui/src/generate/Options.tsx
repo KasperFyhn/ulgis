@@ -214,6 +214,7 @@ const StepSlider: React.FC<StepSliderProps> = ({
   getAndSet,
 }: StepSliderProps) => {
   const [get, set] = getAndSet;
+  const [beingChanged, setBeingChanged] = React.useState<boolean>(false);
   return (
     <div className={'flex-container--horiz'}>
       <input
@@ -223,8 +224,14 @@ const StepSlider: React.FC<StepSliderProps> = ({
         max={steps.length - 1}
         step={1}
         onChange={(event) => set(Number(event.target.value))}
+        onMouseDown={() => setBeingChanged(true)}
+        onMouseUp={() => setBeingChanged(false)}
       />
-      {<div className={'current-value'}>{steps[get()]}</div>}
+      {beingChanged && (
+        <div className={'current-value__hovering'} style={{}}>
+          {steps[get()]}
+        </div>
+      )}
     </div>
   );
 };
@@ -239,6 +246,7 @@ const NumberSlider: React.FC<NumberSliderProps> = ({
   getAndSet,
 }: NumberSliderProps) => {
   const [get, set] = getAndSet;
+  const maxDigits = metadata.max?.toString().length;
   return (
     <div className={'flex-container--horiz'}>
       <input
@@ -249,9 +257,9 @@ const NumberSlider: React.FC<NumberSliderProps> = ({
         step={metadata.step}
         onChange={(event) => set(Number(event.target.value))}
       />
-      {metadata.max && metadata.max >= 10 && (
-        <div className={'current-value'}>{get()}</div>
-      )}
+      <div className={'current-value'} style={{ width: `${maxDigits}ch` }}>
+        {get()}
+      </div>
     </div>
   );
 };

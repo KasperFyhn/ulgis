@@ -6,9 +6,7 @@ from ollama import Options
 from openai import AsyncClient
 from openai.types.chat import ChatCompletionChunk
 
-_system_prompt = (
-    "You are an expert on education and learning. Keep responses concise and to the point."
-)
+_system_prompt = "You are an expert on education and learning. Keep responses concise and to the point."
 
 
 async def generate(prompt: str, stream: bool = False):
@@ -19,11 +17,12 @@ async def generate(prompt: str, stream: bool = False):
                 {"role": "system", "content": _system_prompt},
                 {"role": "user", "content": prompt},
             ],
-            model="gpt-4o",
+            model="gpt-3.5-turbo",
             stream=True,
             max_tokens=2000,
         )
         if stream:
+
             async def generator():
                 async for chunk in await response_coro:
                     chunk: ChatCompletionChunk

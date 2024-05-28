@@ -15,4 +15,14 @@ input[type='text'] {
 .current-value {
   border: 1px solid lightgray;
   padding: 2px;
+  text-align: right;
+}
+
+.current-value__hovering {
+  border: 1px solid lightgray;
+  padding: 5px;
+  z-index: 1000;
+  position: absolute;
+  transform: translateY(-100%);
+  background: lightcyan;
 }
