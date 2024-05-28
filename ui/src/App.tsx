@@ -54,7 +54,7 @@ const NavBar: React.FC = () => {
           </span>
         </Link>
         <Link to={'/generate'}>Generate</Link>
-        <Link to={'/evaluate'}>Evaluate</Link>
+        {/*<Link to={'/evaluate'}>Evaluate</Link>*/}
         <Link to={'/about'}>About</Link>
         {/*{showSidebar && <div>SideBar</div>}*/}
       </div>
@@ -96,7 +96,7 @@ const App: React.FC = () => {
             <Routes>
               <Route path="/" element={<FrontPage />} />
               <Route path="/generate" element={<GeneratorPage />} />
-              <Route path="/evaluate" element={<EvaluationPage />} />
+              {/*<Route path="/evaluate" element={<EvaluationPage />} />*/}
               <Route path="/about" element={<p>Wow. Such empty.</p>} />
             </Routes>
           </div>
