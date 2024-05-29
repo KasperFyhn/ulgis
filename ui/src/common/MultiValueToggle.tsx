@@ -15,19 +15,29 @@ export const MultiValueToggle: React.FC<MultiValueToggleProps> = ({
   options,
 }: MultiValueToggleProps) => {
   return (
-    <div className="multi-value-toggle">
-      {options.map((option) => (
-        <div key={option}>
-          <input
-            type="radio"
-            name={name}
-            id={name + option}
-            checked={option === selected}
-            onChange={() => onChange(option)}
-          />
-          <label htmlFor={name + option}>{option}</label>
-        </div>
-      ))}
-    </div>
+    <fieldset className={'switch switch__content'}>
+      <div className=" switch__segments">
+        {options.map((option) => {
+          const checked = option === selected;
+          return (
+            <div
+              key={option}
+              className={'switch__input ' + (checked ? 'switch__checked' : '')}
+            >
+              <input
+                type="radio"
+                name={name}
+                id={name + option}
+                checked={checked}
+                onChange={() => onChange(option)}
+              />
+              <label className={'switch__segment'} htmlFor={name + option}>
+                {option}
+              </label>
+            </div>
+          );
+        })}
+      </div>
+    </fieldset>
   );
 };

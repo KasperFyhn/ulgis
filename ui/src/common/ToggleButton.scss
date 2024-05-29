@@ -1,0 +1,10 @@
+@import '../common';
+
+.toggle-button {
+  @extend .button;
+  background-color: white;
+}
+
+.toggle-button.toggled {
+  color: black;
+}

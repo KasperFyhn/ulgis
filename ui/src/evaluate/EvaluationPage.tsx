@@ -1,4 +1,4 @@
-import '../common.css';
+import '../common.scss';
 import './chart.css';
 import React from 'react';
 import RadarChart, { ChartProps } from 'react-svg-radar-chart';
@@ -43,7 +43,7 @@ export const EvaluationPage: React.FC = () => {
     <div className={'flex-container--horiz'}>
       <div
         className={
-          'shadow-border flex-container__box--big flex-container--vert padded'
+          'content-pane flex-container__box--big flex-container--vert padded'
         }
       >
         <h1>Input</h1>
@@ -62,7 +62,7 @@ export const EvaluationPage: React.FC = () => {
           Evaluate
         </button>
       </div>
-      <div className={'shadow-border flex-container__box--small padded'}>
+      <div className={'content-pane flex-container__box--small padded'}>
         <h1>Evaluation</h1>
         <RadarChart {...radarChartProps} />
       </div>

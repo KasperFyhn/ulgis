@@ -1,55 +1,43 @@
+@import '../delphinus-style';
+
 h1 {
-  font-size: 20px;
+  font-size: xx-large;
 }
 
 h2 {
-  font-size: 16px;
+  font-size: x-large;
 }
 
 button {
-  border: none;
-  background: deepskyblue;
-  padding: 7px;
-  margin: 3px;
-  border-radius: 7px;
-  min-width: 60px;
-  box-shadow: 2px 2px 2px gray;
-  font-family: inherit;
-  font-size: 14px;
-}
-
-button:active {
-  box-shadow: none;
-}
-
-input[type='text'] {
-  border-width: 1px;
-  padding: 5px;
-  border-radius: 3px;
+  @include set-colors('theme');
+  @extend .button--small;
 }
 
 input[type='range'] {
-  accent-color: #166fc1;
+  accent-color: color('theme');
   height: 20px;
 }
 
+input[type='text'] {
+  border-radius: 0;
+  border-width: 1px;
+  padding: 5px;
+}
+
 textarea {
+  border-radius: 0;
   min-height: 15px;
   max-height: 500px;
   resize: vertical;
   padding: 5px;
 }
 
-label {
-  font-size: 14px;
-}
-
 .height-400px {
   height: 400px;
 }
 
-.shadow-border {
-  box-shadow: 1px 1px 4px gray;
+.content-pane {
+  @extend .theme--background-secondary;
 }
 
 .padded {

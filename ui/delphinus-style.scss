@@ -1,0 +1,92 @@
+// Math module for division
+@use 'sass:math';
+
+//BUILD DELPHINUS CORE
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/atoms/atoms-settings';
+
+//add your overwrites for atoms-settings here
+
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/atoms/colors/colors';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/atoms/fonts/au-passata';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/atoms/fonts/au-peto';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/atoms/fonts/fonts';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/atoms/spacing/spacing';
+
+@include define-color-variables();
+@include define-font-variables();
+@include define-spacing-variables();
+
+// IMPORT SASS VARIABLES
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/sass-variables';
+
+// IMPORT MIXINS
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/_mixins/all';
+
+// IMPORT INCLUDES
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/_includes/all';
+
+// IMPORT CSS RESET AND BASE STYLES
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/base/normalize';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/base/fundamentals';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/base/utility-classes';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/base/body';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/base/hr';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/base/text';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/base/links';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/base/forms';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/base/buttons';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/base/inline-button';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/base/code';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/base/icons';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/base/accessibility';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/base/dl';
+
+// IMPORT LAYOUT
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/layout/breakpoints';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/layout/page';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/layout/row';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/layout/grid';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/layout/footer';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/layout/vertical-spacing';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/layout/width-constrain';
+
+//IMPORT MODULES
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/module/artwork-peto';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/module/autosuggest';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/module/box';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/module/calendar';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/module/datepicker';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/module/empty-state';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/module/list-navigator';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/module/modal-view';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/module/nav';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/module/navigation-list';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/module/notification';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/module/progress-bar';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/module/receipt';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/module/search-filter';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/module/selection-list';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/module/settings-list';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/module/shortcut';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/module/sub-nav';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/module/tabbed-content';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/module/tables';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/module/toast-notification';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/module/toolbar';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/module/content-toggle';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/module/processing-state';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/module/large-bullets';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/module/header-callout';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/module/fact-list';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/module/pre-header';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/module/tooltip';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/module/stepper';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/module/card';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/module/tags';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/module/profile-image';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/module/horizontal-scroll';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/module/switch';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/module/truncator';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/module/copy-to-clipboard';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/module/data-box';
+@import 'node_modules/@aarhus-university/au-designsystem-delphinus/source/style/module/hero-image';

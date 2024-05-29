@@ -1,8 +1,7 @@
-import './App.css';
+import './App.scss';
 import React, { createContext, ReactNode, useContext, useState } from 'react';
 import { BrowserRouter, Link, Route, Routes } from 'react-router-dom';
 import { GeneratorPage } from './generate/GeneratorPage';
-import { EvaluationPage } from './evaluate/EvaluationPage';
 import { UiLevel } from './generate/models';
 import { MultiValueToggle } from './common/MultiValueToggle';
 
@@ -39,38 +38,36 @@ const NavBar: React.FC = () => {
   const { uiLevel, setUiLevel } = useUiLevel();
 
   return (
-    <header className={'navbar shadow-border'}>
-      {/*<button*/}
-      {/*  className={'sidebar-toggle'}*/}
-      {/*  onClick={() => setShowSidebar(!showSidebar)}*/}
-      {/*>*/}
-      {/*  &equiv;*/}
-      {/*</button>*/}
-      <div className={'link-container'}>
-        <Link to={'/'}>
-          <span>
-            <b>U</b>niversal <b>L</b>earning <b>G</b>oal <b>I</b>
-            nspirational <b>S</b>ynthesizer
-          </span>
-        </Link>
-        <Link to={'/generate'}>Generate</Link>
-        {/*<Link to={'/evaluate'}>Evaluate</Link>*/}
-        <Link to={'/about'}>About</Link>
-        {/*{showSidebar && <div>SideBar</div>}*/}
+    <nav className={'nav nav--site-nav theme--dark'}>
+      <Link className={'nav__home home-title'} to={'/'}>
+        <b>U</b>niversal <b>L</b>earning <b>G</b>oal <b>I</b>
+        nspirational <b>S</b>ynthesizer
+      </Link>
+      <div className={'nav__site'}>
+        <div className={'nav__items'}>
+          <Link className={'nav__item'} to={'/generate'}>
+            Generate
+          </Link>
+          <Link className={'nav__item'} to={'/about'}>
+            About
+          </Link>
+        </div>
       </div>
 
-      <div className={'ui-level-selector'}>
-        View:
-        <MultiValueToggle
-          name={'ui-level'}
-          selected={uiLevel}
-          onChange={(s) => {
-            setUiLevel(s as UiLevel);
-          }}
-          options={['simple', 'standard', 'advanced']}
-        />
+      <div className={'nav__utilities'}>
+        <div className={'nav__item'}>
+          View:
+          <MultiValueToggle
+            name={'ui-level'}
+            selected={uiLevel}
+            onChange={(s) => {
+              setUiLevel(s as UiLevel);
+            }}
+            options={['simple', 'standard', 'advanced']}
+          />
+        </div>
       </div>
-    </header>
+    </nav>
   );
 };
 
@@ -91,7 +88,7 @@ const App: React.FC = () => {
     <BrowserRouter>
       <UiLevelProvider>
         <NavBar />
-        <div className="app">
+        <div className="app theme--blue">
           <div className={'app__content'}>
             <Routes>
               <Route path="/" element={<FrontPage />} />

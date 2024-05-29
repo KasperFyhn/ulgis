@@ -1,5 +1,5 @@
 import React from 'react';
-import './ToggleButton.css';
+import './ToggleButton.scss';
 import { TooltipWrap } from './HelpTooltip';
 
 interface ToggleButtonProps extends React.PropsWithChildren {
@@ -16,7 +16,7 @@ export const ToggleButton: React.FC<ToggleButtonProps> = ({
 }: ToggleButtonProps) => {
   const button = (
     <button
-      className={`toggle-button ${checked ? 'toggled' : ''}`}
+      className={`${checked ? '' : 'button--dimmed'}`}
       onClick={() => {
         if (onChange) onChange(!checked);
       }}

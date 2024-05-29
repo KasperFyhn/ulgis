@@ -1,4 +1,4 @@
-import '../common.css';
+import '../common.scss';
 import { DefaultGenerationService } from './GenerationService';
 import React, { useEffect, useState } from 'react';
 import {
@@ -79,7 +79,7 @@ export const GeneratorPage: React.FC = () => {
   }
   return (
     <div className={'flex-container--vert'}>
-      <div className={'shadow-border flex-container__box padded'}>
+      <div className={'content-pane flex-container__box padded'}>
         <h1>Taxonomies</h1>
         <ToggledOptionGroupArrayPanel
           metadata={optionsMetadata.taxonomies}
@@ -94,7 +94,7 @@ export const GeneratorPage: React.FC = () => {
         />
       </div>
       <div className={'flex-container--horiz'}>
-        <div className={'shadow-border flex-container__box padded'}>
+        <div className={'content-pane flex-container__box padded'}>
           <h1>Education Info</h1>
           <OptionGroupPanel
             metadata={optionsMetadata.educationInfo}
@@ -106,18 +106,18 @@ export const GeneratorPage: React.FC = () => {
         </div>
 
         <div
-          className={'shadow-border flex-container__box size_40percent padded'}
+          className={'content-pane flex-container__box size_40percent padded'}
         >
           {response && <Markdown>{response}</Markdown>}
           {creatingResponse && response === '' && <p>Connecting ...</p>}
           {!creatingResponse && (
-            <>
+            <div className={'button-container'}>
               <button onClick={createResponse}>Run prompt on ULGIS</button>
               <button onClick={createPrompt}>Show prompt</button>
-            </>
+            </div>
           )}
         </div>
-        <div className={'shadow-border flex-container__box padded'}>
+        <div className={'content-pane flex-container__box padded'}>
           {Object.keys(optionsMetadata.outputOptions.groups).length > 0 && (
             <>
               <h1>Output Options</h1>
@@ -137,6 +137,7 @@ export const GeneratorPage: React.FC = () => {
           )}
           {Object.keys(optionsMetadata.customInputs.group).length > 0 && (
             <>
+              <hr />
               <h1>Custom Input</h1>
               <OptionGroupPanel
                 metadata={optionsMetadata.customInputs}

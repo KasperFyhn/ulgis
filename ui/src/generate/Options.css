@@ -19,10 +19,11 @@ input[type='text'] {
 }
 
 .current-value__hovering {
-  border: 1px solid lightgray;
+  background-color: lightgray;
+  color: black;
+  border: 1px solid dimgray;
   padding: 5px;
   z-index: 1000;
   position: absolute;
   transform: translateY(-100%);
-  background: lightcyan;
 }

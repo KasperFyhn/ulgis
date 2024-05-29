@@ -1,0 +1,49 @@
+@import '../delphinus-style';
+
+.home-title {
+  font-weight: lighter;
+
+  b {
+    font-weight: bold;
+    font-size: xx-large;
+  }
+}
+
+.link-container {
+  flex-grow: 1;
+}
+
+.ui-level-selector {
+  padding-right: 15px;
+  display: flex;
+  gap: 10px;
+}
+
+.sidebar-toggle {
+  all: unset;
+  font-size: x-large;
+  margin-left: 10px;
+  cursor: pointer;
+}
+
+.frontpage {
+  text-align: center;
+
+  img {
+    display: block;
+    margin: auto;
+    width: min(600px, 95%);
+  }
+}
+
+.app {
+  justify-content: center;
+  overflow-y: auto;
+
+  &__content {
+    width: min(1600px, 95%);
+    /*height: calc(100vh - 50px); !* accounts for  navbar + padding in top and bottom *!*/
+    position: relative;
+    margin: 10px auto; /* a bit of room in top and bottom + centering for cross-browser compatibility */
+  }
+}
