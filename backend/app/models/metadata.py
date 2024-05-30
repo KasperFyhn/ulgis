@@ -77,6 +77,7 @@ class OptionGroupMetadata(OptionMetadataBase):
     class Config:
         from_attributes = True
 
+    type: Literal["optionGroup"] = "optionGroup"
     group: dict[str, OptionMetadata]
 
     @field_validator("group", mode="before")
@@ -86,17 +87,26 @@ class OptionGroupMetadata(OptionMetadataBase):
         return group
 
 
-class ToggledOptionGroupMetadata(OptionGroupMetadata):
+class ToggledOptionGroupMetadata(OptionMetadataBase):
     class Config:
         from_attributes = True
 
+    type: Literal["toggledOptionGroup"] = "toggledOptionGroup"
     default: bool = False
+    group: dict[str, OptionMetadata]
+
+    @field_validator("group", mode="before")
+    def group_validator(cls, group):
+        if isinstance(group, list):
+            return {v.name: v for v in group}
+        return group
 
 
 class ToggledOptionGroupArrayMetadata(OptionMetadataBase):
     class Config:
         from_attributes = True
 
+    type: Literal["toggledOptionGroupArray"] = "toggledOptionGroupArray"
     multiple: bool
     groups: dict[str, ToggledOptionGroupMetadata]
 

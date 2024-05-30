@@ -1,5 +1,6 @@
 import json
 import os
+import sys
 
 from app.db.base import SessionLocal
 from app.db.models import TaxonomyOrm, ParameterOrm
@@ -20,6 +21,7 @@ def seed_database():
         print(
             "Maybe you need to create a .env file with a DATABASE_URL environment variable?"
         )
+        sys.exit(1)
 
     if session.query(TaxonomyOrm).count() != 0:
         if (

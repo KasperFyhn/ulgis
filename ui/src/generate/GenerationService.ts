@@ -18,11 +18,13 @@ export class MockGenerationService implements GenerationService {
   getGenerationOptionsMetadata(): Promise<GenerationOptionsMetadata> {
     const generationOptions: GenerationOptionsMetadata = {
       taxonomies: {
+        type: 'toggledOptionGroupArray',
         name: 'Taxonomies',
         description: 'Taxonomies to choose from',
         multiple: true,
         groups: {
           taxonomy1: {
+            type: 'toggledOptionGroup',
             name: 'Taxonomy 1',
             description: 'Description of first Taxonomy 1',
             default: true,
@@ -38,6 +40,7 @@ export class MockGenerationService implements GenerationService {
             uiLevel: 'Standard',
           },
           taxonomy2: {
+            type: 'toggledOptionGroup',
             name: 'Taxonomy 2',
             description: 'Description of first Taxonomy 1',
             default: true,
@@ -62,6 +65,8 @@ export class MockGenerationService implements GenerationService {
       },
 
       customInputs: {
+        type: 'toggledOptionGroup',
+
         name: 'Custom Inputs',
         default: true,
         group: {
@@ -74,11 +79,15 @@ export class MockGenerationService implements GenerationService {
         uiLevel: 'Ample',
       },
       outputOptions: {
+        type: 'toggledOptionGroupArray',
+
         name: 'Output Options',
         description: 'Various output options',
         multiple: false,
         groups: {
           option1: {
+            type: 'toggledOptionGroup',
+
             name: 'Option 1',
             description: 'Description of option 1',
             default: true,
@@ -94,6 +103,8 @@ export class MockGenerationService implements GenerationService {
             uiLevel: 'Standard',
           },
           option2: {
+            type: 'toggledOptionGroup',
+
             name: 'Option 2',
             description: 'Description of option 2',
             default: false,
@@ -113,6 +124,8 @@ export class MockGenerationService implements GenerationService {
       },
 
       educationInfo: {
+        type: 'optionGroup',
+
         name: 'Settings',
         group: {
           setting1: {

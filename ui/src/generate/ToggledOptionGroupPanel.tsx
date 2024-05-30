@@ -47,7 +47,10 @@ export const ToggledOptionGroupPanel: React.FC<
       {getOptionGroup().enabled && !isEmptyOptionGroup(getOptionGroup()) && (
         <div className={'group'}>
           <OptionGroupPanel
-            metadata={metadata}
+            metadata={{
+              ...metadata,
+              type: 'optionGroup',
+            }}
             getAndSet={[
               () => getOptionGroup(),
               setOptionGroup as (value: OptionGroup) => void,

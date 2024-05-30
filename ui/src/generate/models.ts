@@ -24,11 +24,6 @@ export interface ToggledOptionGroupArray {
 
 export class GenerationOptions {
   [key: string]: OptionGroup | ToggledOptionGroupArray;
-
-  taxonomies: ToggledOptionGroupArray = {};
-  educationInfo: OptionGroup = {};
-  customInputs: OptionGroup = {};
-  outputOptions: ToggledOptionGroupArray = {};
 }
 
 // METADATA CLASSES
@@ -80,23 +75,27 @@ export type OptionMetadata =
   | NumberOptionMetadata;
 
 export interface OptionGroupMetadata extends OptionMetadataBase {
+  type: 'optionGroup';
   group: { [key: string]: OptionMetadata };
 }
 
-export interface ToggledOptionGroupMetadata extends OptionGroupMetadata {
+export interface ToggledOptionGroupMetadata extends OptionMetadataBase {
+  type: 'toggledOptionGroup';
   default: boolean;
+  group: { [key: string]: OptionMetadata };
 }
 
 export interface ToggledOptionGroupArrayMetadata extends OptionMetadataBase {
+  type: 'toggledOptionGroupArray';
   multiple: boolean;
   groups: { [key: string]: ToggledOptionGroupMetadata };
 }
 
 export interface GenerationOptionsMetadata {
-  taxonomies: ToggledOptionGroupArrayMetadata;
-  educationInfo: OptionGroupMetadata;
-  customInputs: ToggledOptionGroupMetadata;
-  outputOptions: ToggledOptionGroupArrayMetadata;
+  [key: string]:
+    | OptionGroupMetadata
+    | ToggledOptionGroupMetadata
+    | ToggledOptionGroupArrayMetadata;
 }
 
 const UiLevel = {
@@ -128,7 +127,11 @@ function filterToggledGroupByLevel(
 ): ToggledOptionGroupMetadata {
   return {
     ...metadata,
-    ...filterGroupByLevel(metadata, uiLevel),
+    group: Object.fromEntries(
+      Object.entries(metadata.group).filter(
+        (entry) => UiLevel[entry[1].uiLevel] <= UiLevel[uiLevel],
+      ),
+    ),
   };
 }
 
@@ -150,15 +153,18 @@ export function filterByLevel(
   metadata: GenerationOptionsMetadata,
   uiLevel: UiLevel,
 ): GenerationOptionsMetadata {
-  return {
-    customInputs: filterToggledGroupByLevel(metadata.customInputs, uiLevel),
-    outputOptions: filterToggledGroupArrayByLevel(
-      metadata.outputOptions,
-      uiLevel,
-    ),
-    educationInfo: filterGroupByLevel(metadata.educationInfo, uiLevel),
-    taxonomies: filterToggledGroupArrayByLevel(metadata.taxonomies, uiLevel),
-  };
+  return Object.fromEntries(
+    Object.entries(metadata).map(([key, subMetadata]) => {
+      switch (subMetadata.type) {
+        case 'optionGroup':
+          return [key, filterGroupByLevel(subMetadata, uiLevel)];
+        case 'toggledOptionGroup':
+          return [key, filterToggledGroupByLevel(subMetadata, uiLevel)];
+        case 'toggledOptionGroupArray':
+          return [key, filterToggledGroupArrayByLevel(subMetadata, uiLevel)];
+      }
+    }),
+  );
 }
 
 // INITIALIZERS
@@ -224,18 +230,19 @@ export function initGenerationOptions(
   metadata?: GenerationOptionsMetadata,
 ): GenerationOptions {
   if (metadata === undefined) {
-    return {
-      taxonomies: {},
-      customInputs: {},
-      outputOptions: {},
-      educationInfo: {},
-    };
+    return {};
   } else {
-    return {
-      taxonomies: initToggledOptionGroupArray(metadata.taxonomies),
-      customInputs: initToggledOptionGroup(metadata.customInputs),
-      educationInfo: initOptionGroup(metadata.educationInfo),
-      outputOptions: initToggledOptionGroupArray(metadata.outputOptions),
-    };
+    return Object.fromEntries(
+      Object.entries(metadata).map(([key, subMetadata]) => {
+        switch (subMetadata.type) {
+          case 'optionGroup':
+            return [key, initOptionGroup(subMetadata)];
+          case 'toggledOptionGroup':
+            return [key, initToggledOptionGroup(subMetadata)];
+          case 'toggledOptionGroupArray':
+            return [key, initToggledOptionGroupArray(subMetadata)];
+        }
+      }),
+    );
   }
 }
