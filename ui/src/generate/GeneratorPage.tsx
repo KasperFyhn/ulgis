@@ -31,51 +31,69 @@ function renderPanelContent(
   ],
   options: GenerationOptions,
   setOptions: (options: GenerationOptions) => void,
-): ReactElement {
+  hr = false,
+): ReactElement | undefined {
   const [key, metadata] = metadataEntry;
   switch (metadata.type) {
     case 'optionGroup':
+      if (Object.keys(metadata.group).length < 1) {
+        return undefined;
+      }
       return (
-        <OptionGroupPanel
-          key={key}
-          metadata={metadata}
-          getAndSet={[
-            () => options[key] as OptionGroup,
-            (v) => {
-              options[key] = v;
-              setOptions({ ...options });
-            },
-          ]}
-        />
+        <>
+          <h1>{metadata.name}</h1>
+          <OptionGroupPanel
+            metadata={metadata}
+            getAndSet={[
+              () => options[key] as OptionGroup,
+              (v) => {
+                options[key] = v;
+                setOptions({ ...options });
+              },
+            ]}
+          />
+        </>
       );
     case 'toggledOptionGroup':
+      if (Object.keys(metadata.group).length < 1) {
+        return undefined;
+      }
       return (
-        <ToggledOptionGroupPanel
-          key={key}
-          metadata={metadata}
-          getAndSet={[
-            () => options[key] as ToggledOptionGroup,
-            (v) => {
-              options[key] = v;
-              setOptions({ ...options });
-            },
-          ]}
-        />
+        <>
+          <h1>{metadata.name}</h1>
+          <ToggledOptionGroupPanel
+            key={key}
+            metadata={metadata}
+            getAndSet={[
+              () => options[key] as ToggledOptionGroup,
+              (v) => {
+                options[key] = v;
+                setOptions({ ...options });
+              },
+            ]}
+          />
+        </>
       );
     case 'toggledOptionGroupArray':
+      if (Object.keys(metadata.groups).length < 1) {
+        return undefined;
+      }
       return (
-        <ToggledOptionGroupArrayPanel
-          key={key}
-          metadata={metadata}
-          vertical={key !== 'taxonomies'} // TODO: fix this hack
-          getAndSet={[
-            () => options[key] as ToggledOptionGroupArray,
-            (v) => {
-              options[key] = v;
-              setOptions({ ...options });
-            },
-          ]}
-        />
+        <>
+          <h1>{metadata.name}</h1>
+          <ToggledOptionGroupArrayPanel
+            key={key}
+            metadata={metadata}
+            vertical={key !== 'taxonomies'} // TODO: fix this hack
+            getAndSet={[
+              () => options[key] as ToggledOptionGroupArray,
+              (v) => {
+                options[key] = v;
+                setOptions({ ...options });
+              },
+            ]}
+          />
+        </>
       );
   }
 }

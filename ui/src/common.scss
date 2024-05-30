@@ -2,6 +2,11 @@
 
 h1 {
   font-size: xx-large;
+  margin-bottom: 15px;
+}
+
+h1:not(:first-child) {
+  margin-top: 40px;
 }
 
 h2 {
@@ -10,6 +15,7 @@ h2 {
 
 button {
   @include set-colors('theme');
+  @extend .button;
   @extend .button--small;
 }
 
