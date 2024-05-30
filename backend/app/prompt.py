@@ -28,8 +28,8 @@ def build_prompt(
 
     if options.taxonomies.is_any_enabled():
         prompt += (
-            "It should be based on the provided taxonomies where you aim for the following levels of "
-            "competency for the respective aspects:"
+            "Your response should be based on the provided taxonomies where you aim for the following levels of "
+            "competency for the described aspects:"
         )
         prompt += "\n"
         for taxonomy_name, taxonomy_params in options.taxonomies.iter_taxonomies():
@@ -41,15 +41,18 @@ def build_prompt(
                     prompt += f"\t- Ignore '{param_name}'.\n"
                 else:
                     prompt += f"\t- Aim for a {ParameterOrm.steps[param_value]} level for '{param_name}'.\n"
+
         prompt += "\n\n"
 
     education = options.education_info.education_name or "any education"
     level = options.education_info.education_level
 
-    prompt += f"It should fit with {education} at {level} level."
     if options.education_info.education_description:
         prompt += "\n\n"
-        prompt += f"It is described as follows: {options.education_info.education_description}"
+        prompt += (
+            f"Your response should fit with {education} at {level} level which is described as "
+            f"follows: {options.education_info.education_description}"
+        )
     prompt += "\n\n"
 
     if options.education_info.previous_learning_goals:
@@ -58,12 +61,14 @@ def build_prompt(
         prompt += "\n\n"
 
     if options.custom_inputs.custom_instruction:
-        prompt += "\n\n"
         prompt += options.custom_inputs.custom_instruction
+        prompt += "\n\n"
 
     # output formatting
     if options.output_options.learning_goals.enabled:
-        prompt += f"Create a list of learning goals for {education} at {level} level."
+        prompt += (
+            f"Create a list of five learning goals for {education} at {level} level."
+        )
     elif options.output_options.competency_profile.enabled:
         prompt += (
             f"Create a 200 word competency profile for {education} at {level} level."

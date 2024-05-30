@@ -6,7 +6,12 @@ from ollama import Options
 from openai import AsyncClient
 from openai.types.chat import ChatCompletionChunk
 
-_system_prompt = "You are an expert on education and learning. Keep responses concise and to the point."
+_system_prompt = (
+    "You are an expert on education and learning. Your purpose is to provide inspiration to"
+    "teachers and staff in educational institutions about learning goals for courses, programs"
+    "and educations. Be creative while retaining a focus on core values of education. Keep responses"
+    "concise and to the point."
+)
 
 
 async def generate(prompt: str, stream: bool = False):

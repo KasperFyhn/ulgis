@@ -9,7 +9,7 @@ const UiLevelContext = createContext<{
   uiLevel: UiLevel;
   setUiLevel: (level: UiLevel) => void;
 }>({
-  uiLevel: 'simple',
+  uiLevel: 'Standard',
   // eslint-disable-next-line @typescript-eslint/no-empty-function
   setUiLevel: () => {},
 });
@@ -17,7 +17,7 @@ const UiLevelContext = createContext<{
 const UiLevelProvider: React.FC<{
   children: ReactNode;
 }> = ({ children }) => {
-  const [uiLevel, setUiLevel] = useState<UiLevel>('standard');
+  const [uiLevel, setUiLevel] = useState<UiLevel>('Standard');
 
   return (
     <UiLevelContext.Provider value={{ uiLevel, setUiLevel }}>
@@ -56,14 +56,14 @@ const NavBar: React.FC = () => {
 
       <div className={'nav__utilities'}>
         <div className={'nav__item'}>
-          View:
+          <div>Mode:</div>
           <MultiValueToggle
             name={'ui-level'}
             selected={uiLevel}
             onChange={(s) => {
               setUiLevel(s as UiLevel);
             }}
-            options={['simple', 'standard', 'advanced']}
+            options={['Standard', 'Modular', 'Ample']}
           />
         </div>
       </div>

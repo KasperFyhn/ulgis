@@ -55,23 +55,23 @@ class EducationInfo(OptionGroup):
         title="Education Level",
         description="Education level",
         json_schema_extra=dict(
-            options=["Bachelor", "Master", "PhD"], ui_level="simple"
+            options=["Bachelor", "Master", "PhD"], ui_level="Standard"
         ),
     )
     education_name: str = Field(
         title="Education Name",
         description="Education name",
-        json_schema_extra=dict(short=True, ui_level="simple"),
+        json_schema_extra=dict(short=True, ui_level="Standard"),
     )
     education_description: str = Field(
         title="Education Description",
         description="Education Description",
-        json_schema_extra=dict(ui_level="standard"),
+        json_schema_extra=dict(ui_level="Modular"),
     )
     previous_learning_goals: str = Field(
         title="Previous Learning Goals",
         description="Previous Learning Goals",
-        json_schema_extra=dict(ui_level="advanced"),
+        json_schema_extra=dict(ui_level="Ample"),
     )
 
 
@@ -79,13 +79,13 @@ class CustomInputs(OptionGroup):
     custom_instruction: str = Field(
         title="Custom Instruction",
         description="Custom instructions for the LLM, for example: a specific context, language, situation, etc.",
-        json_schema_extra=dict(ui_level="advanced"),
+        json_schema_extra=dict(ui_level="Ample"),
     )
     extra_inputs: list[str] = Field(
         title="Extra Inputs",
         description="Extra inputs akin to taxonomies that the LLM should take into account, for example: previous "
         "learning outcomes from study regulations, programme or course descriptions, etc.",
-        json_schema_extra=dict(ui_level="advanced"),
+        json_schema_extra=dict(ui_level="Ample"),
     )
 
 
@@ -104,7 +104,7 @@ class BulletPointOptions(ToggledOptionGroup):
         description="The number of bullets that the LLM is instructed to write out.",
         ge=1,
         le=25,
-        json_schema_extra=dict(step=1, ui_level="advanced"),
+        json_schema_extra=dict(step=1, ui_level="Ample"),
     )
     nested: bool = Field(
         title="Nested",
@@ -141,12 +141,12 @@ class OutputOptions(ToggledOptionGroupArray):
     bullet_points: BulletPointOptions = Field(
         title="Bullet Points",
         description="Instruct the LLM to write in bullet points.",
-        json_schema_extra=dict(ui_level="advanced"),
+        json_schema_extra=dict(ui_level="Ample"),
     )
     prose_description: ProseDescriptionOptions = Field(
         title="Prose Description",
         description="Instruct the LLM to write a prose description.",
-        json_schema_extra=dict(ui_level="advanced"),
+        json_schema_extra=dict(ui_level="Ample"),
     )
 
 
@@ -155,7 +155,7 @@ class GenerationOptions(CamelModel):
     education_info: EducationInfo = Field(
         title="Education Information",
         description="Education Information",
-        json_schema_extra=dict(ui_level="simple"),
+        json_schema_extra=dict(ui_level="Standard"),
     )
     custom_inputs: CustomInputs = Field(
         title="Custom Inputs",

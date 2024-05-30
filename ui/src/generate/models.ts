@@ -33,7 +33,7 @@ export class GenerationOptions {
 
 // METADATA CLASSES
 
-export type UiLevel = 'simple' | 'standard' | 'advanced';
+export type UiLevel = 'Standard' | 'Modular' | 'Ample';
 
 interface OptionMetadataBase {
   name: string;
@@ -102,10 +102,10 @@ export interface GenerationOptionsMetadata {
 const UiLevel = {
   // TODO: consider this: being the lowest should ultimately be decided by its
   //  parents, right?
-  inherit: -1,
-  simple: 0,
-  standard: 1,
-  advanced: 2,
+  Inherit: -1,
+  Standard: 0,
+  Modular: 1,
+  Ample: 2,
 } as const;
 
 function filterGroupByLevel(
