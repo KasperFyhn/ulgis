@@ -2,7 +2,6 @@ import '../common.scss';
 import { DefaultGenerationService } from './GenerationService';
 import React, { ReactElement, useEffect, useState } from 'react';
 import {
-  filterByLevel,
   GenerationOptions,
   GenerationOptionsMetadata,
   initGenerationOptions,
@@ -31,7 +30,6 @@ function renderPanelContent(
   ],
   options: GenerationOptions,
   setOptions: (options: GenerationOptions) => void,
-  hr = false,
 ): ReactElement | undefined {
   const [key, metadata] = metadataEntry;
   switch (metadata.type) {
@@ -40,9 +38,10 @@ function renderPanelContent(
         return undefined;
       }
       return (
-        <>
+        <div key={key} className={'options-group'}>
           <h1>{metadata.name}</h1>
           <OptionGroupPanel
+            key={key}
             metadata={metadata}
             getAndSet={[
               () => options[key] as OptionGroup,
@@ -52,14 +51,14 @@ function renderPanelContent(
               },
             ]}
           />
-        </>
+        </div>
       );
     case 'toggledOptionGroup':
       if (Object.keys(metadata.group).length < 1) {
         return undefined;
       }
       return (
-        <>
+        <div key={key} className={'options-group'}>
           <h1>{metadata.name}</h1>
           <ToggledOptionGroupPanel
             key={key}
@@ -72,14 +71,14 @@ function renderPanelContent(
               },
             ]}
           />
-        </>
+        </div>
       );
     case 'toggledOptionGroupArray':
       if (Object.keys(metadata.groups).length < 1) {
         return undefined;
       }
       return (
-        <>
+        <div key={key} className={'options-group'}>
           <h1>{metadata.name}</h1>
           <ToggledOptionGroupArrayPanel
             key={key}
@@ -93,19 +92,16 @@ function renderPanelContent(
               },
             ]}
           />
-        </>
+        </div>
       );
   }
 }
 
-export const GeneratorPage: React.FC = () => {
-  const service = new DefaultGenerationService();
+const service = new DefaultGenerationService();
 
+export const GeneratorPage: React.FC = () => {
   const { uiLevel } = useUiLevel();
 
-  const [cachedOptionsMetadata, setCachedOptionsMetadata] = useState<
-    GenerationOptionsMetadata | undefined
-  >(undefined);
   const [optionsMetadata, setOptionsMetadata] = useState<
     GenerationOptionsMetadata | undefined
   >(undefined);
@@ -115,20 +111,11 @@ export const GeneratorPage: React.FC = () => {
   );
 
   useEffect(() => {
-    if (cachedOptionsMetadata !== undefined) {
-      setOptionsMetadata(() => filterByLevel(cachedOptionsMetadata, uiLevel));
-    }
-  }, [uiLevel, cachedOptionsMetadata]);
-
-  useEffect(() => {
-    if (optionsMetadata === undefined) {
-      service.getGenerationOptionsMetadata().then((metadata) => {
-        setCachedOptionsMetadata(() => metadata);
-        setOptionsMetadata(() => filterByLevel(metadata, uiLevel));
-        setOptions(() => initGenerationOptions(metadata));
-      });
-    }
-  });
+    service.getGenerationOptionsMetadata(uiLevel).then((metadata) => {
+      setOptionsMetadata(() => metadata);
+      setOptions(() => initGenerationOptions(metadata));
+    });
+  }, [uiLevel]);
 
   const [creatingResponse, setCreatingResponse] = useState(false);
   const [response, setResponse] = useState<string | undefined>(undefined);
@@ -163,21 +150,26 @@ export const GeneratorPage: React.FC = () => {
   }
 
   const optionMetadataList = Object.entries(optionsMetadata);
-  const topPanelMetadata = optionMetadataList[0];
-  const halfLength = Math.floor(optionMetadataList.length / 2) + 1;
-  const leftPanelMetadata = optionMetadataList.slice(1, halfLength);
+  const topPanelMetadata =
+    optionMetadataList.length > 2 ? optionMetadataList.shift() : undefined;
+  const halfLength = Math.floor(optionMetadataList.length / 2);
+  const leftPanelMetadata = optionMetadataList.slice(0, halfLength);
   const rightPanelMetadata = optionMetadataList.slice(halfLength);
 
   return (
     <div className={'flex-container--vert'}>
-      <div className={'content-pane flex-container__box padded'}>
-        {renderPanelContent(topPanelMetadata, options, setOptions)}
-      </div>
+      {topPanelMetadata && (
+        <div className={'content-pane flex-container__box padded'}>
+          {renderPanelContent(topPanelMetadata, options, setOptions)}
+        </div>
+      )}
       <div className={'flex-container--horiz'}>
         <div className={'content-pane flex-container__box padded'}>
-          {leftPanelMetadata.map((metadataEntry) =>
-            renderPanelContent(metadataEntry, options, setOptions),
-          )}
+          {leftPanelMetadata
+            .map((metadataEntry) =>
+              renderPanelContent(metadataEntry, options, setOptions),
+            )
+            .filter((obj) => obj !== undefined)}
         </div>
         <div
           className={'content-pane flex-container__box size_40percent padded'}

@@ -138,6 +138,9 @@ class OutputOptions(ToggledOptionGroupArray):
         title="Competency Profile",
         description="Instruct the LLM to write out a competency profile.",
     )
+
+
+class AdvancedOutputOptions(OutputOptions):
     bullet_points: BulletPointOptions = Field(
         title="Bullet Points",
         description="Instruct the LLM to write in bullet points.",
@@ -150,18 +153,42 @@ class OutputOptions(ToggledOptionGroupArray):
     )
 
 
-class GenerationOptions(CamelModel):
-    taxonomies: TaxonomyArray = Field(title="Taxonomies", description="Taxonomies")
+class _GenerationOptionsBase(CamelModel):
+    taxonomies: None = None
+    education_info: None = None
+    generation_settings: None = None
+    output_options: None = None
+    custom_inputs: None = None
+
+
+class StandardGenerationOptions(_GenerationOptionsBase):
+    taxonomies: None = Field(default=None)
     education_info: EducationInfo = Field(
         title="Education Information",
         description="Education Information",
         json_schema_extra=dict(ui_level="Standard"),
     )
-    custom_inputs: CustomInputs = Field(
-        title="Custom Inputs",
-        description="Custom inputs",
-    )
     output_options: OutputOptions = Field(
         title="Output Options",
         description="Options for instructing an LLM about output format.",
     )
+
+
+class ModularGenerationOptions(StandardGenerationOptions):
+    taxonomies: TaxonomyArray = Field(title="Taxonomies", description="Taxonomies")
+
+
+class AmpleGenerationOptions(ModularGenerationOptions):
+    custom_inputs: CustomInputs = Field(
+        title="Custom Inputs",
+        description="Custom inputs",
+    )
+    output_options: AdvancedOutputOptions = Field(
+        title="Output Options",
+        description="Options for instructing an LLM about output format.",
+    )
+
+
+GenerationOptions = (
+    AmpleGenerationOptions | ModularGenerationOptions | StandardGenerationOptions
+)

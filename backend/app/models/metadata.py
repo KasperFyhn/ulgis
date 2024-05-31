@@ -1,3 +1,4 @@
+from types import NoneType
 from typing import Optional, Literal, Union, Any, Callable, Type
 
 from annotated_types import Ge, Le
@@ -11,6 +12,7 @@ from app.models.models import (
     OptionGroup,
     ToggledOptionGroup,
     ToggledOptionGroupArray,
+    GenerationOptions,
 )
 
 
@@ -244,8 +246,9 @@ def _create_field_metadata(
         raise TypeError("Unsupported annotation")
 
 
-def create_metadata(model: Type[BaseModel], db: Session):
+def create_metadata(model: Type[GenerationOptions], db: Session):
     return {
         v.alias: _create_field_metadata(v, db)  # alias to get camelCase naming
         for k, v in model.model_fields.items()
+        if v.annotation != NoneType  #
     }

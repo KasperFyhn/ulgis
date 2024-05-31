@@ -1,5 +1,9 @@
 from app.db.models import ParameterOrm
-from app.models.models import GenerationOptions
+from app.models.models import (
+    GenerationOptions,
+    ModularGenerationOptions,
+    AmpleGenerationOptions,
+)
 
 
 def build_prompt(
@@ -8,7 +12,10 @@ def build_prompt(
     prompt = ""
 
     # background knowledge
-    if options.taxonomies.is_any_enabled():
+    if (
+        isinstance(options, ModularGenerationOptions)
+        and options.taxonomies.is_any_enabled()
+    ):
         prompt += "Below are some descriptions of educational taxonomies:\n\n"
         for taxonomy_name, taxonomy_params in options.taxonomies.iter_taxonomies():
             if not taxonomy_params.enabled:
@@ -20,13 +27,19 @@ def build_prompt(
             prompt += "\n\n"
 
     # custom inputs
-    if options.custom_inputs.extra_inputs:
+    if (
+        isinstance(options, AmpleGenerationOptions)
+        and options.custom_inputs.extra_inputs
+    ):
         prompt += "Also pay heed to the following information:\n\n"
         for value in options.custom_inputs.extra_inputs:
             if value:
                 prompt += f"{value}:\n\n"
 
-    if options.taxonomies.is_any_enabled():
+    if (
+        isinstance(options, ModularGenerationOptions)
+        and options.taxonomies.is_any_enabled()
+    ):
         prompt += (
             "Your response should be based on the provided taxonomies where you aim for the following levels of "
             "competency for the described aspects:"
@@ -60,7 +73,10 @@ def build_prompt(
         prompt += options.education_info.previous_learning_goals
         prompt += "\n\n"
 
-    if options.custom_inputs.custom_instruction:
+    if (
+        isinstance(options, AmpleGenerationOptions)
+        and options.custom_inputs.custom_instruction
+    ):
         prompt += options.custom_inputs.custom_instruction
         prompt += "\n\n"
 

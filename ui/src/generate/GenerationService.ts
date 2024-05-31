@@ -1,7 +1,13 @@
-import { GenerationOptions, GenerationOptionsMetadata } from './models';
+import {
+  GenerationOptions,
+  GenerationOptionsMetadata,
+  UiLevel,
+} from './models';
 
 export interface GenerationService {
-  getGenerationOptionsMetadata(): Promise<GenerationOptionsMetadata>;
+  getGenerationOptionsMetadata(
+    uiLevel: UiLevel,
+  ): Promise<GenerationOptionsMetadata>;
 
   createPrompt(options: GenerationOptions): Promise<string>;
 
@@ -15,7 +21,10 @@ export interface GenerationService {
 }
 
 export class MockGenerationService implements GenerationService {
-  getGenerationOptionsMetadata(): Promise<GenerationOptionsMetadata> {
+  getGenerationOptionsMetadata(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    uiLevel: UiLevel,
+  ): Promise<GenerationOptionsMetadata> {
     const generationOptions: GenerationOptionsMetadata = {
       taxonomies: {
         type: 'toggledOptionGroupArray',
@@ -197,9 +206,11 @@ export class DefaultGenerationService implements GenerationService {
     }
   }
 
-  async getGenerationOptionsMetadata(): Promise<GenerationOptionsMetadata> {
+  async getGenerationOptionsMetadata(
+    uiLevel: UiLevel,
+  ): Promise<GenerationOptionsMetadata> {
     const response = await fetch(
-      this.url + '/generate/generation_options_metadata',
+      this.url + '/generate/generation_options_metadata/' + uiLevel,
     );
 
     return await response.json();
