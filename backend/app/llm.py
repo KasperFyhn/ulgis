@@ -22,7 +22,7 @@ async def generate(prompt: str, stream: bool = False):
                 {"role": "system", "content": _system_prompt},
                 {"role": "user", "content": prompt},
             ],
-            model="gpt-3.5-turbo",
+            model="gpt-4o",
             stream=True,
             max_tokens=2000,
         )
