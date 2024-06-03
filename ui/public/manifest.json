@@ -1,6 +1,13 @@
 {
-  "short_name": "Outcome Synthesizer",
-  "name": "Outcome Synthesizer - AI Learning Outcomes",
+  "short_name": "ULGIS",
+  "name": "Universal Learning Goal Inspirational Synthesizer",
+  "icons": [
+    {
+      "src": "favicon.ico",
+      "sizes": "64x64 32x32 24x24 16x16",
+      "type": "image/x-icon"
+    }
+  ],
   "start_url": ".",
   "display": "standalone",
   "theme_color": "#000000",

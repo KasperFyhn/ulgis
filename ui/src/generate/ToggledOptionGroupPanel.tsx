@@ -27,7 +27,9 @@ export const ToggledOptionGroupPanel: React.FC<
   return (
     <div
       className={
-        equalSize ? 'flex-container__box--equal-size' : 'flex-container__box'
+        (equalSize
+          ? 'flex-container__box--equal-size'
+          : 'flex-container__box') + ' flex-container--vert'
       }
     >
       <ToggleButton

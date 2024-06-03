@@ -24,13 +24,6 @@ export const ToggleButton: React.FC<ToggleButtonProps> = ({
       {children}
     </button>
   );
-  if (tooltipText) {
-    return (
-      <TooltipWrap tooltipId={tooltipText} content={tooltipText}>
-        {button}
-      </TooltipWrap>
-    );
-  } else {
-    return button;
-  }
+
+  return button;
 };

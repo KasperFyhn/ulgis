@@ -45,9 +45,6 @@ const NavBar: React.FC = () => {
       </Link>
       <div className={'nav__site'}>
         <div className={'nav__items'}>
-          <Link className={'nav__item'} to={'/generate'}>
-            Generate
-          </Link>
           <Link className={'nav__item'} to={'/about'}>
             About
           </Link>
@@ -71,18 +68,6 @@ const NavBar: React.FC = () => {
   );
 };
 
-const FrontPage: React.FC = () => {
-  return (
-    <div className={'frontpage'}>
-      <img src={'img.png'} alt={'ULGIS Logo'} />
-      <p>
-        Welcome to ULGIS. Go to the <Link to={'/generate'}>generate</Link> page
-        to generate learning outcomes.
-      </p>
-    </div>
-  );
-};
-
 const App: React.FC = () => {
   return (
     <BrowserRouter>
@@ -91,8 +76,7 @@ const App: React.FC = () => {
         <div className="app theme--blue">
           <div className={'app__content'}>
             <Routes>
-              <Route path="/" element={<FrontPage />} />
-              <Route path="/generate" element={<GeneratorPage />} />
+              <Route path="/" element={<GeneratorPage />} />
               {/*<Route path="/evaluate" element={<EvaluationPage />} />*/}
               <Route path="/about" element={<p>Wow. Such empty.</p>} />
             </Routes>

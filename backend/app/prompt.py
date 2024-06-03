@@ -3,6 +3,7 @@ from app.models.models import (
     GenerationOptions,
     ModularGenerationOptions,
     AmpleGenerationOptions,
+    ModularEducationInfo,
 )
 
 
@@ -68,7 +69,10 @@ def build_prompt(
         )
     prompt += "\n\n"
 
-    if options.education_info.previous_learning_goals:
+    if (
+        isinstance(options.education_info, ModularEducationInfo)
+        and options.education_info.previous_learning_goals
+    ):
         prompt += "Take into account these previous learning goals:\n"
         prompt += options.education_info.previous_learning_goals
         prompt += "\n\n"
