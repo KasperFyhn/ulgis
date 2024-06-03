@@ -91,11 +91,15 @@ export interface ToggledOptionGroupArrayMetadata extends OptionMetadataBase {
   groups: { [key: string]: ToggledOptionGroupMetadata };
 }
 
+export type GroupMetadata =
+  | OptionGroupMetadata
+  | ToggledOptionGroupMetadata
+  | ToggledOptionGroupArrayMetadata;
+
 export interface GenerationOptionsMetadata {
-  [key: string]:
-    | OptionGroupMetadata
-    | ToggledOptionGroupMetadata
-    | ToggledOptionGroupArrayMetadata;
+  [key: string]: GroupMetadata;
+
+  taxonomies: GroupMetadata;
 }
 
 // INITIALIZERS

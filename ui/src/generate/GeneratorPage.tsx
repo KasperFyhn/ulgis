@@ -4,13 +4,11 @@ import React, { ReactElement, useEffect, useState } from 'react';
 import {
   GenerationOptions,
   GenerationOptionsMetadata,
+  GroupMetadata,
   initGenerationOptions,
   OptionGroup,
-  OptionGroupMetadata,
   ToggledOptionGroup,
   ToggledOptionGroupArray,
-  ToggledOptionGroupArrayMetadata,
-  ToggledOptionGroupMetadata,
 } from './models';
 import Markdown from 'react-markdown';
 
@@ -20,14 +18,7 @@ import { ToggledOptionGroupPanel } from './ToggledOptionGroupPanel';
 import { ToggledOptionGroupArrayPanel } from './ToggledOptionGroupArrayPanel';
 
 function renderPanelContent(
-  metadataEntry: [
-    string,
-    (
-      | OptionGroupMetadata
-      | ToggledOptionGroupMetadata
-      | ToggledOptionGroupArrayMetadata
-    ),
-  ],
+  metadataEntry: [string, GroupMetadata],
   options: GenerationOptions,
   setOptions: (options: GenerationOptions) => void,
 ): ReactElement | undefined {
@@ -150,8 +141,15 @@ export const GeneratorPage: React.FC = () => {
   }
 
   const optionMetadataList = Object.entries(optionsMetadata);
-  const topPanelMetadata =
-    optionMetadataList.length > 2 ? optionMetadataList.shift() : undefined;
+
+  const topPanelMetadata = optionsMetadata.taxonomies;
+  if (optionsMetadata.taxonomies) {
+    optionMetadataList.splice(
+      optionMetadataList.findIndex((entry) => entry[0] === 'taxonomies'),
+      1,
+    );
+  }
+
   const halfLength = Math.floor(optionMetadataList.length / 2);
   const leftPanelMetadata = optionMetadataList.slice(0, halfLength);
   const rightPanelMetadata = optionMetadataList.slice(halfLength);
@@ -160,7 +158,11 @@ export const GeneratorPage: React.FC = () => {
     <div className={'flex-container--vert'}>
       {topPanelMetadata && (
         <div className={'content-pane flex-container__box padded'}>
-          {renderPanelContent(topPanelMetadata, options, setOptions)}
+          {renderPanelContent(
+            ['taxonomies', topPanelMetadata],
+            options,
+            setOptions,
+          )}
         </div>
       )}
       <div className={'flex-container--horiz'}>
