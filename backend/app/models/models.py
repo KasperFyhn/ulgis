@@ -35,18 +35,35 @@ class Taxonomy(ToggledOptionGroup):
         return ((name, d) for name, d in self.model_extra.items())
 
 
+class NoneTaxonomy(Taxonomy):
+    enabled: bool = True
+
+
 class TaxonomyArray(ToggledOptionGroupArray):
     class Config:
         extra = Extra.allow
         depends = TaxonomyOrm
 
+    multiple: bool = False
+
+    none: NoneTaxonomy = Field(
+        title="None",
+    )
+
     def is_any_enabled(self) -> bool:
+        # the "none" taxonomy is not checked since it will not be part of iter_taxonomies()
         return any(taxonomy.enabled for _, taxonomy in self.iter_taxonomies())
 
     def iter_taxonomies(self) -> Iterable[tuple[str, Taxonomy]]:
         return (
             (name, Taxonomy.model_validate(d)) for name, d in self.model_extra.items()
         )
+
+
+class CombinableTaxonomyArray(TaxonomyArray):
+
+    none: None
+    multiple: bool = True
 
 
 class EducationInfo(OptionGroup):
@@ -194,6 +211,9 @@ class ModularGenerationOptions(StandardGenerationOptions):
 
 
 class AmpleGenerationOptions(ModularGenerationOptions):
+    taxonomies: CombinableTaxonomyArray = Field(
+        title="Taxonomies", description="Taxonomies"
+    )
     education_info: AdvancedEducationInfo = Field(
         title="Education Information",
         description="Education Information",

@@ -143,7 +143,7 @@ def _model_fields_metadata(model: Type[BaseModel], db: Session, *exclude: str) -
     return {
         v.alias: _create_field_metadata(v, db)
         for k, v in model.model_fields.items()
-        if k not in exclude
+        if k not in exclude and v.annotation != NoneType
     }
 
 
