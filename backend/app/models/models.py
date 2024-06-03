@@ -54,38 +54,54 @@ class EducationInfo(OptionGroup):
         "Bachelor",
         title="Education Level",
         description="Education level",
-        json_schema_extra=dict(
-            options=["Bachelor", "Master", "PhD"], ui_level="Standard"
-        ),
+        json_schema_extra=dict(options=["Bachelor", "Master", "PhD"]),
     )
     education_name: str = Field(
         title="Education Name",
         description="Education name",
-        json_schema_extra=dict(short=True, ui_level="Standard"),
+        json_schema_extra=dict(short=True),
     )
     education_description: str = Field(
         title="Education Description",
         description="Education Description",
-        json_schema_extra=dict(ui_level="Modular"),
     )
+
+
+class ModularEducationInfo(EducationInfo):
     previous_learning_goals: str = Field(
         title="Previous Learning Goals",
         description="Previous Learning Goals",
-        json_schema_extra=dict(ui_level="Ample"),
     )
+
+
+class AdvancedEducationInfo(ModularEducationInfo):
+    education_level: str = Field(
+        "6",
+        title="EQF Education Level",
+        description="Education level",
+        json_schema_extra=dict(options=["1", "2", "3", "4", "5", "6", "7", "8"]),
+    )
+
+
+class ModelSettings(OptionGroup):
+    model_name: str = Field(
+        default="GPT-4o",
+        title="Model",
+        description="Model name",
+        json_schema_extra=dict(options=["GPT-3.5", "GPT-4o"]),
+    )
+    temperature: float = Field(title="Temperature", ge=0, le=100)
 
 
 class CustomInputs(OptionGroup):
     custom_instruction: str = Field(
         title="Custom Instruction",
         description="Custom instructions for the LLM, for example: a specific context, language, situation, etc.",
-        json_schema_extra=dict(ui_level="Ample"),
     )
     extra_inputs: list[str] = Field(
         title="Extra Inputs",
         description="Extra inputs akin to taxonomies that the LLM should take into account, for example: previous "
         "learning outcomes from study regulations, programme or course descriptions, etc.",
-        json_schema_extra=dict(ui_level="Ample"),
     )
 
 
@@ -102,11 +118,11 @@ class BulletPointOptions(ToggledOptionGroup):
         10,
         title="Number of Bullets",
         description="The number of bullets that the LLM is instructed to write out.",
-        ge=1,
+        ge=5,
         le=25,
-        json_schema_extra=dict(step=1, ui_level="Ample"),
     )
     nested: bool = Field(
+        default=True,
         title="Nested",
         description="Whether the LLM is instructed to write out nested bullet points.",
     )
@@ -117,9 +133,8 @@ class ProseDescriptionOptions(ToggledOptionGroup):
         250,
         title="Number of Words",
         description="The number of words that the LLM is instructed to write out.",
-        ge=10,
+        ge=50,
         le=500,
-        json_schema_extra=dict(step=1),
     )
     headings: bool = Field(
         True,
@@ -144,19 +159,17 @@ class AdvancedOutputOptions(OutputOptions):
     bullet_points: BulletPointOptions = Field(
         title="Bullet Points",
         description="Instruct the LLM to write in bullet points.",
-        json_schema_extra=dict(ui_level="Ample"),
     )
     prose_description: ProseDescriptionOptions = Field(
         title="Prose Description",
         description="Instruct the LLM to write a prose description.",
-        json_schema_extra=dict(ui_level="Ample"),
     )
 
 
 class _GenerationOptionsBase(CamelModel):
     taxonomies: None = None
     education_info: None = None
-    generation_settings: None = None
+    model_settings: None = None
     output_options: None = None
     custom_inputs: None = None
 
@@ -166,7 +179,6 @@ class StandardGenerationOptions(_GenerationOptionsBase):
     education_info: EducationInfo = Field(
         title="Education Information",
         description="Education Information",
-        json_schema_extra=dict(ui_level="Standard"),
     )
     output_options: OutputOptions = Field(
         title="Output Options",
@@ -176,9 +188,16 @@ class StandardGenerationOptions(_GenerationOptionsBase):
 
 class ModularGenerationOptions(StandardGenerationOptions):
     taxonomies: TaxonomyArray = Field(title="Taxonomies", description="Taxonomies")
+    education_info: ModularEducationInfo = Field(
+        title="Education Info", description="Education Info"
+    )
 
 
 class AmpleGenerationOptions(ModularGenerationOptions):
+    education_info: AdvancedEducationInfo = Field(
+        title="Education Information",
+        description="Education Information",
+    )
     custom_inputs: CustomInputs = Field(
         title="Custom Inputs",
         description="Custom inputs",
@@ -186,6 +205,9 @@ class AmpleGenerationOptions(ModularGenerationOptions):
     output_options: AdvancedOutputOptions = Field(
         title="Output Options",
         description="Options for instructing an LLM about output format.",
+    )
+    model_settings: ModelSettings = Field(
+        title="Model Settings", description="Model Settings"
     )
 
 

@@ -40,7 +40,7 @@ const StringOptions: React.FC<StringOptionsProps> = ({
   getAndSet,
 }: StringOptionsProps) => {
   const [get, set] = getAndSet;
-  if (options.length < 6) {
+  if (options.length < 10) {
     return (
       <div className={'small-vert-margin'}>
         <MultiValueToggle

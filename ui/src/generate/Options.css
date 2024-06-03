@@ -13,9 +13,8 @@ input[type='text'] {
 }
 
 .current-value {
-  border: 1px solid lightgray;
-  padding: 2px;
-  text-align: right;
+  font-size: smaller;
+  padding-left: 5px;
 }
 
 .current-value__hovering {
