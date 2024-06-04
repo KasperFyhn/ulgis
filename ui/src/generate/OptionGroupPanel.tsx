@@ -1,10 +1,14 @@
-import { OptionGroup, OptionGroupMetadata } from './models';
+import {
+  OptionGroup,
+  OptionGroupMetadata,
+  ToggledOptionGroupMetadata,
+} from './models';
 import { Options } from './Options';
 import React from 'react';
 import { HelpTooltip } from '../common/HelpTooltip';
 
 export interface OptionGroupPanelProps {
-  metadata: OptionGroupMetadata;
+  metadata: OptionGroupMetadata | ToggledOptionGroupMetadata;
   getAndSet: [() => OptionGroup, (v: OptionGroup) => void];
   horizontal?: boolean;
 }

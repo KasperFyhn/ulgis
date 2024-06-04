@@ -13,16 +13,11 @@ interface BooleanToggleProps {
 
 const BooleanToggle: React.FC<BooleanToggleProps> = ({
   text,
-  tooltipText,
   getAndSet,
 }: BooleanToggleProps) => {
   const [get, set] = getAndSet;
   return (
-    <ToggleButton
-      checked={get()}
-      onChange={(value) => set(value)}
-      tooltipText={tooltipText}
-    >
+    <ToggleButton checked={get()} onChange={(value) => set(value)}>
       {text}
     </ToggleButton>
   );

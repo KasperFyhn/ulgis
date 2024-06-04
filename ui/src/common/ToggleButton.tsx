@@ -1,24 +1,21 @@
 import React, { CSSProperties } from 'react';
 import './ToggleButton.scss';
-import { TooltipWrap } from './HelpTooltip';
 
 interface ToggleButtonProps extends React.PropsWithChildren {
   checked: boolean;
   onChange?: (value: boolean) => void;
-  tooltipText?: string;
   style?: CSSProperties;
   className?: string;
 }
 
 export const ToggleButton: React.FC<ToggleButtonProps> = ({
   checked,
-  tooltipText,
   children,
   onChange,
   style,
   className,
 }: ToggleButtonProps) => {
-  const button = (
+  return (
     <button
       style={style}
       className={`${checked ? '' : 'button--dimmed'} ` + className}
@@ -29,6 +26,4 @@ export const ToggleButton: React.FC<ToggleButtonProps> = ({
       {children}
     </button>
   );
-
-  return button;
 };

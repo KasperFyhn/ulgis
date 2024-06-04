@@ -49,6 +49,7 @@ def seed_database():
                         short_description=taxonomy["short_description"],
                         text=taxonomy["text"],
                         ui_level=taxonomy["ui_level"],
+                        priority=taxonomy["priority"],
                         group=[
                             default_param(param) for param in taxonomy["parameters"]
                         ],

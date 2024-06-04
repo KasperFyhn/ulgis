@@ -18,6 +18,7 @@ class ToggledOptionGroup(CamelModel):
     """An Abstract class. Child classes should contain fields of type OptionType."""
 
     enabled: bool = False
+    priority: float = 0.0
 
 
 class ToggledOptionGroupArray(CamelModel):
@@ -36,13 +37,14 @@ class Taxonomy(ToggledOptionGroup):
 
 
 class NoneTaxonomy(Taxonomy):
-    enabled: bool = True
+    priority: float = -1000
 
 
-class TaxonomyArray(ToggledOptionGroupArray):
+class StandardTaxonomyArray(ToggledOptionGroupArray):
     class Config:
         extra = Extra.allow
         depends = TaxonomyOrm
+        ui_level = "Standard"
 
     multiple: bool = False
 
@@ -60,9 +62,16 @@ class TaxonomyArray(ToggledOptionGroupArray):
         )
 
 
-class CombinableTaxonomyArray(TaxonomyArray):
+class ModularTaxonomyArray(StandardTaxonomyArray):
+    class Config:
+        ui_level = "Modular"
 
-    none: None
+
+class CombinableTaxonomyArray(ModularTaxonomyArray):
+    class Config:
+        ui_level = "Ample"
+
+    none: None = None
     multiple: bool = True
 
 
@@ -100,8 +109,8 @@ class AdvancedEducationInfo(ModularEducationInfo):
     )
 
 
-class ModelSettings(OptionGroup):
-    model_name: str = Field(
+class LlmSettings(OptionGroup):
+    model: str = Field(
         default="GPT-4o",
         title="Model",
         description="Model name",
@@ -186,13 +195,15 @@ class AdvancedOutputOptions(OutputOptions):
 class _GenerationOptionsBase(CamelModel):
     taxonomies: None = None
     education_info: None = None
-    model_settings: None = None
+    llm_settings: None = None
     output_options: None = None
     custom_inputs: None = None
 
 
 class StandardGenerationOptions(_GenerationOptionsBase):
-    taxonomies: None = Field(default=None)
+    taxonomies: StandardTaxonomyArray = Field(
+        title="Taxonomies", description="Taxonomies"
+    )
     education_info: EducationInfo = Field(
         title="Education Information",
         description="Education Information",
@@ -204,7 +215,9 @@ class StandardGenerationOptions(_GenerationOptionsBase):
 
 
 class ModularGenerationOptions(StandardGenerationOptions):
-    taxonomies: TaxonomyArray = Field(title="Taxonomies", description="Taxonomies")
+    taxonomies: ModularTaxonomyArray = Field(
+        title="Taxonomies", description="Taxonomies"
+    )
     education_info: ModularEducationInfo = Field(
         title="Education Info", description="Education Info"
     )
@@ -226,7 +239,7 @@ class AmpleGenerationOptions(ModularGenerationOptions):
         title="Output Options",
         description="Options for instructing an LLM about output format.",
     )
-    model_settings: ModelSettings = Field(
+    llm_settings: LlmSettings = Field(
         title="Model Settings", description="Model Settings"
     )
 

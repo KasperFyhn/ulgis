@@ -41,7 +41,6 @@ export const ToggledOptionGroupPanel: React.FC<
           obj.enabled = value;
           setOptionGroup({ ...obj });
         }}
-        tooltipText={metadata.description}
       >
         {metadata.name}
       </ToggleButton>

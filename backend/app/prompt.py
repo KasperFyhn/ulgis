@@ -1,7 +1,6 @@
 from app.db.models import ParameterOrm
 from app.models.models import (
     GenerationOptions,
-    ModularGenerationOptions,
     AmpleGenerationOptions,
     ModularEducationInfo,
 )
@@ -13,10 +12,7 @@ def build_prompt(
     prompt = ""
 
     # background knowledge
-    if (
-        isinstance(options, ModularGenerationOptions)
-        and options.taxonomies.is_any_enabled()
-    ):
+    if options.taxonomies.is_any_enabled():
         prompt += "Below are some descriptions of educational taxonomies:\n\n"
         for taxonomy_name, taxonomy_params in options.taxonomies.iter_taxonomies():
             if not taxonomy_params.enabled:
@@ -37,10 +33,7 @@ def build_prompt(
             if value:
                 prompt += f"{value}:\n\n"
 
-    if (
-        isinstance(options, ModularGenerationOptions)
-        and options.taxonomies.is_any_enabled()
-    ):
+    if options.taxonomies.is_any_enabled():
         prompt += (
             "Your response should be based on the provided taxonomies where you aim for the following levels of "
             "competency for the described aspects:"

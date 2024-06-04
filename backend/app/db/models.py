@@ -1,4 +1,4 @@
-from sqlalchemy import Column, Integer, String, Text, ForeignKey
+from sqlalchemy import Column, Integer, String, Text, ForeignKey, Float
 from sqlalchemy.orm import Mapped, relationship
 
 from app.db.base import Base
@@ -12,6 +12,7 @@ class TaxonomyOrm(Base):
     short_description = Column(String)
     text = Column(Text)
     ui_level = Column(String)
+    priority = Column(Float)
 
     group: Mapped[list["ParameterOrm"]] = relationship(back_populates="taxonomy")
 

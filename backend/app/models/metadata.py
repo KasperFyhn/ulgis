@@ -3,7 +3,7 @@ from typing import Optional, Literal, Union, Any, Callable, Type
 
 from annotated_types import Ge, Le
 from fastapi_camelcase import CamelModel
-from pydantic import Field, field_validator, BaseModel
+from pydantic import Field, field_validator, BaseModel, model_validator
 from pydantic.fields import FieldInfo  # noqa
 from sqlalchemy.orm import Session
 from typing_extensions import Annotated
@@ -95,6 +95,7 @@ class ToggledOptionGroupMetadata(OptionMetadataBase):
 
     type: Literal["toggledOptionGroup"] = "toggledOptionGroup"
     default: bool = False
+    priority: float = 0.0
     group: dict[str, OptionMetadata]
 
     @field_validator("group", mode="before")
@@ -111,6 +112,21 @@ class ToggledOptionGroupArrayMetadata(OptionMetadataBase):
     type: Literal["toggledOptionGroupArray"] = "toggledOptionGroupArray"
     multiple: bool
     groups: dict[str, ToggledOptionGroupMetadata]
+
+    @model_validator(mode="after")
+    def group_validator_sort(self):
+        # post validation setup of groups
+        groups = {
+            k: v
+            for k, v in sorted(
+                self.groups.items(), key=lambda item: item[1].priority, reverse=True
+            )
+        }
+        if not self.multiple and not any(v.default for v in groups.values()):
+            for v in groups.values():
+                v.default = True
+                break
+        self.groups = groups
 
 
 def _get_from_field_metadata(
@@ -147,12 +163,23 @@ def _model_fields_metadata(model: Type[BaseModel], db: Session, *exclude: str) -
     }
 
 
+_ui_level_map: dict[str, int] = {
+    "Standard": 0,
+    "Modular": 1,
+    "Ample": 2,
+}
+
+
 def _populate_from_orm_dependencies(
     model: Type[OptionGroup | ToggledOptionGroup | ToggledOptionGroupArray], db: Session
 ):
+
     if "depends" in model.model_config:
+        ui_level = _ui_level_map[model.model_config.get("ui_level", "Standard")]
         return {
-            orm.name: orm for orm in (db.query(model.model_config["depends"]).all())
+            orm.name: orm
+            for orm in (db.query(model.model_config["depends"]).all())
+            if _ui_level_map[orm.ui_level] <= ui_level
         }
     else:
         return {}
@@ -230,7 +257,8 @@ def _create_field_metadata(
             description=field.description,
             ui_level=_get_from_json_schema_extra(field, "ui_level", "Inherit"),
             default=field.annotation.model_fields["enabled"].default,
-            group=_model_fields_metadata(field.annotation, db, "enabled")
+            priority=field.annotation.model_fields["priority"].default,
+            group=_model_fields_metadata(field.annotation, db, "enabled", "priority")
             | _populate_from_orm_dependencies(field.annotation, db),
         )
     elif issubclass(field.annotation, ToggledOptionGroupArray):
