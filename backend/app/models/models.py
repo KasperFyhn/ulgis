@@ -111,12 +111,14 @@ class AdvancedEducationInfo(ModularEducationInfo):
 
 class LlmSettings(OptionGroup):
     model: str = Field(
-        default="GPT-4o",
+        default="gpt-4o",
         title="Model",
         description="Model name",
-        json_schema_extra=dict(options=["GPT-3.5", "GPT-4o"]),
+        json_schema_extra=dict(options=["gpt-3.5-turbo", "gpt-4o"]),
     )
-    temperature: float = Field(title="Temperature", ge=0, le=100)
+    temperature: float = Field(
+        title="Temperature", ge=0, le=2, json_schema_extra=dict(step=0.01)
+    )
 
 
 class CustomInputs(OptionGroup):

@@ -51,7 +51,12 @@ async def generate_outcomes(
 ):
     logger.debug(request)
     prompt = build_prompt(request, get_taxonomy_texts(db))
-    response = await llm.generate(prompt)
+    extra_kwargs = (
+        request.llm_settings.dict()
+        if isinstance(request, AmpleGenerationOptions)
+        else {}
+    )
+    response = await llm.generate(prompt, **extra_kwargs)
     return response
 
 
@@ -66,7 +71,12 @@ async def start_stream(
     logger.debug(request)
     prompt = build_prompt(request, get_taxonomy_texts(db))
     token = str(uuid.uuid4())
-    _streaming_responses[token] = llm.generate(prompt, stream=True)
+    extra_kwargs = (
+        request.llm_settings.dict()
+        if isinstance(request, AmpleGenerationOptions)
+        else {}
+    )
+    _streaming_responses[token] = llm.generate(prompt, stream=True, **extra_kwargs)
     return {"token": token}
 
 

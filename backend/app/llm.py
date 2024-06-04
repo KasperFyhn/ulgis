@@ -14,7 +14,12 @@ _system_prompt = (
 )
 
 
-async def generate(prompt: str, stream: bool = False):
+async def generate(
+    prompt: str,
+    stream: bool = False,
+    model: Optional[str] = None,
+    temperature: float = None,
+):
     if os.environ.get("OPENAI_API_KEY"):
         client = AsyncClient(api_key=os.environ.get("OPENAI_API_KEY"))
         response_coro = client.chat.completions.create(
@@ -22,7 +27,8 @@ async def generate(prompt: str, stream: bool = False):
                 {"role": "system", "content": _system_prompt},
                 {"role": "user", "content": prompt},
             ],
-            model="gpt-3.5-turbo",
+            model=model or "gpt-3.5-turbo",
+            temperature=temperature,
             stream=True,
             max_tokens=2000,
         )
