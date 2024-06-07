@@ -52,12 +52,15 @@ def build_prompt(
         prompt += "\n\n"
 
     education = options.education_info.education_name or "any education"
-    level = options.education_info.education_level
+    if isinstance(options, AmpleGenerationOptions):
+        level = "EQF level " + options.education_info.education_level
+    else:
+        level = options.education_info.education_level + " level"
 
     if options.education_info.education_description:
         prompt += "\n\n"
         prompt += (
-            f"Your response should fit with {education} at {level} level which is described as "
+            f"Your response should fit with {education} at {level} which is described as "
             f"follows: {options.education_info.education_description}"
         )
     prompt += "\n\n"
@@ -79,23 +82,19 @@ def build_prompt(
 
     # output formatting
     if options.output_options.learning_goals.enabled:
-        prompt += (
-            f"Create a list of five learning goals for {education} at {level} level."
-        )
+        prompt += f"Create a list of five learning goals for {education} at {level}."
     elif options.output_options.competency_profile.enabled:
-        prompt += (
-            f"Create a 200 word competency profile for {education} at {level} level."
-        )
+        prompt += f"Create a 200 word competency profile for {education} at {level}."
     elif options.output_options.bullet_points.enabled:
         prompt += (
             f"Create learning outcomes in {options.output_options.bullet_points.number_of_bullets} bullet points "
             f"which can {'' if options.output_options.bullet_points.nested else 'NOT'} be nested "
-            f"for {education} at {level} level."
+            f"for {education} at {level}."
         )
     elif options.output_options.prose_description.enabled:
         prompt += (
             f"Create a prose description of {options.output_options.prose_description.number_of_words} "
-            f"words and NOT bullet points which addresses learning outcomes for {education} at {level} level. "
+            f"words and NOT bullet points which addresses learning outcomes for {education} at {level}. "
             f"{'Include' if options.output_options.prose_description.headings else 'Do NOT include'} headings."
         )
     prompt += "\n\n"

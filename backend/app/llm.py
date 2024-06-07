@@ -53,6 +53,7 @@ async def generate(
             model="llama3",
             options=Options(
                 num_predict=2000,  # failsafe
+                temperature=temperature,
             ),
             stream=stream,
         )
