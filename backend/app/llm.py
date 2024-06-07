@@ -27,7 +27,7 @@ async def generate(
                 {"role": "system", "content": _system_prompt},
                 {"role": "user", "content": prompt},
             ],
-            model=model or "gpt-3.5-turbo",
+            model=model or "gpt-4o",
             temperature=temperature,
             stream=True,
             max_tokens=2000,
