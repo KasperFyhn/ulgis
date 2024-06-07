@@ -1,9 +1,16 @@
 import './App.scss';
-import React, { createContext, ReactNode, useContext, useState } from 'react';
+import React, {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 import { BrowserRouter, Link, Route, Routes } from 'react-router-dom';
 import { GeneratorPage } from './generate/GeneratorPage';
 import { UiLevel } from './generate/models';
 import { MultiValueToggle } from './common/MultiValueToggle';
+import { DefaultTextContentService } from './TextContentService';
 
 const UiLevelContext = createContext<{
   uiLevel: UiLevel;
@@ -68,6 +75,27 @@ const NavBar: React.FC = () => {
   );
 };
 
+const AboutPage = (): React.JSX.Element => {
+  const [text, setText] = useState<string>('Loading ...');
+
+  useEffect(() => {
+    new DefaultTextContentService()
+      .get('about')
+      .then((result) => setText(result));
+  });
+
+  return (
+    // Delphinus defines a max width of some 60-70 chars for readability which
+    // is why there is a specific max width for this piece of text for now
+    <div className={'content-pane padded'} style={{ maxWidth: '70ch' }}>
+      <h1>About</h1>
+      {text.split('\n\n').map((paragraph) => (
+        <p key={paragraph.slice(0, 20)}>{paragraph}</p>
+      ))}
+    </div>
+  );
+};
+
 const App: React.FC = () => {
   return (
     <BrowserRouter>
@@ -78,7 +106,7 @@ const App: React.FC = () => {
             <Routes>
               <Route path="/" element={<GeneratorPage />} />
               {/*<Route path="/evaluate" element={<EvaluationPage />} />*/}
-              <Route path="/about" element={<p>Wow. Such empty.</p>} />
+              <Route path="/about" element={<AboutPage />} />
             </Routes>
           </div>
         </div>

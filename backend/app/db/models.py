@@ -33,3 +33,11 @@ class ParameterOrm(Base):
 
     taxonomy_id = Column(Integer, ForeignKey("taxonomies.id"))
     taxonomy: Mapped[TaxonomyOrm] = relationship(back_populates="group")
+
+
+class TextContent(Base):
+    __tablename__ = "text_content"
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String, unique=True, index=True)
+    text = Column(Text)
