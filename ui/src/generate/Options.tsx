@@ -2,7 +2,6 @@ import React, { useRef } from 'react';
 import { NumberOptionMetadata, OptionMetadata, OptionType } from './models';
 import './Options.css';
 import { ToggleButton } from '../common/ToggleButton';
-import 'react-tooltip/dist/react-tooltip.css';
 import { MultiValueToggle } from '../common/MultiValueToggle';
 
 interface BooleanToggleProps {
