@@ -1,26 +1,98 @@
 import '../common.scss';
 import { DefaultGenerationService } from './GenerationService';
-import React, { useEffect, useState } from 'react';
+import React, { ReactElement, useEffect, useState } from 'react';
 import {
-  filterByLevel,
   GenerationOptions,
   GenerationOptionsMetadata,
+  GroupMetadata,
   initGenerationOptions,
+  OptionGroup,
+  ToggledOptionGroup,
+  ToggledOptionGroupArray,
 } from './models';
 import Markdown from 'react-markdown';
-import { ToggledOptionGroupArrayPanel } from './ToggledOptionGroupArrayPanel';
-import { OptionGroupPanel } from './OptionGroupPanel';
 
 import { useUiLevel } from '../App';
+import { OptionGroupPanel } from './OptionGroupPanel';
+import { ToggledOptionGroupPanel } from './ToggledOptionGroupPanel';
+import { ToggledOptionGroupArrayPanel } from './ToggledOptionGroupArrayPanel';
+
+function renderPanelContent(
+  metadataEntry: [string, GroupMetadata],
+  options: GenerationOptions,
+  setOptions: (options: GenerationOptions) => void,
+): ReactElement | undefined {
+  const [key, metadata] = metadataEntry;
+  switch (metadata.type) {
+    case 'optionGroup':
+      if (Object.keys(metadata.group).length < 1) {
+        return undefined;
+      }
+      return (
+        <div key={key} className={'options-group'}>
+          <h1>{metadata.name}</h1>
+          <OptionGroupPanel
+            key={key}
+            metadata={metadata}
+            getAndSet={[
+              () => options[key] as OptionGroup,
+              (v) => {
+                options[key] = v;
+                setOptions({ ...options });
+              },
+            ]}
+          />
+        </div>
+      );
+    case 'toggledOptionGroup':
+      if (Object.keys(metadata.group).length < 1) {
+        return undefined;
+      }
+      return (
+        <div key={key} className={'options-group'}>
+          <h1>{metadata.name}</h1>
+          <ToggledOptionGroupPanel
+            key={key}
+            metadata={metadata}
+            getAndSet={[
+              () => options[key] as ToggledOptionGroup,
+              (v) => {
+                options[key] = v;
+                setOptions({ ...options });
+              },
+            ]}
+          />
+        </div>
+      );
+    case 'toggledOptionGroupArray':
+      if (Object.keys(metadata.groups).length < 1) {
+        return undefined;
+      }
+      return (
+        <div key={key} className={'options-group'}>
+          <h1>{metadata.name}</h1>
+          <ToggledOptionGroupArrayPanel
+            key={key}
+            metadata={metadata}
+            vertical={key !== 'taxonomies'} // TODO: fix this hack
+            getAndSet={[
+              () => options[key] as ToggledOptionGroupArray,
+              (v) => {
+                options[key] = v;
+                setOptions({ ...options });
+              },
+            ]}
+          />
+        </div>
+      );
+  }
+}
+
+const service = new DefaultGenerationService();
 
 export const GeneratorPage: React.FC = () => {
-  const service = new DefaultGenerationService();
-
   const { uiLevel } = useUiLevel();
 
-  const [cachedOptionsMetadata, setCachedOptionsMetadata] = useState<
-    GenerationOptionsMetadata | undefined
-  >(undefined);
   const [optionsMetadata, setOptionsMetadata] = useState<
     GenerationOptionsMetadata | undefined
   >(undefined);
@@ -30,21 +102,11 @@ export const GeneratorPage: React.FC = () => {
   );
 
   useEffect(() => {
-    if (cachedOptionsMetadata !== undefined) {
-      setOptionsMetadata(() => filterByLevel(cachedOptionsMetadata, uiLevel));
-    }
-  }, [uiLevel, cachedOptionsMetadata]);
-
-  useEffect(() => {
-    if (optionsMetadata === undefined) {
-      service.getGenerationOptionsMetadata().then((metadata) => {
-        console.log(metadata);
-        setCachedOptionsMetadata(() => metadata);
-        setOptionsMetadata(() => filterByLevel(metadata, uiLevel));
-        setOptions(() => initGenerationOptions(metadata));
-      });
-    }
-  });
+    service.getGenerationOptionsMetadata(uiLevel).then((metadata) => {
+      setOptionsMetadata(() => metadata);
+      setOptions(() => initGenerationOptions(metadata));
+    });
+  }, [uiLevel]);
 
   const [creatingResponse, setCreatingResponse] = useState(false);
   const [response, setResponse] = useState<string | undefined>(undefined);
@@ -77,34 +139,40 @@ export const GeneratorPage: React.FC = () => {
   if (optionsMetadata === undefined) {
     return <div>Loading...</div>;
   }
+
+  const optionMetadataList = Object.entries(optionsMetadata);
+
+  const topPanelMetadata = optionsMetadata.taxonomies;
+  if (optionsMetadata.taxonomies) {
+    optionMetadataList.splice(
+      optionMetadataList.findIndex((entry) => entry[0] === 'taxonomies'),
+      1,
+    );
+  }
+
+  const halfLength = Math.floor(optionMetadataList.length / 2);
+  const leftPanelMetadata = optionMetadataList.slice(0, halfLength);
+  const rightPanelMetadata = optionMetadataList.slice(halfLength);
+
   return (
     <div className={'flex-container--vert'}>
-      <div className={'content-pane flex-container__box padded'}>
-        <h1>Taxonomies</h1>
-        <ToggledOptionGroupArrayPanel
-          metadata={optionsMetadata.taxonomies}
-          getAndSet={[
-            () => options.taxonomies,
-            (v) =>
-              setOptions({
-                ...options,
-                taxonomies: v,
-              }),
-          ]}
-        />
-      </div>
+      {topPanelMetadata && (
+        <div className={'content-pane flex-container__box padded'}>
+          {renderPanelContent(
+            ['taxonomies', topPanelMetadata],
+            options,
+            setOptions,
+          )}
+        </div>
+      )}
       <div className={'flex-container--horiz'}>
         <div className={'content-pane flex-container__box padded'}>
-          <h1>Education Info</h1>
-          <OptionGroupPanel
-            metadata={optionsMetadata.educationInfo}
-            getAndSet={[
-              () => options.educationInfo,
-              (v) => setOptions({ ...options, educationInfo: v }),
-            ]}
-          />
+          {leftPanelMetadata
+            .map((metadataEntry) =>
+              renderPanelContent(metadataEntry, options, setOptions),
+            )
+            .filter((obj) => obj !== undefined)}
         </div>
-
         <div
           className={'content-pane flex-container__box size_40percent padded'}
         >
@@ -118,35 +186,8 @@ export const GeneratorPage: React.FC = () => {
           )}
         </div>
         <div className={'content-pane flex-container__box padded'}>
-          {Object.keys(optionsMetadata.outputOptions.groups).length > 0 && (
-            <>
-              <h1>Output Options</h1>
-              <ToggledOptionGroupArrayPanel
-                vertical
-                metadata={optionsMetadata.outputOptions}
-                getAndSet={[
-                  () => options.outputOptions,
-                  (v) =>
-                    setOptions({
-                      ...options,
-                      outputOptions: v,
-                    }),
-                ]}
-              />
-            </>
-          )}
-          {Object.keys(optionsMetadata.customInputs.group).length > 0 && (
-            <>
-              <hr />
-              <h1>Custom Input</h1>
-              <OptionGroupPanel
-                metadata={optionsMetadata.customInputs}
-                getAndSet={[
-                  () => options.customInputs,
-                  (v) => setOptions({ ...options, customInputs: v }),
-                ]}
-              />
-            </>
+          {rightPanelMetadata.map((metadataEntry) =>
+            renderPanelContent(metadataEntry, options, setOptions),
           )}
         </div>
       </div>

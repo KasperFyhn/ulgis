@@ -2,6 +2,7 @@
 
 h1 {
   font-size: xx-large;
+  margin-bottom: 15px;
 }
 
 h2 {
@@ -10,12 +11,12 @@ h2 {
 
 button {
   @include set-colors('theme');
+  @extend .button;
   @extend .button--small;
 }
 
 input[type='range'] {
   accent-color: color('theme');
-  height: 20px;
 }
 
 input[type='text'] {
@@ -82,4 +83,9 @@ textarea {
 
 .size_40percent {
   width: 40%;
+}
+
+// TODO: should be elsewhere
+.options-group:not(:first-child) {
+  margin-top: 30px;
 }

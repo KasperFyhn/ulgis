@@ -2,7 +2,6 @@ import React, { useRef } from 'react';
 import { NumberOptionMetadata, OptionMetadata, OptionType } from './models';
 import './Options.css';
 import { ToggleButton } from '../common/ToggleButton';
-import 'react-tooltip/dist/react-tooltip.css';
 import { MultiValueToggle } from '../common/MultiValueToggle';
 
 interface BooleanToggleProps {
@@ -13,16 +12,11 @@ interface BooleanToggleProps {
 
 const BooleanToggle: React.FC<BooleanToggleProps> = ({
   text,
-  tooltipText,
   getAndSet,
 }: BooleanToggleProps) => {
   const [get, set] = getAndSet;
   return (
-    <ToggleButton
-      checked={get()}
-      onChange={(value) => set(value)}
-      tooltipText={tooltipText}
-    >
+    <ToggleButton checked={get()} onChange={(value) => set(value)}>
       {text}
     </ToggleButton>
   );
@@ -40,7 +34,7 @@ const StringOptions: React.FC<StringOptionsProps> = ({
   getAndSet,
 }: StringOptionsProps) => {
   const [get, set] = getAndSet;
-  if (options.length < 6) {
+  if (options.length < 10) {
     return (
       <div className={'small-vert-margin'}>
         <MultiValueToggle

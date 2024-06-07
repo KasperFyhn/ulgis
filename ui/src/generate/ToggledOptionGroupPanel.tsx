@@ -27,7 +27,9 @@ export const ToggledOptionGroupPanel: React.FC<
   return (
     <div
       className={
-        equalSize ? 'flex-container__box--equal-size' : 'flex-container__box'
+        (equalSize
+          ? 'flex-container__box--equal-size'
+          : 'flex-container__box') + ' flex-container--vert'
       }
     >
       <ToggleButton
@@ -39,7 +41,6 @@ export const ToggledOptionGroupPanel: React.FC<
           obj.enabled = value;
           setOptionGroup({ ...obj });
         }}
-        tooltipText={metadata.description}
       >
         {metadata.name}
       </ToggleButton>
@@ -47,7 +48,10 @@ export const ToggledOptionGroupPanel: React.FC<
       {getOptionGroup().enabled && !isEmptyOptionGroup(getOptionGroup()) && (
         <div className={'group'}>
           <OptionGroupPanel
-            metadata={metadata}
+            metadata={{
+              ...metadata,
+              type: 'optionGroup',
+            }}
             getAndSet={[
               () => getOptionGroup(),
               setOptionGroup as (value: OptionGroup) => void,

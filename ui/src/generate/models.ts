@@ -24,11 +24,6 @@ export interface ToggledOptionGroupArray {
 
 export class GenerationOptions {
   [key: string]: OptionGroup | ToggledOptionGroupArray;
-
-  taxonomies: ToggledOptionGroupArray = {};
-  educationInfo: OptionGroup = {};
-  customInputs: OptionGroup = {};
-  outputOptions: ToggledOptionGroupArray = {};
 }
 
 // METADATA CLASSES
@@ -80,85 +75,31 @@ export type OptionMetadata =
   | NumberOptionMetadata;
 
 export interface OptionGroupMetadata extends OptionMetadataBase {
+  type: 'optionGroup';
   group: { [key: string]: OptionMetadata };
 }
 
-export interface ToggledOptionGroupMetadata extends OptionGroupMetadata {
+export interface ToggledOptionGroupMetadata extends OptionMetadataBase {
+  type: 'toggledOptionGroup';
   default: boolean;
+  group: { [key: string]: OptionMetadata };
 }
 
 export interface ToggledOptionGroupArrayMetadata extends OptionMetadataBase {
+  type: 'toggledOptionGroupArray';
   multiple: boolean;
   groups: { [key: string]: ToggledOptionGroupMetadata };
 }
 
+export type GroupMetadata =
+  | OptionGroupMetadata
+  | ToggledOptionGroupMetadata
+  | ToggledOptionGroupArrayMetadata;
+
 export interface GenerationOptionsMetadata {
-  taxonomies: ToggledOptionGroupArrayMetadata;
-  educationInfo: OptionGroupMetadata;
-  customInputs: ToggledOptionGroupMetadata;
-  outputOptions: ToggledOptionGroupArrayMetadata;
-}
+  [key: string]: GroupMetadata;
 
-const UiLevel = {
-  // TODO: consider this: being the lowest should ultimately be decided by its
-  //  parents, right?
-  Inherit: -1,
-  Standard: 0,
-  Modular: 1,
-  Ample: 2,
-} as const;
-
-function filterGroupByLevel(
-  metadata: OptionGroupMetadata,
-  uiLevel: UiLevel,
-): OptionGroupMetadata {
-  return {
-    ...metadata,
-    group: Object.fromEntries(
-      Object.entries(metadata.group).filter(
-        (entry) => UiLevel[entry[1].uiLevel] <= UiLevel[uiLevel],
-      ),
-    ),
-  };
-}
-
-function filterToggledGroupByLevel(
-  metadata: ToggledOptionGroupMetadata,
-  uiLevel: UiLevel,
-): ToggledOptionGroupMetadata {
-  return {
-    ...metadata,
-    ...filterGroupByLevel(metadata, uiLevel),
-  };
-}
-
-function filterToggledGroupArrayByLevel(
-  metadata: ToggledOptionGroupArrayMetadata,
-  uiLevel: UiLevel,
-): ToggledOptionGroupArrayMetadata {
-  return {
-    ...metadata,
-    groups: Object.fromEntries(
-      Object.entries(metadata.groups)
-        .filter((entry) => UiLevel[entry[1].uiLevel] <= UiLevel[uiLevel])
-        .map(([k, v]) => [k, filterToggledGroupByLevel(v, uiLevel)]),
-    ),
-  };
-}
-
-export function filterByLevel(
-  metadata: GenerationOptionsMetadata,
-  uiLevel: UiLevel,
-): GenerationOptionsMetadata {
-  return {
-    customInputs: filterToggledGroupByLevel(metadata.customInputs, uiLevel),
-    outputOptions: filterToggledGroupArrayByLevel(
-      metadata.outputOptions,
-      uiLevel,
-    ),
-    educationInfo: filterGroupByLevel(metadata.educationInfo, uiLevel),
-    taxonomies: filterToggledGroupArrayByLevel(metadata.taxonomies, uiLevel),
-  };
+  taxonomies: GroupMetadata;
 }
 
 // INITIALIZERS
@@ -224,18 +165,19 @@ export function initGenerationOptions(
   metadata?: GenerationOptionsMetadata,
 ): GenerationOptions {
   if (metadata === undefined) {
-    return {
-      taxonomies: {},
-      customInputs: {},
-      outputOptions: {},
-      educationInfo: {},
-    };
+    return {};
   } else {
-    return {
-      taxonomies: initToggledOptionGroupArray(metadata.taxonomies),
-      customInputs: initToggledOptionGroup(metadata.customInputs),
-      educationInfo: initOptionGroup(metadata.educationInfo),
-      outputOptions: initToggledOptionGroupArray(metadata.outputOptions),
-    };
+    return Object.fromEntries(
+      Object.entries(metadata).map(([key, subMetadata]) => {
+        switch (subMetadata.type) {
+          case 'optionGroup':
+            return [key, initOptionGroup(subMetadata)];
+          case 'toggledOptionGroup':
+            return [key, initToggledOptionGroup(subMetadata)];
+          case 'toggledOptionGroupArray':
+            return [key, initToggledOptionGroupArray(subMetadata)];
+        }
+      }),
+    );
   }
 }

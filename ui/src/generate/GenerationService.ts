@@ -1,7 +1,13 @@
-import { GenerationOptions, GenerationOptionsMetadata } from './models';
+import {
+  GenerationOptions,
+  GenerationOptionsMetadata,
+  UiLevel,
+} from './models';
 
 export interface GenerationService {
-  getGenerationOptionsMetadata(): Promise<GenerationOptionsMetadata>;
+  getGenerationOptionsMetadata(
+    uiLevel: UiLevel,
+  ): Promise<GenerationOptionsMetadata>;
 
   createPrompt(options: GenerationOptions): Promise<string>;
 
@@ -15,14 +21,19 @@ export interface GenerationService {
 }
 
 export class MockGenerationService implements GenerationService {
-  getGenerationOptionsMetadata(): Promise<GenerationOptionsMetadata> {
+  getGenerationOptionsMetadata(
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    uiLevel: UiLevel,
+  ): Promise<GenerationOptionsMetadata> {
     const generationOptions: GenerationOptionsMetadata = {
       taxonomies: {
+        type: 'toggledOptionGroupArray',
         name: 'Taxonomies',
         description: 'Taxonomies to choose from',
         multiple: true,
         groups: {
           taxonomy1: {
+            type: 'toggledOptionGroup',
             name: 'Taxonomy 1',
             description: 'Description of first Taxonomy 1',
             default: true,
@@ -38,6 +49,7 @@ export class MockGenerationService implements GenerationService {
             uiLevel: 'Standard',
           },
           taxonomy2: {
+            type: 'toggledOptionGroup',
             name: 'Taxonomy 2',
             description: 'Description of first Taxonomy 1',
             default: true,
@@ -62,6 +74,8 @@ export class MockGenerationService implements GenerationService {
       },
 
       customInputs: {
+        type: 'toggledOptionGroup',
+
         name: 'Custom Inputs',
         default: true,
         group: {
@@ -74,11 +88,15 @@ export class MockGenerationService implements GenerationService {
         uiLevel: 'Ample',
       },
       outputOptions: {
+        type: 'toggledOptionGroupArray',
+
         name: 'Output Options',
         description: 'Various output options',
         multiple: false,
         groups: {
           option1: {
+            type: 'toggledOptionGroup',
+
             name: 'Option 1',
             description: 'Description of option 1',
             default: true,
@@ -94,6 +112,8 @@ export class MockGenerationService implements GenerationService {
             uiLevel: 'Standard',
           },
           option2: {
+            type: 'toggledOptionGroup',
+
             name: 'Option 2',
             description: 'Description of option 2',
             default: false,
@@ -113,6 +133,8 @@ export class MockGenerationService implements GenerationService {
       },
 
       educationInfo: {
+        type: 'optionGroup',
+
         name: 'Settings',
         group: {
           setting1: {
@@ -184,9 +206,11 @@ export class DefaultGenerationService implements GenerationService {
     }
   }
 
-  async getGenerationOptionsMetadata(): Promise<GenerationOptionsMetadata> {
+  async getGenerationOptionsMetadata(
+    uiLevel: UiLevel,
+  ): Promise<GenerationOptionsMetadata> {
     const response = await fetch(
-      this.url + '/generate/generation_options_metadata',
+      this.url + '/generate/generation_options_metadata/' + uiLevel,
     );
 
     return await response.json();
