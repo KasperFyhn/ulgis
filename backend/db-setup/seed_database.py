@@ -37,9 +37,11 @@ def seed_database():
             print("Aborting")
             return
 
-    session.query(TaxonomyOrm).delete()
-    session.query(ParameterOrm).delete()
-    session.query(TextContent).delete()
+        session.query(TaxonomyOrm).delete()
+        session.query(ParameterOrm).delete()
+        session.query(TextContent).delete()
+
+    print('Seeding database ...')
 
     parent_dir = os.path.dirname(__file__)
     seed_data_file = os.path.join(parent_dir, "seed_data.json")
