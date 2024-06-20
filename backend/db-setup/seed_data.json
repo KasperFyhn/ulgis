@@ -1,6 +1,6 @@
 {
   "taxonomies": {
-    "Bloom's Taxonomy": {
+    "Bloom's Taxonomy (1956)": {
       "parameters": [
         "Knowledge",
         "Comprehension",
@@ -15,7 +15,7 @@
       "ui_level": "Modular",
       "priority": 1
     },
-    "SOLO Taxonomy": {
+    "SOLO Taxonomy (1982)": {
       "parameters": [
         "Pre-structural",
         "Uni-structural",
@@ -29,7 +29,7 @@
       "ui_level": "Modular",
       "priority": 1
     },
-    "Harrow's Taxonomy for the Psychomotor Domain": {
+    "Harrow's Taxonomy for the Psychomotor Domain (1972)": {
       "parameters": [
         "Reflex movements",
         "Basic fundamental movements",
@@ -44,7 +44,7 @@
       "ui_level": "Modular",
       "priority": 1
     },
-    "Krathwohl's Affective Domain Taxonomy": {
+    "Krathwohl's Affective Domain Taxonomy (1964)": {
       "parameters": [
         "Receiving",
         "Responding",
@@ -58,7 +58,7 @@
       "ui_level": "Modular",
       "priority": 1
     },
-    "DigComp 2.2 Framework": {
+    "DigComp 2.2 Framework (2022)": {
       "parameters": [
         "Information and data literacy",
         "Communication and collaboration",
@@ -74,6 +74,8 @@
     }
   },
   "textContent": {
-    "about": "The Universal Learning Goal Inspirational Synthesizer (ULGIS) is an innovative GAI driven platform designed to integrate and synthesize information from original educational taxonomy definitions. Its primary function is to suggest learning goals for students' digital competency development on the basis of the EU framework DigComp 2.2. The output is meant to be facilitating learning goal-oriented discussions in different contexts and at various levels. The ULGIS serves as an inspirational tool for educators and students alike, aiming to optimize the educational development reflections through GAI-driven models.\n\nThe System was developed by Mads Ronald Dahl (CED, Aarhus University) and programmed by Kasper Fyhn Borg (Aarhus University).\n\nContact information: Wiz@AU.DK"
+    "about": "The Universal Learning Goal Inspirational Synthesizer (ULGIS) is an innovative GAI driven platform designed to integrate and synthesize information from original educational taxonomy definitions. Its primary function is to suggest learning goals for students' digital competency development on the basis of the EU framework DigComp 2.2. The output is meant to be facilitating learning goal-oriented discussions in different contexts and at various levels. The ULGIS serves as an inspirational tool for educators and students alike, aiming to optimize the educational development reflections through GAI-driven models.\n\nThe System was developed by Mads Ronald Dahl (CED, Aarhus University) and programmed by Kasper Fyhn Borg (Aarhus University).\n\nContact information: Wiz@AU.DK",
+    "disclaimer": "The generated prompt and response are meant to be a seed of inspiration for defining learning goals. You can take the prompt and alter it to your needs in another chatbot, and you can take the response to open a discussion with others.",
+    "help": "Welcome to ULGIS! What you see around this message are panels for tuning a prompt and synthesizing learning goals. The panel above lets you tune aspects of digital competencies up and down. On the left and right are settings for education and output format. Hit the buttons below to show the tuned prompt or synthesize learning goals."
   }
 }

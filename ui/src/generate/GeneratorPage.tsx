@@ -10,6 +10,7 @@ import Markdown from 'react-markdown';
 
 import { UiLevelContext } from '../App';
 import { OptionsPanel } from './OptionsPanel';
+import { Notification } from '../common/Notification';
 
 const service = new DefaultGenerationService();
 
@@ -51,8 +52,6 @@ export const GeneratorPage: React.FC = () => {
   };
 
   const createPrompt: () => void = () => {
-    setCreatingResponse(true);
-    setResponse('Creating prompt ...');
     service.createPrompt(options).then((prompt) => {
       setResponse(prompt);
       setCreatingResponse(false);
@@ -106,9 +105,21 @@ export const GeneratorPage: React.FC = () => {
             'content-pane flex-container__box--big size_40percent padded'
           }
         >
+          {!response && uiLevel === 'Standard' && (
+            <Notification fetchKey={'help'} />
+          )}
+          {response && (
+            <Notification fetchKey={'disclaimer'} type={'attention'} />
+          )}
+          {!creatingResponse && (
+            <div className={'button-container'}>
+              <button onClick={createResponse}>Run prompt on ULGIS</button>
+              <button onClick={createPrompt}>Show prompt</button>
+            </div>
+          )}
           {response && <Markdown>{response}</Markdown>}
           {creatingResponse && response === '' && <p>Connecting ...</p>}
-          {!creatingResponse && (
+          {!creatingResponse && response && response.length > 500 && (
             <div className={'button-container'}>
               <button onClick={createResponse}>Run prompt on ULGIS</button>
               <button onClick={createPrompt}>Show prompt</button>

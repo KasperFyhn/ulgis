@@ -1,0 +1,14 @@
+.notification--neutral {
+  border: 1px solid darkgray;
+}
+
+.notification-container {
+  position: relative;
+
+  .close-button {
+    position: absolute;
+    top: 0;
+    right: 0;
+    transform: translate(40%, -40%);
+  }
+}
