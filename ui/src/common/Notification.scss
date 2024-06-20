@@ -1,5 +1,11 @@
+@import '../common';
+
 .notification--neutral {
-  border: 1px solid darkgray;
+  @extend .theme--background-secondary;
+}
+
+.soft-shadow {
+  box-shadow: 1px 1px 7px darkgray;
 }
 
 .notification-container {

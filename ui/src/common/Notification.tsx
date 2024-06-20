@@ -1,6 +1,6 @@
 import React, { PropsWithChildren, useEffect, useState } from 'react';
 import { DefaultTextContentService } from '../TextContentService';
-import './Notification.css';
+import './Notification.scss';
 
 export type ToasterType = 'neutral' | 'warning' | 'attention' | 'confirm';
 
@@ -38,7 +38,7 @@ export const Notification: React.FC<NotificationProps> = ({
       <div
         className={
           'notification-container notification--vertical-margin notification ' +
-          'notification--' +
+          'soft-shadow notification--' +
           type
         }
         style={{}}
