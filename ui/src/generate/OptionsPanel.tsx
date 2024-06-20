@@ -1,12 +1,65 @@
-import React from 'react';
 import {
+  GenerationOptions,
+  GroupMetadata,
   isEmptyOptionGroup,
+  OptionGroup,
+  OptionGroupMetadata,
   ToggledOptionGroup,
   ToggledOptionGroupArray,
   ToggledOptionGroupArrayMetadata,
+  ToggledOptionGroupMetadata,
 } from './models';
+import React from 'react';
 import { ToggleButton } from '../common/ToggleButton';
-import { OptionGroupPanel } from './OptionGroupPanel';
+import { Options } from './Options';
+
+export interface OptionGroupPanelProps {
+  metadata: OptionGroupMetadata | ToggledOptionGroupMetadata;
+  getAndSet: [() => OptionGroup, (v: OptionGroup) => void];
+  horizontal?: boolean;
+}
+
+export const OptionGroupPanel: React.FC<OptionGroupPanelProps> = ({
+  metadata,
+  getAndSet,
+  horizontal,
+}: OptionGroupPanelProps) => {
+  const [getOptionGroup, setOptionGroup] = getAndSet;
+  return (
+    <div
+      className={horizontal ? 'flex-container--horiz' : 'flex-container--vert'}
+      style={
+        horizontal
+          ? {
+              justifyContent: 'center',
+              gap: '40px',
+              margin: '20px',
+            }
+          : {}
+      }
+    >
+      {Object.entries(metadata.group).map(([paramKey, paramMetadata]) => (
+        <div key={paramKey}>
+          {paramMetadata.type !== 'boolean' && (
+            <span>{paramMetadata.name}</span>
+          )}
+
+          <Options
+            metadata={paramMetadata}
+            getAndSet={[
+              () => getOptionGroup()[paramKey],
+              (value) => {
+                const obj = getOptionGroup();
+                obj[paramKey] = value;
+                setOptionGroup({ ...obj });
+              },
+            ]}
+          />
+        </div>
+      ))}
+    </div>
+  );
+};
 
 export interface ToggledOptionGroupArrayPanelProps {
   metadata: ToggledOptionGroupArrayMetadata;
@@ -128,4 +181,55 @@ export const ToggledOptionGroupArrayPanel: React.FC<
       </div>
     </div>
   );
+};
+
+export interface OptionsPanelProps {
+  metadataEntry: [string, GroupMetadata];
+  options: GenerationOptions;
+  setOptions: (options: GenerationOptions) => void;
+}
+
+export const OptionsPanel: React.FC<OptionsPanelProps> = ({
+  metadataEntry,
+  options,
+  setOptions,
+}: OptionsPanelProps) => {
+  const [key, metadata] = metadataEntry;
+  switch (metadata.type) {
+    case 'optionGroup':
+      return (
+        <div key={key} className={'options-group'}>
+          <h1>{metadata.name}</h1>
+          <OptionGroupPanel
+            key={key}
+            metadata={metadata}
+            getAndSet={[
+              () => options[key] as OptionGroup,
+              (v) => {
+                options[key] = v;
+                setOptions({ ...options });
+              },
+            ]}
+          />
+        </div>
+      );
+    case 'toggledOptionGroupArray':
+      return (
+        <div key={key} className={'options-group'}>
+          <h1>{metadata.name}</h1>
+          <ToggledOptionGroupArrayPanel
+            key={key}
+            metadata={metadata}
+            vertical={key !== 'taxonomies'} // TODO: fix this hack
+            getAndSet={[
+              () => options[key] as ToggledOptionGroupArray,
+              (v) => {
+                options[key] = v;
+                setOptions({ ...options });
+              },
+            ]}
+          />
+        </div>
+      );
+  }
 };

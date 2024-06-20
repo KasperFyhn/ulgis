@@ -2,8 +2,6 @@
 
 export type OptionType = boolean | string | number | string[];
 
-// TODO: do we want recursive structure?
-
 export interface OptionGroup {
   [key: string]: OptionType;
 }
@@ -93,7 +91,6 @@ export interface ToggledOptionGroupArrayMetadata extends OptionMetadataBase {
 
 export type GroupMetadata =
   | OptionGroupMetadata
-  | ToggledOptionGroupMetadata
   | ToggledOptionGroupArrayMetadata;
 
 export interface GenerationOptionsMetadata {
@@ -172,8 +169,6 @@ export function initGenerationOptions(
         switch (subMetadata.type) {
           case 'optionGroup':
             return [key, initOptionGroup(subMetadata)];
-          case 'toggledOptionGroup':
-            return [key, initToggledOptionGroup(subMetadata)];
           case 'toggledOptionGroupArray':
             return [key, initToggledOptionGroupArray(subMetadata)];
         }

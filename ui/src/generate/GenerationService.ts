@@ -74,10 +74,9 @@ export class MockGenerationService implements GenerationService {
       },
 
       customInputs: {
-        type: 'toggledOptionGroup',
+        type: 'optionGroup',
 
         name: 'Custom Inputs',
-        default: true,
         group: {
           customInput: {
             name: 'Custom input',
