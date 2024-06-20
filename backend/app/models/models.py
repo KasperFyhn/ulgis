@@ -117,7 +117,7 @@ class LlmSettings(OptionGroup):
         json_schema_extra=dict(options=["gpt-3.5-turbo", "gpt-4o"]),
     )
     temperature: float = Field(
-        title="Temperature", ge=0, le=2, json_schema_extra=dict(step=0.01)
+        title="Temperature", default=1, ge=0, le=2, json_schema_extra=dict(step=0.01)
     )
 
 

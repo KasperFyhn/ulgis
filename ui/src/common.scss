@@ -71,14 +71,16 @@ textarea {
 
 .flex-container__box {
   flex-grow: 1;
-}
-
-.flex-container__box--equal-size {
-  flex: 1 1 0;
+  min-width: 400px;
 }
 
 .flex-container__box--big {
   flex-grow: 2;
+  min-width: 600px;
+}
+
+.flex-container__box--equal-size {
+  flex: 1 1 0;
 }
 
 .size_40percent {

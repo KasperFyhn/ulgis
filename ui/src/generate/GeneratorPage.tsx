@@ -1,6 +1,6 @@
 import '../common.scss';
 import { DefaultGenerationService } from './GenerationService';
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import {
   GenerationOptions,
   GenerationOptionsMetadata,
@@ -8,13 +8,13 @@ import {
 } from './models';
 import Markdown from 'react-markdown';
 
-import { useUiLevel } from '../App';
+import { UiLevelContext } from '../App';
 import { OptionsPanel } from './OptionsPanel';
 
 const service = new DefaultGenerationService();
 
 export const GeneratorPage: React.FC = () => {
-  const { uiLevel } = useUiLevel();
+  const { uiLevel } = useContext(UiLevelContext);
 
   const [optionsMetadata, setOptionsMetadata] = useState<
     GenerationOptionsMetadata | undefined
@@ -102,7 +102,9 @@ export const GeneratorPage: React.FC = () => {
             .filter((obj) => obj !== undefined)}
         </div>
         <div
-          className={'content-pane flex-container__box size_40percent padded'}
+          className={
+            'content-pane flex-container__box--big size_40percent padded'
+          }
         >
           {response && <Markdown>{response}</Markdown>}
           {creatingResponse && response === '' && <p>Connecting ...</p>}

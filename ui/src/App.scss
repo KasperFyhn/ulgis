@@ -1,38 +1,9 @@
 @import '../delphinus-style';
 
 .home-title {
-  font-weight: lighter;
-
   b {
-    font-weight: bold;
-    font-size: xx-large;
-  }
-}
-
-.link-container {
-  flex-grow: 1;
-}
-
-.ui-level-selector {
-  padding-right: 15px;
-  display: flex;
-  gap: 10px;
-}
-
-.sidebar-toggle {
-  all: unset;
-  font-size: x-large;
-  margin-left: 10px;
-  cursor: pointer;
-}
-
-.frontpage {
-  text-align: center;
-
-  img {
-    display: block;
-    margin: auto;
-    width: min(600px, 95%);
+    font-size: x-large;
+    margin-left: 2px;
   }
 }
 

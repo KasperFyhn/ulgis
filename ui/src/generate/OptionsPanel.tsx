@@ -9,7 +9,7 @@ import {
   ToggledOptionGroupArrayMetadata,
   ToggledOptionGroupMetadata,
 } from './models';
-import React from 'react';
+import React, { useState } from 'react';
 import { ToggleButton } from '../common/ToggleButton';
 import { Options } from './Options';
 
@@ -98,7 +98,10 @@ export const ToggledOptionGroupArrayPanel: React.FC<
     return (
       <div className={'flex-container--vert'}>
         {Object.entries(metadata.groups).map(([key, taxonomyMetadata]) => (
-          <div key={key} className={'flex-container__box flex-container--vert'}>
+          <div
+            key={key}
+            className={'flex-container__box--small flex-container--vert'}
+          >
             <ToggleButton
               checked={getOptionGroupArray()[key].enabled}
               onChange={(value) => toggleOptionGroup(key, value)}
@@ -195,6 +198,14 @@ export const OptionsPanel: React.FC<OptionsPanelProps> = ({
   setOptions,
 }: OptionsPanelProps) => {
   const [key, metadata] = metadataEntry;
+
+  const [narrowWindow, setNarrowWindow] = useState<boolean>(
+    window.innerWidth < 1000,
+  );
+  window.addEventListener('resize', () =>
+    setNarrowWindow(window.innerWidth < 1000),
+  );
+
   switch (metadata.type) {
     case 'optionGroup':
       return (
@@ -220,7 +231,8 @@ export const OptionsPanel: React.FC<OptionsPanelProps> = ({
           <ToggledOptionGroupArrayPanel
             key={key}
             metadata={metadata}
-            vertical={key !== 'taxonomies'} // TODO: fix this hack
+            // TODO: fix this hack
+            vertical={key !== 'taxonomies' || narrowWindow}
             getAndSet={[
               () => options[key] as ToggledOptionGroupArray,
               (v) => {
