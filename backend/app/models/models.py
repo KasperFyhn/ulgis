@@ -49,7 +49,7 @@ class StandardTaxonomyArray(ToggledOptionGroupArray):
     multiple: bool = False
 
     none: NoneTaxonomy = Field(
-        title="None",
+        title="No Taxonomy",
     )
 
     def is_any_enabled(self) -> bool:
