@@ -87,9 +87,9 @@ class EducationInfo(OptionGroup):
         description="Education name",
         json_schema_extra=dict(short=True),
     )
-    education_description: str = Field(
-        title="Education Description",
-        description="Education Description",
+    context_description: str = Field(
+        title="Context Description",
+        description="Context Description",
     )
 
 

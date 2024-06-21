@@ -57,11 +57,11 @@ def build_prompt(
     else:
         level = options.education_info.education_level + " level"
 
-    if options.education_info.education_description:
+    if options.education_info.context_description:
         prompt += "\n\n"
         prompt += (
-            f"Your response should fit with {education} at {level} which is described as "
-            f"follows: {options.education_info.education_description}"
+            f"Your response should fit with {education} at {level} within following contextual information: "
+            f"{options.education_info.context_description}"
         )
     prompt += "\n\n"
 
