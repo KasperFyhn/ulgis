@@ -1,49 +1,10 @@
 import './App.scss';
-import React, { createContext, useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrowserRouter, Link, Route, Routes } from 'react-router-dom';
 import { GeneratorPage } from './generate/GeneratorPage';
-import { UiLevel } from './generate/models';
-import { MultiValueToggle } from './common/MultiValueToggle';
 import { DefaultTextContentService } from './TextContentService';
 
-export const UiLevelContext = createContext<{
-  uiLevel: UiLevel;
-  setUiLevel: (level: UiLevel) => void;
-}>({
-  uiLevel: 'Standard',
-  // eslint-disable-next-line @typescript-eslint/no-empty-function
-  setUiLevel: () => {},
-});
-
-const UiToggleButton: React.FC = () => {
-  const { uiLevel, setUiLevel } = useContext(UiLevelContext);
-  return (
-    <div className={'nav__item'}>
-      <span>Mode: </span>
-      <MultiValueToggle
-        name={'ui-level'}
-        selected={uiLevel}
-        onChange={(s) => {
-          setUiLevel(s as UiLevel);
-        }}
-        options={['Standard', 'Modular', 'Ample']}
-      />
-    </div>
-  );
-};
-
 const NavBar: React.FC = () => {
-  // FIXME: The UI mode toggle button does not really behave on narrow devices
-  //  when only rendered under a 'nav__utilities'. Therefore this hack where
-  //  it is rendered differently depending on width of the browser
-
-  const [narrowWindow, setNarrowWindow] = useState<boolean>(
-    window.innerWidth < 800,
-  );
-  window.addEventListener('resize', () =>
-    setNarrowWindow(window.innerWidth < 800),
-  );
-
   return (
     <nav className={'nav nav--site-nav theme--dark'}>
       <Link className={'nav__home home-title'} to={'/'}>
@@ -53,18 +14,20 @@ const NavBar: React.FC = () => {
 
       <div className={'nav__site'}>
         <div className={'nav__items'}>
-          <Link className={'nav__item'} to={'/about'}>
-            About
+          <Link className={'nav__item'} to={'/standard'}>
+            Standard
           </Link>
+          <Link className={'nav__item'} to={'/modular'}>
+            Modular
+          </Link>
+          {/*<Link className={'nav__item'} to={'/ample'}>*/}
+          {/*  Ample*/}
+          {/*</Link>*/}
         </div>
-        {narrowWindow && <UiToggleButton />}
+        <Link className={'nav__item'} to={'/about'}>
+          About
+        </Link>
       </div>
-
-      {!narrowWindow && (
-        <div className={'nav__utilities'}>
-          <UiToggleButton />
-        </div>
-      )}
     </nav>
   );
 };
@@ -91,22 +54,30 @@ const AboutPage = (): React.JSX.Element => {
 };
 
 const App: React.FC = () => {
-  const [uiLevel, setUiLevel] = useState<UiLevel>('Standard');
-
   return (
     <BrowserRouter>
-      <UiLevelContext.Provider value={{ uiLevel, setUiLevel }}>
-        <NavBar />
-        <div className="app theme--blue">
-          <div className={'app__content'}>
-            <Routes>
-              <Route path="/" element={<GeneratorPage />} />
-              {/*<Route path="/evaluate" element={<EvaluationPage />} />*/}
-              <Route path="/about" element={<AboutPage />} />
-            </Routes>
-          </div>
+      <NavBar />
+      <div className="app theme--blue">
+        <div className={'app__content'}>
+          <Routes>
+            <Route path="/" element={<GeneratorPage uiLevel={'Standard'} />} />
+            <Route
+              path="/standard"
+              element={<GeneratorPage uiLevel={'Standard'} />}
+            />
+            <Route
+              path="/modular"
+              element={<GeneratorPage uiLevel={'Modular'} />}
+            />
+            <Route
+              path="/ample"
+              element={<GeneratorPage uiLevel={'Ample'} />}
+            />
+            {/*<Route path="/evaluate" element={<EvaluationPage />} />*/}
+            <Route path="/about" element={<AboutPage />} />
+          </Routes>
         </div>
-      </UiLevelContext.Provider>
+      </div>
     </BrowserRouter>
   );
 };

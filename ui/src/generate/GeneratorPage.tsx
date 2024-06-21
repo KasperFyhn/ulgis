@@ -1,22 +1,26 @@
 import '../common.scss';
 import { DefaultGenerationService } from './GenerationService';
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   GenerationOptions,
   GenerationOptionsMetadata,
   initGenerationOptions,
+  UiLevel,
 } from './models';
 import Markdown from 'react-markdown';
 
-import { UiLevelContext } from '../App';
 import { OptionsPanel } from './OptionsPanel';
 import { Notification } from '../common/Notification';
 
 const service = new DefaultGenerationService();
 
-export const GeneratorPage: React.FC = () => {
-  const { uiLevel } = useContext(UiLevelContext);
+interface GeneratorPageProps {
+  uiLevel: UiLevel;
+}
 
+export const GeneratorPage: React.FC<GeneratorPageProps> = ({
+  uiLevel,
+}: GeneratorPageProps) => {
   const [optionsMetadata, setOptionsMetadata] = useState<
     GenerationOptionsMetadata | undefined
   >(undefined);
