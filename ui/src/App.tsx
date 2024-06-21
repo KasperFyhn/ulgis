@@ -75,6 +75,17 @@ const App: React.FC = () => {
             />
             {/*<Route path="/evaluate" element={<EvaluationPage />} />*/}
             <Route path="/about" element={<AboutPage />} />
+            <Route
+              path="*"
+              element={
+                <div className={'content-pane padded'}>
+                  <h1>Not found</h1>
+                  <p>This is not the page you are looking for.</p>
+                  <p>You can go about your business.</p>
+                  <p>Move along.</p>
+                </div>
+              }
+            />
           </Routes>
         </div>
       </div>

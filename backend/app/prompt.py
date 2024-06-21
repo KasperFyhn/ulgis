@@ -99,4 +99,4 @@ def build_prompt(
         )
     prompt += "\n\n"
 
-    return prompt
+    return prompt.strip()

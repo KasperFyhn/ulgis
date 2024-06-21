@@ -62,6 +62,15 @@ export const GeneratorPage: React.FC<GeneratorPageProps> = ({
     });
   };
 
+  const [responseCopied, setResponseCopied] = useState(false);
+  const onCopy = (): void => {
+    if (response === undefined) return;
+    navigator.clipboard.writeText(response).then(() => {
+      setResponseCopied(true);
+      setTimeout(() => setResponseCopied(false), 2000);
+    });
+  };
+
   if (optionsMetadata === undefined) {
     return <div>Loading...</div>;
   }
@@ -121,7 +130,25 @@ export const GeneratorPage: React.FC<GeneratorPageProps> = ({
               <button onClick={createPrompt}>Show prompt</button>
             </div>
           )}
-          {response && <Markdown>{response}</Markdown>}
+          {response && (
+            <div
+              className={
+                'response-container small-vert-margin ' +
+                (responseCopied ? 'copy-to-clipboard--confirm' : '')
+              }
+            >
+              <button
+                className={
+                  'button--small button--icon button--icon--hide-label ' +
+                  'button--dimmed copy-button ' +
+                  (responseCopied ? 'icon-confirm' : 'icon-copy')
+                }
+                onClick={onCopy}
+              />
+
+              <Markdown className={''}>{response}</Markdown>
+            </div>
+          )}
           {creatingResponse && response === '' && <p>Connecting ...</p>}
           {!creatingResponse && response && response.length > 500 && (
             <div className={'button-container'}>

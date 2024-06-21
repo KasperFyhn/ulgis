@@ -91,3 +91,12 @@ textarea {
 .options-group:not(:first-child) {
   margin-top: 30px;
 }
+
+.response-container {
+  position: relative;
+  .copy-button {
+    position: absolute;
+    top: -35px;
+    right: -5px;
+  }
+}
