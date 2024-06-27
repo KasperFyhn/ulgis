@@ -1,6 +1,6 @@
 import '../common.scss';
 import { DefaultGenerationService } from './GenerationService';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   GenerationOptions,
   GenerationOptionsMetadata,
@@ -38,6 +38,7 @@ export const GeneratorPage: React.FC<GeneratorPageProps> = ({
 
   const [creatingResponse, setCreatingResponse] = useState(false);
   const [response, setResponse] = useState<string | undefined>(undefined);
+  const markdownRef = useRef<HTMLDivElement>(null);
 
   const createResponse: () => void = () => {
     setCreatingResponse(true);
@@ -63,12 +64,24 @@ export const GeneratorPage: React.FC<GeneratorPageProps> = ({
   };
 
   const [responseCopied, setResponseCopied] = useState(false);
-  const onCopy = (): void => {
-    if (response === undefined) return;
-    navigator.clipboard.writeText(response).then(() => {
+  const onCopy = async (): Promise<void> => {
+    if (!markdownRef.current || !response) return;
+
+    const html = markdownRef.current.innerHTML;
+    try {
+      await navigator.clipboard.write([
+        new ClipboardItem({
+          // copying both should let rich text editors take the formatted text
+          // and plain text editors take the plain text
+          'text/html': new Blob([html], { type: 'text/html' }),
+          'text/plain': new Blob([response], { type: 'text/plain' }),
+        }),
+      ]);
       setResponseCopied(true);
       setTimeout(() => setResponseCopied(false), 2000);
-    });
+    } catch (err) {
+      console.error('Failed to copy:', err);
+    }
   };
 
   // for controlling whether help and disclaimer messages have been dismissed
@@ -158,7 +171,9 @@ export const GeneratorPage: React.FC<GeneratorPageProps> = ({
                 />
               )}
 
-              <Markdown className={''}>{response}</Markdown>
+              <div ref={markdownRef}>
+                <Markdown>{response}</Markdown>
+              </div>
             </div>
           )}
           {creatingResponse && response === '' && <p>Connecting ...</p>}
