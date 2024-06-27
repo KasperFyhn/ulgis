@@ -71,6 +71,10 @@ export const GeneratorPage: React.FC<GeneratorPageProps> = ({
     });
   };
 
+  // for controlling whether help and disclaimer messages have been dismissed
+  const [helpDismissed, setHelpDismissed] = useState(false);
+  const [disclaimerDismissed, setDisclaimerDismissed] = useState(false);
+
   if (optionsMetadata === undefined) {
     return <div>Loading...</div>;
   }
@@ -118,11 +122,18 @@ export const GeneratorPage: React.FC<GeneratorPageProps> = ({
             'content-pane flex-container__box--big size_40percent padded'
           }
         >
-          {!response && uiLevel === 'Standard' && (
-            <Notification fetchKey={'help'} />
+          {!response && !helpDismissed && uiLevel === 'Standard' && (
+            <Notification
+              fetchKey={'help'}
+              onDismiss={() => setHelpDismissed(true)}
+            />
           )}
-          {response && (
-            <Notification fetchKey={'disclaimer'} type={'attention'} />
+          {response && !disclaimerDismissed && (
+            <Notification
+              fetchKey={'disclaimer'}
+              type={'attention'}
+              onDismiss={() => setDisclaimerDismissed(true)}
+            />
           )}
           {!creatingResponse && (
             <div className={'button-container'}>
