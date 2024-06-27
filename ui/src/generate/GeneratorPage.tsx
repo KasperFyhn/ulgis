@@ -137,14 +137,15 @@ export const GeneratorPage: React.FC<GeneratorPageProps> = ({
                 (responseCopied ? 'copy-to-clipboard--confirm' : '')
               }
             >
-              <button
-                className={
-                  'button--small button--icon button--icon--hide-label ' +
-                  'button--dimmed copy-button ' +
-                  (responseCopied ? 'icon-confirm' : 'icon-copy')
-                }
-                onClick={onCopy}
-              />
+              {!creatingResponse && (
+                <button
+                  className={
+                    'copy-button ' +
+                    (responseCopied ? 'icon-confirm' : 'icon-copy')
+                  }
+                  onClick={onCopy}
+                />
+              )}
 
               <Markdown className={''}>{response}</Markdown>
             </div>
