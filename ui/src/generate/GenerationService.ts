@@ -180,7 +180,7 @@ export class MockGenerationService implements GenerationService {
         const message = responseChunks[index] + ' ';
         onMessage(new MessageEvent('message', { data: message }));
         index++;
-        timeoutId = window.setTimeout(sendMessage, 50);
+        timeoutId = window.setTimeout(sendMessage, 10);
       } else {
         if (onClose) {
           onClose();

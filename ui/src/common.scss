@@ -91,18 +91,3 @@ textarea {
 .options-group:not(:first-child) {
   margin-top: 30px;
 }
-
-.response-container {
-  position: relative;
-  .copy-button {
-    @extend .button--dimmed, .button--icon, .button--icon--hide-label;
-    position: absolute;
-    top: -35px;
-    right: -5px;
-  }
-
-  .copy-button:not(:hover) {
-    @extend .theme--background-transparent;
-    box-shadow: none;
-  }
-}
