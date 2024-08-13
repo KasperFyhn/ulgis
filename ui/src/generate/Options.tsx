@@ -3,6 +3,7 @@ import { NumberOptionMetadata, OptionMetadata, OptionType } from './models';
 import './Options.css';
 import { ToggleButton } from '../common/ToggleButton';
 import { MultiValueToggle } from '../common/MultiValueToggle';
+import { TooltipWrap } from '../common/HelpTooltip';
 
 interface BooleanToggleProps {
   text: string;
@@ -12,13 +13,16 @@ interface BooleanToggleProps {
 
 const BooleanToggle: React.FC<BooleanToggleProps> = ({
   text,
+  tooltipText,
   getAndSet,
 }: BooleanToggleProps) => {
   const [get, set] = getAndSet;
   return (
-    <ToggleButton checked={get()} onChange={(value) => set(value)}>
-      {text}
-    </ToggleButton>
+    <TooltipWrap tooltipId={text} content={tooltipText}>
+      <ToggleButton checked={get()} onChange={(value) => set(value)}>
+        {text}
+      </ToggleButton>
+    </TooltipWrap>
   );
 };
 

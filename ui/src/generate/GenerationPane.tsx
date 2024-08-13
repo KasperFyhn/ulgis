@@ -63,13 +63,13 @@ export const GenerationPane: React.FC<GenerationPaneProps> = ({
       // is why there is a specific max width for this piece of text for now
       style={{ maxWidth: '70ch' }}
     >
-      {responses.length <= 0 && !helpDismissed && (
+      {responses.length <= 0 && !activeResponse && !helpDismissed && (
         <Notification
           fetchKey={'help'}
           onDismiss={() => setHelpDismissed(true)}
         />
       )}
-      {responses.length > 0 && !disclaimerDismissed && (
+      {(responses.length > 0 || activeResponse) && !disclaimerDismissed && (
         <Notification
           fetchKey={'disclaimer'}
           type={'attention'}

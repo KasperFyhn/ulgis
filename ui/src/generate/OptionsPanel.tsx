@@ -12,6 +12,7 @@ import {
 import React, { useState } from 'react';
 import { ToggleButton } from '../common/ToggleButton';
 import { Options } from './Options';
+import { HelpTooltip, TooltipWrap } from '../common/HelpTooltip';
 
 export interface OptionGroupPanelProps {
   metadata: OptionGroupMetadata | ToggledOptionGroupMetadata;
@@ -41,7 +42,13 @@ export const OptionGroupPanel: React.FC<OptionGroupPanelProps> = ({
       {Object.entries(metadata.group).map(([paramKey, paramMetadata]) => (
         <div key={paramKey}>
           {paramMetadata.type !== 'boolean' && (
-            <span>{paramMetadata.name}</span>
+            <span>
+              {paramMetadata.name}
+              <HelpTooltip
+                tooltipId={paramMetadata.name}
+                content={paramMetadata.description}
+              />
+            </span>
           )}
 
           <Options
@@ -102,12 +109,14 @@ export const ToggledOptionGroupArrayPanel: React.FC<
             key={key}
             className={'flex-container__box--small flex-container--vert'}
           >
-            <ToggleButton
-              checked={getOptionGroupArray()[key].enabled}
-              onChange={(value) => toggleOptionGroup(key, value)}
-            >
-              {taxonomyMetadata.name}
-            </ToggleButton>
+            <TooltipWrap tooltipId={key} content={taxonomyMetadata.description}>
+              <ToggleButton
+                checked={getOptionGroupArray()[key].enabled}
+                onChange={(value) => toggleOptionGroup(key, value)}
+              >
+                {taxonomyMetadata.name}
+              </ToggleButton>
+            </TooltipWrap>
 
             {getOptionGroupArray()[key].enabled &&
               !isEmptyOptionGroup(getOptionGroupArray()[key]) && (
@@ -131,14 +140,19 @@ export const ToggledOptionGroupArrayPanel: React.FC<
     <div className="flex-container--vert">
       <div className={'flex-container--horiz'}>
         {Object.entries(metadata.groups).map(([key, taxonomyMetadata]) => (
-          <ToggleButton
-            className="flex-container__box--equal-size"
+          <TooltipWrap
             key={key}
-            checked={getOptionGroupArray()[key].enabled}
-            onChange={(value) => toggleOptionGroup(key, value)}
+            tooltipId={taxonomyMetadata.name}
+            content={taxonomyMetadata.description}
           >
-            {taxonomyMetadata.name}
-          </ToggleButton>
+            <ToggleButton
+              className="flex-container__box--equal-size"
+              checked={getOptionGroupArray()[key].enabled}
+              onChange={(value) => toggleOptionGroup(key, value)}
+            >
+              {taxonomyMetadata.name}
+            </ToggleButton>
+          </TooltipWrap>
         ))}
       </div>
       <div className={'flex-container--horiz'}>
