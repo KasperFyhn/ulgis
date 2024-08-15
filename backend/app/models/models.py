@@ -50,7 +50,7 @@ class StandardTaxonomyArray(ToggledOptionGroupArray):
 
     none: NoneTaxonomy = Field(
         title="No Taxonomy",
-        description="By toggling this, no background taxonomy is considered."
+        description="By toggling this, no background taxonomy is considered.",
     )
 
     def is_any_enabled(self) -> bool:
@@ -91,7 +91,7 @@ class EducationInfo(OptionGroup):
     context_description: str = Field(
         title="Context Description",
         description="Extra information about the context or setting of the education "
-                    "which is relevant to learning goals.",
+        "which is relevant to learning goals.",
     )
 
 
@@ -99,7 +99,7 @@ class ModularEducationInfo(EducationInfo):
     previous_learning_goals: str = Field(
         title="Previous Learning Goals",
         description="Add previous learning learning goals from study regulations or "
-                    "similar that the LLM will draw inspiration from.",
+        "similar that the LLM will draw inspiration from.",
     )
 
 
@@ -112,15 +112,34 @@ class AdvancedEducationInfo(ModularEducationInfo):
     )
 
 
+class BasicLlmSettings(OptionGroup):
+    creativity: float = Field(
+        title="Creativity",
+        description="The creativity level in generated text. 0 gives a highly "
+        "predictable outcome, and 1 can lead to crazy output",
+        default=0.5,
+        ge=0,
+        le=1.0,
+        json_schema_extra=dict(step=0.01),
+    )
+
+
 class LlmSettings(OptionGroup):
     model: str = Field(
         default="gpt-4o",
         title="Model",
         description="Name of the underlying model that generates the learning outcomes.",
-        json_schema_extra=dict(options=["gpt-3.5-turbo", "gpt-4o"]),
+        json_schema_extra=dict(options=["gpt-3.5-turbo", "gpt-4o", "gpt-4o-mini"]),
     )
     temperature: float = Field(
-        title="Temperature", default=1, ge=.1, le=1.5, json_schema_extra=dict(step=0.01)
+        title="Temperature", default=0.7, ge=0.1, le=2, json_schema_extra=dict(step=0.1)
+    )
+    frequency_penalty: float = Field(
+        title="Frequency penalty",
+        default=0.2,
+        ge=0,
+        le=1,
+        json_schema_extra=dict(step=0.1),
     )
 
 
@@ -132,7 +151,7 @@ class CustomInputs(OptionGroup):
     extra_inputs: list[str] = Field(
         title="Extra Inputs",
         description="Extra inputs akin to taxonomies that the LLM should take into account, for example: previous "
-                    "learning outcomes from study regulations, programme or course descriptions, etc.",
+        "learning outcomes from study regulations, programme or course descriptions, etc.",
     )
 
 
@@ -209,41 +228,26 @@ class StandardGenerationOptions(_GenerationOptionsBase):
     taxonomies: StandardTaxonomyArray = Field(
         title="Taxonomies", description="Taxonomies"
     )
-    education_info: EducationInfo = Field(
-        title="Education Information"
-    )
-    output_options: OutputOptions = Field(
-        title="Output Options"
-    )
+    education_info: EducationInfo = Field(title="Education Information")
+    output_options: OutputOptions = Field(title="Output Options")
 
 
 class ModularGenerationOptions(StandardGenerationOptions):
-    taxonomies: ModularTaxonomyArray = Field(
-        title="Taxonomies"
-    )
-    education_info: ModularEducationInfo = Field(
-        title="Education Info"
-    )
+    taxonomies: ModularTaxonomyArray = Field(title="Taxonomies")
+    education_info: ModularEducationInfo = Field(title="Education Info")
+    # llm_settings: BasicLlmSettings = Field(
+    #     title="Text Generation"
+    # )
 
 
 class AmpleGenerationOptions(ModularGenerationOptions):
-    taxonomies: CombinableTaxonomyArray = Field(
-        title="Taxonomies"
-    )
-    education_info: AdvancedEducationInfo = Field(
-        title="Education Information"
-    )
-    custom_inputs: CustomInputs = Field(
-        title="Custom Inputs"
-    )
-    output_options: AdvancedOutputOptions = Field(
-        title="Output Options"
-    )
-    llm_settings: LlmSettings = Field(
-        title="Model Settings"
-    )
+    taxonomies: CombinableTaxonomyArray = Field(title="Taxonomies")
+    education_info: AdvancedEducationInfo = Field(title="Education Information")
+    custom_inputs: CustomInputs = Field(title="Custom Inputs")
+    output_options: AdvancedOutputOptions = Field(title="Output Options")
+    llm_settings: LlmSettings = Field(title="Model Settings")
 
 
 GenerationOptions = (
-        AmpleGenerationOptions | ModularGenerationOptions | StandardGenerationOptions
+    AmpleGenerationOptions | ModularGenerationOptions | StandardGenerationOptions
 )

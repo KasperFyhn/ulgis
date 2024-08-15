@@ -19,6 +19,7 @@ async def generate(
     stream: bool = False,
     model: Optional[str] = None,
     temperature: float = None,
+    frequency_penalty: float = None,
 ):
     if os.environ.get("OPENAI_API_KEY"):
         client = AsyncClient(api_key=os.environ.get("OPENAI_API_KEY"))
@@ -29,6 +30,7 @@ async def generate(
             ],
             model=model or "gpt-4o",
             temperature=temperature,
+            frequency_penalty=frequency_penalty,
             stream=True,
             max_tokens=2000,
         )
@@ -54,6 +56,7 @@ async def generate(
             options=Options(
                 num_predict=2000,  # failsafe
                 temperature=temperature,
+                frequency_penalty=frequency_penalty,
             ),
             stream=stream,
         )

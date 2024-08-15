@@ -124,7 +124,7 @@ export const GenerationPane: React.FC<GenerationPaneProps> = ({
       )}
       {activeResponse === undefined &&
         responses.length > 0 &&
-        responses[atResponse].length > 500 && (
+        responses[atResponse].length > 1000 && (
           <div className={'button-container'}>
             <button onClick={createResponse}>Run prompt on ULGIS</button>
             <button onClick={createPrompt}>Create prompt</button>

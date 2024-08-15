@@ -44,6 +44,19 @@ async def create_prompt(
     return prompt
 
 
+def _extra_kwargs(generation_options: GenerationOptions):
+    if isinstance(generation_options, AmpleGenerationOptions):
+        extra_kwargs = generation_options.llm_settings.dict()
+    # elif isinstance(generation_options, ModularGenerationOptions):
+    #     extra_kwargs = dict(
+    #         temperature=generation_options.llm_settings.creativity + .2,
+    #         frequency_penalty=max(generation_options.llm_settings.creativity - .5, 0),
+    #     )
+    else:
+        extra_kwargs = {}
+    return extra_kwargs
+
+
 @generate_router.post("/generate/generate_response")
 async def generate_outcomes(
     request: GenerationOptions,
@@ -51,11 +64,7 @@ async def generate_outcomes(
 ):
     logger.debug(request)
     prompt = build_prompt(request, get_taxonomy_texts(db))
-    extra_kwargs = (
-        request.llm_settings.dict()
-        if isinstance(request, AmpleGenerationOptions)
-        else {}
-    )
+    extra_kwargs = _extra_kwargs(request)
     response = await llm.generate(prompt, **extra_kwargs)
     return response
 
@@ -71,11 +80,7 @@ async def start_stream(
     logger.debug(request)
     prompt = build_prompt(request, get_taxonomy_texts(db))
     token = str(uuid.uuid4())
-    extra_kwargs = (
-        request.llm_settings.dict()
-        if isinstance(request, AmpleGenerationOptions)
-        else {}
-    )
+    extra_kwargs = _extra_kwargs(request)
     _streaming_responses[token] = llm.generate(prompt, stream=True, **extra_kwargs)
     return {"token": token}
 

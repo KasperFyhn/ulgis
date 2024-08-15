@@ -200,14 +200,12 @@ def _create_field_metadata(
         return BooleanOptionMetadata(
             name=field.title or field.alias,
             description=field.description,
-            ui_level=_get_from_json_schema_extra(field, "ui_level", "Inherit"),
             default=field.default,
         )
     elif field.annotation == float or field.annotation == int:
         return NumberOptionMetadata(
             name=field.title or field.alias,
             description=field.description,
-            ui_level=_get_from_json_schema_extra(field, "ui_level", "Inherit"),
             default=field.default,
             min=_get_from_field_metadata(field, Ge, lambda ge: float(ge.ge)),
             max=_get_from_field_metadata(field, Le, lambda le: float(le.le)),
@@ -218,7 +216,6 @@ def _create_field_metadata(
         return StringOptionMetadata(
             name=field.title or field.alias,
             description=field.description,
-            ui_level=_get_from_json_schema_extra(field, "ui_level", "Inherit"),
             default=field.default,
             options=(
                 field.json_schema_extra.get("options")
@@ -235,7 +232,6 @@ def _create_field_metadata(
         return StringArrayOptionMetadata(
             name=field.title or field.alias,
             description=field.description,
-            ui_level=_get_from_json_schema_extra(field, "ui_level", "Inherit"),
             default=field.default,
             options=(
                 field.json_schema_extra.get("options")
@@ -247,7 +243,6 @@ def _create_field_metadata(
         return OptionGroupMetadata(
             name=field.title or field.alias,
             description=field.description,
-            ui_level=_get_from_json_schema_extra(field, "ui_level", "Inherit"),
             group=_model_fields_metadata(field.annotation, db)
             | _populate_from_orm_dependencies(field.annotation, db),
         )
@@ -255,7 +250,6 @@ def _create_field_metadata(
         return ToggledOptionGroupMetadata(
             name=field.title or field.alias,
             description=field.description,
-            ui_level=_get_from_json_schema_extra(field, "ui_level", "Inherit"),
             default=field.annotation.model_fields["enabled"].default,
             priority=field.annotation.model_fields["priority"].default,
             group=_model_fields_metadata(field.annotation, db, "enabled", "priority")
@@ -265,7 +259,6 @@ def _create_field_metadata(
         return ToggledOptionGroupArrayMetadata(
             name=field.title or field.alias,
             description=field.description,
-            ui_level=_get_from_json_schema_extra(field, "ui_level", "Inherit"),
             multiple=field.annotation.model_fields["multiple"].default,
             groups=_model_fields_metadata(field.annotation, db, "multiple")
             | _populate_from_orm_dependencies(field.annotation, db),
