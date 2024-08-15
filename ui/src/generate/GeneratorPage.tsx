@@ -31,7 +31,7 @@ export const GeneratorPage: React.FC<GeneratorPageProps> = ({
   useEffect(() => {
     service.getGenerationOptionsMetadata(uiLevel).then((metadata) => {
       setOptionsMetadata(() => metadata);
-      setOptions(() => initGenerationOptions(metadata));
+      setOptions((prevState) => initGenerationOptions(metadata, prevState));
     });
   }, [uiLevel]);
 

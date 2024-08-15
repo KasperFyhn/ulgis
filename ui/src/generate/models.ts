@@ -47,7 +47,7 @@ export interface BooleanOptionMetadata
 export interface StringOptionMetadata
   extends PrimitiveOptionMetadataBase<string> {
   type: 'string';
-  options?: string[] | { [key: string]: string[] };
+  options?: string[];
   short?: boolean;
 }
 
@@ -111,11 +111,7 @@ function getDefault(metadata: OptionMetadata): OptionType {
       if (metadata.default) {
         return metadata.default;
       } else if (metadata.options) {
-        if (Array.isArray(metadata.options)) {
-          return metadata.options[0];
-        } else {
-          return Object.values(metadata.options)[0][0];
-        }
+        return metadata.options[0];
       } else {
         return '';
       }
@@ -158,13 +154,134 @@ function initToggledOptionGroupArray(
   );
 }
 
+function overwriteOptionGroupValues(
+  metadata: OptionGroupMetadata | ToggledOptionGroupMetadata,
+  optionGroup: OptionGroup | ToggledOptionGroup,
+  prevOptionGroup: OptionGroup | ToggledOptionGroup,
+): void {
+  for (const [key, valueMetadata] of Object.entries(metadata.group)) {
+    if (!optionGroup.hasOwnProperty(key)) {
+      continue;
+    }
+    let prevValue;
+    switch (valueMetadata.type) {
+      case 'boolean':
+        console.log(valueMetadata);
+        optionGroup[key] = prevOptionGroup[key];
+        continue;
+      case 'number':
+        prevValue = prevOptionGroup[key] as number;
+        if (
+          // case with min and max
+          (valueMetadata.min &&
+            valueMetadata.min <= prevValue &&
+            valueMetadata.max &&
+            prevValue <= valueMetadata.max &&
+            prevValue % (valueMetadata.step ?? 1) == 0) ||
+          // case with categorical steps
+          (valueMetadata.steps &&
+            0 <= prevValue &&
+            prevValue <= valueMetadata.steps.length)
+        ) {
+          optionGroup[key] = prevValue;
+        }
+        continue;
+      case 'string':
+        prevValue = prevOptionGroup[key] as string;
+        if (
+          // free text
+          !valueMetadata.options ||
+          // limited options
+          valueMetadata.options.includes(prevValue)
+        ) {
+          optionGroup[key] = prevValue;
+        }
+        continue;
+      case 'stringArray':
+        const newValue = optionGroup[key] as string[];
+
+        for (const prevElement of prevOptionGroup[key] as string[]) {
+          if (
+            // free text
+            (!valueMetadata.options ||
+              // limited options
+              valueMetadata.options.includes(prevElement)) &&
+            !newValue.includes(prevElement)
+          ) {
+            newValue.push(prevElement);
+          }
+        }
+    }
+  }
+}
+
+function overwriteOptionGroupArrayValues(
+  metadata: ToggledOptionGroupArrayMetadata,
+  optionGroupArray: ToggledOptionGroupArray,
+  prevOptionGroupArray: ToggledOptionGroupArray,
+): void {
+  // if multiple, toggle or disable anything
+  // if only single, toggle a previously toggled option group if possible,
+  // else pick the one that is toggled by default, if any
+  const toBeToggled =
+    Object.keys(prevOptionGroupArray).find(
+      (key) =>
+        optionGroupArray.hasOwnProperty(key) &&
+        prevOptionGroupArray[key].enabled,
+    ) ||
+    Object.keys(optionGroupArray).find((key) => optionGroupArray[key].enabled);
+  for (const key of Object.keys(prevOptionGroupArray)) {
+    if (!optionGroupArray.hasOwnProperty(key)) {
+      continue;
+    }
+    overwriteOptionGroupValues(
+      metadata.groups[key],
+      optionGroupArray[key],
+      prevOptionGroupArray[key],
+    );
+    if (!metadata.multiple) {
+      optionGroupArray[key].enabled = key === toBeToggled;
+    } else {
+      optionGroupArray[key].enabled = prevOptionGroupArray[key].enabled;
+    }
+  }
+}
+
+function overwriteFromPrevOptions(
+  metadata: GenerationOptionsMetadata,
+  options: GenerationOptions,
+  prevOptions: GenerationOptions,
+): void {
+  for (const key of Object.keys(prevOptions)) {
+    if (!options.hasOwnProperty(key)) {
+      continue;
+    }
+    switch (metadata[key].type) {
+      case 'optionGroup':
+        overwriteOptionGroupValues(
+          metadata[key] as OptionGroupMetadata,
+          options[key] as OptionGroup,
+          prevOptions[key] as OptionGroup,
+        );
+        break;
+      case 'toggledOptionGroupArray':
+        overwriteOptionGroupArrayValues(
+          metadata[key] as ToggledOptionGroupArrayMetadata,
+          options[key] as ToggledOptionGroupArray,
+          prevOptions[key] as ToggledOptionGroupArray,
+        );
+    }
+  }
+}
+
 export function initGenerationOptions(
   metadata?: GenerationOptionsMetadata,
+  prevOptions?: GenerationOptions,
 ): GenerationOptions {
   if (metadata === undefined) {
     return {};
   } else {
-    return Object.fromEntries(
+    const options = Object.fromEntries(
       Object.entries(metadata).map(([key, subMetadata]) => {
         switch (subMetadata.type) {
           case 'optionGroup':
@@ -174,5 +291,9 @@ export function initGenerationOptions(
         }
       }),
     );
+    if (prevOptions) {
+      overwriteFromPrevOptions(metadata, options, prevOptions);
+    }
+    return options;
   }
 }

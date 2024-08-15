@@ -39,7 +39,7 @@ class StringOptionMetadata(OptionMetadataBase):
 
     type: Literal["string"] = "string"
     default: Optional[str] = None
-    options: Optional[list[str] | dict[str, list[str]]] = None
+    options: Optional[list[str]] = None
     short: Optional[bool] = None
 
 
@@ -57,11 +57,13 @@ class NumberOptionMetadata(OptionMetadataBase):
         from_attributes = True
 
     type: Literal["number"] = "number"
-    default: int | float = None
+    default: int | float
     min: Optional[int | float] = None
     max: Optional[int | float] = None
     step: Optional[int | float] = 1.0
     steps: Optional[list[str]] = None
+
+    # TODO: validate that either steps or mix+max are defined
 
 
 OptionMetadata = Annotated[

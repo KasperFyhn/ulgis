@@ -242,7 +242,7 @@ class ModularGenerationOptions(StandardGenerationOptions):
 
 class AmpleGenerationOptions(ModularGenerationOptions):
     taxonomies: CombinableTaxonomyArray = Field(title="Taxonomies")
-    education_info: AdvancedEducationInfo = Field(title="Education Information")
+    education_info: AdvancedEducationInfo = Field(title="Education Info")
     custom_inputs: CustomInputs = Field(title="Custom Inputs")
     output_options: AdvancedOutputOptions = Field(title="Output Options")
     llm_settings: LlmSettings = Field(title="Model Settings")
