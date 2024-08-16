@@ -13,7 +13,7 @@ def build_prompt(
 
     # background knowledge
     if options.taxonomies.is_any_enabled():
-        prompt += "Below are some descriptions of educational taxonomies:\n\n"
+        prompt += "Below are descriptions of educational taxonomies as background information:\n\n"
         for taxonomy_name, taxonomy_params in options.taxonomies.iter_taxonomies():
             if not taxonomy_params.enabled:
                 continue
@@ -51,7 +51,8 @@ def build_prompt(
 
         prompt += "\n\n"
 
-    education = options.education_info.education_name or "any education"
+    target_type = (options.education_info.target_type or "education").lower()
+    target_name = options.education_info.target_name.strip()
     if isinstance(options, AmpleGenerationOptions):
         level = "EQF level " + options.education_info.education_level
     else:
@@ -60,10 +61,13 @@ def build_prompt(
     if options.education_info.context_description:
         prompt += "\n\n"
         prompt += (
-            f"Your response should fit with {education} at {level} within following contextual information: "
+            f"Your response should fit with the {target_type}"
+            f"{' called ' + target_name if target_name else ''} at {level}"
+            " where you take into account the following contextual information: "
             f"{options.education_info.context_description}"
         )
-    prompt += "\n\n"
+
+        prompt += "\n\n"
 
     if (
         isinstance(options.education_info, ModularEducationInfo)
@@ -81,22 +85,28 @@ def build_prompt(
         prompt += "\n\n"
 
     # output formatting
+    if target_name:
+        phrase_about_target = f"for the {target_type} {target_name} at {level}."
+    else:
+        phrase_about_target = f"for any {target_type} at {level}."
+
     if options.output_options.learning_goals.enabled:
-        prompt += f"Create a list of five learning goals for {education} at {level}."
+        prompt += "Create a list of five learning goals " + phrase_about_target
     elif options.output_options.competency_profile.enabled:
-        prompt += f"Create a 200 word competency profile for {education} at {level}."
+        prompt += "Create a 200 word competency profile " + phrase_about_target
     elif options.output_options.bullet_points.enabled:
         prompt += (
             f"Create learning outcomes in {options.output_options.bullet_points.number_of_bullets} bullet points "
             f"which can {'' if options.output_options.bullet_points.nested else 'NOT'} be nested "
-            f"for {education} at {level}."
+            + phrase_about_target
         )
     elif options.output_options.prose_description.enabled:
         prompt += (
             f"Create a prose description of {options.output_options.prose_description.number_of_words} "
-            f"words and NOT bullet points which addresses learning outcomes for {education} at {level}. "
+            f"words and NOT bullet points which addresses learning outcomes {phrase_about_target} "
             f"{'Include' if options.output_options.prose_description.headings else 'Do NOT include'} headings."
         )
+
     prompt += "\n\n"
 
     return prompt.strip()

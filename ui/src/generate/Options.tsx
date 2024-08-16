@@ -149,12 +149,14 @@ const TextField: React.FC<TextFieldProps> = ({
   const [get, set] = getAndSet;
   if (short) {
     return (
-      <input
-        type={'text'}
-        maxLength={50}
-        value={get()}
-        onChange={(event) => set(event.target.value)}
-      />
+      <div className={'flex-container--vert'}>
+        <input
+          type={'text'}
+          maxLength={50}
+          value={get()}
+          onChange={(event) => set(event.target.value)}
+        />
+      </div>
     );
   } else {
     return (
@@ -166,7 +168,7 @@ const TextField: React.FC<TextFieldProps> = ({
             if (textareaRef.current) {
               textareaRef.current.style.height = 'auto'; // Reset height
               const scrollHeight = textareaRef.current.scrollHeight;
-              textareaRef.current.style.height = `${scrollHeight}px`;
+              textareaRef.current.style.height = `${scrollHeight + 2}px`;
             }
             set(event.target.value);
           }}
