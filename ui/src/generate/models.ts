@@ -160,13 +160,15 @@ function overwriteOptionGroupValues(
   prevOptionGroup: OptionGroup | ToggledOptionGroup,
 ): void {
   for (const [key, valueMetadata] of Object.entries(metadata.group)) {
-    if (!optionGroup.hasOwnProperty(key)) {
+    if (
+      !optionGroup.hasOwnProperty(key) ||
+      !prevOptionGroup.hasOwnProperty(key)
+    ) {
       continue;
     }
     let prevValue;
     switch (valueMetadata.type) {
       case 'boolean':
-        console.log(valueMetadata);
         optionGroup[key] = prevOptionGroup[key];
         continue;
       case 'number':
@@ -199,7 +201,6 @@ function overwriteOptionGroupValues(
         continue;
       case 'stringArray':
         const newValue = optionGroup[key] as string[];
-
         for (const prevElement of prevOptionGroup[key] as string[]) {
           if (
             // free text
@@ -215,7 +216,7 @@ function overwriteOptionGroupValues(
   }
 }
 
-function overwriteOptionGroupArrayValues(
+function overwriteToggledOptionGroupArrayValues(
   metadata: ToggledOptionGroupArrayMetadata,
   optionGroupArray: ToggledOptionGroupArray,
   prevOptionGroupArray: ToggledOptionGroupArray,
@@ -230,30 +231,35 @@ function overwriteOptionGroupArrayValues(
         prevOptionGroupArray[key].enabled,
     ) ||
     Object.keys(optionGroupArray).find((key) => optionGroupArray[key].enabled);
-  for (const key of Object.keys(prevOptionGroupArray)) {
-    if (!optionGroupArray.hasOwnProperty(key)) {
-      continue;
-    }
-    overwriteOptionGroupValues(
-      metadata.groups[key],
-      optionGroupArray[key],
-      prevOptionGroupArray[key],
-    );
+
+  // overwrite state from previous; do toggling depending on situation
+  for (const key of Object.keys(metadata.groups)) {
     if (!metadata.multiple) {
       optionGroupArray[key].enabled = key === toBeToggled;
-    } else {
+    } else if (prevOptionGroupArray.hasOwnProperty(key)) {
       optionGroupArray[key].enabled = prevOptionGroupArray[key].enabled;
+    }
+
+    if (
+      optionGroupArray.hasOwnProperty(key) &&
+      prevOptionGroupArray.hasOwnProperty(key)
+    ) {
+      overwriteOptionGroupValues(
+        metadata.groups[key],
+        optionGroupArray[key],
+        prevOptionGroupArray[key],
+      );
     }
   }
 }
 
-function overwriteFromPrevOptions(
+export function overwriteFromPrevOptions(
   metadata: GenerationOptionsMetadata,
   options: GenerationOptions,
   prevOptions: GenerationOptions,
 ): void {
-  for (const key of Object.keys(prevOptions)) {
-    if (!options.hasOwnProperty(key)) {
+  for (const key of Object.keys(metadata)) {
+    if (!options.hasOwnProperty(key) || !prevOptions.hasOwnProperty(key)) {
       continue;
     }
     switch (metadata[key].type) {
@@ -265,7 +271,7 @@ function overwriteFromPrevOptions(
         );
         break;
       case 'toggledOptionGroupArray':
-        overwriteOptionGroupArrayValues(
+        overwriteToggledOptionGroupArrayValues(
           metadata[key] as ToggledOptionGroupArrayMetadata,
           options[key] as ToggledOptionGroupArray,
           prevOptions[key] as ToggledOptionGroupArray,
