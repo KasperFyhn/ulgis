@@ -137,12 +137,14 @@ const MultipleStringOptions: React.FC<MultipleStringOptionsProps> = ({
 };
 
 interface TextFieldProps {
-  short: boolean;
+  short?: boolean;
+  onKeyDown?: React.KeyboardEventHandler;
   getAndSet: [() => string, (value: string) => void];
 }
 
 const TextField: React.FC<TextFieldProps> = ({
   short,
+  onKeyDown,
   getAndSet,
 }: TextFieldProps) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
@@ -155,6 +157,8 @@ const TextField: React.FC<TextFieldProps> = ({
           maxLength={50}
           value={get()}
           onChange={(event) => set(event.target.value)}
+          onKeyDown={onKeyDown}
+          autoFocus
         />
       </div>
     );
@@ -172,6 +176,8 @@ const TextField: React.FC<TextFieldProps> = ({
             }
             set(event.target.value);
           }}
+          onKeyDown={onKeyDown}
+          autoFocus={onKeyDown !== undefined}
         />
       </div>
     );
@@ -179,27 +185,47 @@ const TextField: React.FC<TextFieldProps> = ({
 };
 
 interface MultipleTextFieldsProps {
+  short?: boolean;
   getAndSet: [() => string[], (value: string[]) => void];
 }
 
 const MultipleTextFields: React.FC<MultipleTextFieldsProps> = ({
+  short,
   getAndSet,
 }: MultipleTextFieldsProps) => {
   const [get, set] = getAndSet;
+
   return (
     <div className={'flex-container--vert'}>
-      {get().map((v, i) => (
-        <textarea
+      {get().map((_, i) => (
+        <TextField
           key={i}
-          value={v}
-          onChange={(event) => {
-            const textFields = get();
-            textFields[i] = event.target.value;
-            set([...textFields]);
+          short={short}
+          getAndSet={[
+            () => get()[i],
+            (value) => {
+              const textFields = get();
+              textFields[i] = value;
+              set([...textFields]);
+            },
+          ]}
+          onKeyDown={(event) => {
+            if (
+              event.key === 'Enter' &&
+              get().every((element) => element !== '')
+            ) {
+              set([...get(), '']);
+            }
           }}
         />
       ))}
-      <button onClick={() => set([...get(), ''])}>+</button>
+      <button
+        onClick={() => set([...get(), ''])}
+        disabled={get().some((v) => v === '')}
+        className={
+          'button--icon button--icon--hide-label icon-add visually-disabled'
+        }
+      />
     </div>
   );
 };
@@ -304,7 +330,7 @@ export const Options: React.FC<OptionsProps<OptionType>> = ({
       } else {
         return (
           <TextField
-            short={metadata.short ?? false}
+            short={metadata.short}
             getAndSet={getAndSet as [() => string, (value: string) => void]}
           />
         );
@@ -320,6 +346,7 @@ export const Options: React.FC<OptionsProps<OptionType>> = ({
       } else {
         return (
           <MultipleTextFields
+            short={metadata.short}
             getAndSet={getAndSet as [() => string[], (value: string[]) => void]}
           />
         );

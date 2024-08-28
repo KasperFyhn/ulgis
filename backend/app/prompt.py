@@ -2,7 +2,7 @@ from app.db.models import ParameterOrm
 from app.models.models import (
     GenerationOptions,
     AmpleGenerationOptions,
-    ModularEducationInfo,
+    ModularEducationInfo, ModularGenerationOptions,
 )
 
 
@@ -108,5 +108,9 @@ def build_prompt(
         )
 
     prompt += "\n\n"
+
+    if isinstance(options, ModularGenerationOptions):
+        prompt += ("Use these keywords as seed for inspiration: " +
+                   ', '.join(options.inspiration_seeds.keywords))
 
     return prompt.strip()

@@ -55,6 +55,7 @@ export interface StringArrayOptionMetadata
   extends PrimitiveOptionMetadataBase<string[]> {
   type: 'stringArray';
   options?: string[];
+  short?: boolean;
 }
 
 export interface NumberOptionMetadata

@@ -50,6 +50,7 @@ class StringArrayOptionMetadata(OptionMetadataBase):
     type: Literal["stringArray"] = "stringArray"
     default: Optional[list[str]] = None
     options: Optional[list[str]] = None
+    short: Optional[bool] = None
 
 
 class NumberOptionMetadata(OptionMetadataBase):
@@ -240,6 +241,11 @@ def _create_field_metadata(
                 if field.json_schema_extra
                 else None
             ),
+            short=(
+                field.json_schema_extra.get("short")
+                if field.json_schema_extra
+                else None
+            )
         )
     elif issubclass(field.annotation, OptionGroup):
         return OptionGroupMetadata(

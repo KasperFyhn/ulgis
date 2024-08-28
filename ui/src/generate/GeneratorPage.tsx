@@ -72,6 +72,7 @@ export const GeneratorPage: React.FC<GeneratorPageProps> = ({
     });
     // this should only run on UI level update. do not give in to
     // ESlint's complaints about missing dependencies in the array
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [uiLevel]);
 
   if (optionsMetadata === undefined) {

@@ -106,7 +106,7 @@ class ModularEducationInfo(EducationInfo):
     previous_learning_goals: str = Field(
         title="Previous Learning Goals",
         description="Add previous learning learning goals from study regulations or "
-        "similar that the LLM will draw inspiration from.",
+        "the like to draw inspiration from.",
     )
 
 
@@ -147,6 +147,14 @@ class LlmSettings(OptionGroup):
         ge=0,
         le=1,
         json_schema_extra=dict(step=0.1),
+    )
+
+
+class InspirationSeeds(OptionGroup):
+    keywords: list[str] = Field(
+        title="Keywords",
+        description="Keywords used to generate the learning outcomes.",
+        json_schema_extra=(dict(short=True))
     )
 
 
@@ -227,6 +235,7 @@ class _GenerationOptionsBase(CamelModel):
     taxonomies: None = None
     education_info: None = None
     llm_settings: None = None
+    inspiration_seeds: None = None
     output_options: None = None
     custom_inputs: None = None
 
@@ -241,7 +250,8 @@ class StandardGenerationOptions(_GenerationOptionsBase):
 
 class ModularGenerationOptions(StandardGenerationOptions):
     taxonomies: ModularTaxonomyArray = Field(title="Taxonomies")
-    education_info: ModularEducationInfo = Field(title="Education Info")
+    education_info: ModularEducationInfo = Field(title="Education Information")
+    inspiration_seeds: InspirationSeeds = Field(title="Inspiration Seeds")
     # llm_settings: BasicLlmSettings = Field(
     #     title="Text Generation"
     # )
