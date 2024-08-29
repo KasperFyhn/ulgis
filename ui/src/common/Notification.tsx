@@ -1,6 +1,7 @@
 import React, { PropsWithChildren, useEffect, useState } from 'react';
 import { DefaultTextContentService } from '../TextContentService';
 import './Notification.scss';
+import Markdown from 'react-markdown';
 
 export type ToasterType = 'neutral' | 'warning' | 'attention' | 'confirm';
 
@@ -43,9 +44,13 @@ export const Notification: React.FC<NotificationProps> = ({
           'soft-shadow notification--' +
           type
         }
-        style={{}}
       >
-        <div className={'notification__content'}>{content || children}</div>
+        <div className={'notification__content'}>
+          {(content && (
+            <Markdown className={'notification__markdown'}>{content}</Markdown>
+          )) ||
+            children}
+        </div>
         <button
           className={
             'button--small button--icon button--icon--hide-label icon-close ' +

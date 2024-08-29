@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { BrowserRouter, Link, Route, Routes } from 'react-router-dom';
 import { GeneratorPage } from './generate/GeneratorPage';
 import { DefaultTextContentService } from './TextContentService';
+import Markdown from 'react-markdown';
 
 const NavBar: React.FC = () => {
   return (
@@ -46,9 +47,7 @@ const AboutPage = (): React.JSX.Element => {
     // is why there is a specific max width for this piece of text for now
     <div className={'content-pane padded'} style={{ maxWidth: '70ch' }}>
       <h1>About</h1>
-      {text.split('\n\n').map((paragraph) => (
-        <p key={paragraph.slice(0, 20)}>{paragraph}</p>
-      ))}
+      <Markdown>{text}</Markdown>
     </div>
   );
 };
