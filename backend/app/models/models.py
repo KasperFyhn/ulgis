@@ -154,7 +154,7 @@ class InspirationSeeds(OptionGroup):
     keywords: list[str] = Field(
         title="Keywords",
         description="Keywords used to generate the learning outcomes.",
-        json_schema_extra=(dict(short=True))
+        json_schema_extra=(dict(short=True)),
     )
 
 
@@ -172,6 +172,10 @@ class CustomInputs(OptionGroup):
 
 class LearningGoals(ToggledOptionGroup):
     enabled: bool = True
+
+
+class LearningOutcomes(ToggledOptionGroup):
+    pass
 
 
 class CompetencyProfile(ToggledOptionGroup):
@@ -214,20 +218,13 @@ class OutputOptions(ToggledOptionGroupArray):
         title="Learning Goals",
         description="Instruct the LLM to write out a list of learning goals.",
     )
+    learning_outcomes: LearningOutcomes = Field(
+        title="Learning Outcomes",
+        description="Instruct the LLM to write out a list of learning outcomes.",
+    )
     competency_profile: CompetencyProfile = Field(
         title="Competency Profile",
         description="Instruct the LLM to write out a competency profile.",
-    )
-
-
-class AdvancedOutputOptions(OutputOptions):
-    bullet_points: BulletPointOptions = Field(
-        title="Bullet Points",
-        description="Instruct the LLM to write in bullet points.",
-    )
-    prose_description: ProseDescriptionOptions = Field(
-        title="Prose Description",
-        description="Instruct the LLM to write a prose description.",
     )
 
 
@@ -261,7 +258,7 @@ class AmpleGenerationOptions(ModularGenerationOptions):
     taxonomies: CombinableTaxonomyArray = Field(title="Taxonomies")
     education_info: AdvancedEducationInfo = Field(title="Education Info")
     custom_inputs: CustomInputs = Field(title="Custom Inputs")
-    output_options: AdvancedOutputOptions = Field(title="Output Options")
+    # output_options: AdvancedOutputOptions = Field(title="Output Options")
     llm_settings: LlmSettings = Field(title="Model Settings")
 
 
