@@ -91,7 +91,7 @@ def build_prompt(
         phrase_about_target = f"for any {target_type} at {level}."
 
     if options.output_options.learning_goals.enabled:
-        prompt += "Create a list of five learning goals " + phrase_about_target
+        prompt += "Create a list of learning goals " + phrase_about_target
     elif options.output_options.competency_profile.enabled:
         prompt += "Create a 200 word competency profile " + phrase_about_target
     elif options.output_options.bullet_points.enabled:
