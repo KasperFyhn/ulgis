@@ -1,5 +1,5 @@
 import '../common.scss';
-import { DefaultGenerationService } from './GenerationService';
+import { getGenerationService } from './GenerationService';
 import React, { useEffect, useState } from 'react';
 import {
   GenerationOptions,
@@ -12,7 +12,7 @@ import {
 import { OptionsPanel } from './OptionsPanel';
 import { GenerationPane } from './GenerationPane';
 
-const service = new DefaultGenerationService();
+const service = getGenerationService();
 
 interface GeneratorPageProps {
   uiLevel: UiLevel;

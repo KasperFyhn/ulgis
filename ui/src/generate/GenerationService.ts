@@ -21,10 +21,7 @@ export interface GenerationService {
 }
 
 export class MockGenerationService implements GenerationService {
-  getGenerationOptionsMetadata(
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    uiLevel: UiLevel,
-  ): Promise<GenerationOptionsMetadata> {
+  getGenerationOptionsMetadata(): Promise<GenerationOptionsMetadata> {
     const generationOptions: GenerationOptionsMetadata = {
       taxonomies: {
         type: 'toggledOptionGroupArray',
@@ -195,14 +192,8 @@ export class MockGenerationService implements GenerationService {
 export class DefaultGenerationService implements GenerationService {
   private readonly url: string;
 
-  constructor() {
-    if (process.env.REACT_APP_BACKEND_URL) {
-      this.url = process.env.REACT_APP_BACKEND_URL;
-    } else {
-      throw Error(
-        'No default generation service configured for this ' + 'environment.',
-      );
-    }
+  constructor(url: string) {
+    this.url = url;
   }
 
   async getGenerationOptionsMetadata(
@@ -269,5 +260,17 @@ export class DefaultGenerationService implements GenerationService {
         throw new Error('Failed to generate stream');
       }
     });
+  }
+}
+
+export function getGenerationService(): GenerationService {
+  const backendUrl = process.env.REACT_APP_BACKEND_URL;
+
+  if (backendUrl === 'mock') {
+    return new MockGenerationService();
+  } else if (backendUrl) {
+    return new DefaultGenerationService(backendUrl);
+  } else {
+    throw Error('No generation service configured for this environment!');
   }
 }
