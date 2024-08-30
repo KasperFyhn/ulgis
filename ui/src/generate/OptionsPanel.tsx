@@ -10,7 +10,7 @@ import {
   ToggledOptionGroupMetadata,
 } from './models';
 import React, { useState } from 'react';
-import { ToggleButton } from '../common/ToggleButton';
+import { ToggleButton } from '../common/input/ToggleButton';
 import { Options } from './Options';
 import { HelpTooltip, TooltipWrap } from '../common/HelpTooltip';
 
