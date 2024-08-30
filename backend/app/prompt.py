@@ -109,7 +109,7 @@ def build_prompt(
 
     prompt += "\n\n"
 
-    if isinstance(options, ModularGenerationOptions):
+    if isinstance(options, ModularGenerationOptions) and options.inspiration_seeds.keywords:
         prompt += ("Use these keywords as seed for inspiration: " +
                    ', '.join(options.inspiration_seeds.keywords))
 
