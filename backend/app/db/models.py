@@ -1,3 +1,7 @@
+from typing import Optional
+
+from fastapi_camelcase import CamelModel
+from pydantic import BaseModel
 from sqlalchemy import Column, Integer, String, Text, ForeignKey, Float
 from sqlalchemy.orm import Mapped, relationship
 
@@ -15,6 +19,18 @@ class TaxonomyOrm(Base):
     priority = Column(Float)
 
     group: Mapped[list["ParameterOrm"]] = relationship(back_populates="taxonomy")
+
+
+class TaxonomyOrmItem(CamelModel):
+    class Config:
+        from_attributes = True
+
+    name: str
+    short_description: str
+    text: str
+    ui_level: str
+    priority: float
+    group: Optional[list["ParameterOrmItem"]] = None
 
 
 class ParameterOrm(Base):
@@ -35,9 +51,25 @@ class ParameterOrm(Base):
     taxonomy: Mapped[TaxonomyOrm] = relationship(back_populates="group")
 
 
+class ParameterOrmItem(BaseModel):
+    class Config:
+        from_attributes = True
+
+    name: str
+    short_description: Optional[str]
+
+
 class TextContent(Base):
     __tablename__ = "text_content"
 
     id = Column(Integer, primary_key=True)
     name = Column(String, unique=True, index=True)
     text = Column(Text)
+
+
+class TextContentItem(BaseModel):
+    class Config:
+        from_attributes = True
+
+    name: str
+    text: str

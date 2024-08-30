@@ -1,4 +1,4 @@
-import React, { useRef } from 'react';
+import React, { useEffect, useRef } from 'react';
 import { NumberOptionMetadata, OptionMetadata, OptionType } from './models';
 import './Options.css';
 import { ToggleButton } from '../common/ToggleButton';
@@ -142,12 +142,22 @@ interface TextFieldProps {
   getAndSet: [() => string, (value: string) => void];
 }
 
-const TextField: React.FC<TextFieldProps> = ({
+export const TextField: React.FC<TextFieldProps> = ({
   short,
   onKeyDown,
   getAndSet,
 }: TextFieldProps) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
+  const autoSetHeight = () => {
+    if (textareaRef.current) {
+      textareaRef.current.style.height = 'auto'; // Reset height
+      const scrollHeight = textareaRef.current.scrollHeight;
+      textareaRef.current.style.height = `${scrollHeight + 2}px`;
+    }
+  };
+
+  useEffect(autoSetHeight);
+
   const [get, set] = getAndSet;
   if (short) {
     return (
@@ -169,11 +179,7 @@ const TextField: React.FC<TextFieldProps> = ({
           ref={textareaRef}
           value={get()}
           onChange={(event) => {
-            if (textareaRef.current) {
-              textareaRef.current.style.height = 'auto'; // Reset height
-              const scrollHeight = textareaRef.current.scrollHeight;
-              textareaRef.current.style.height = `${scrollHeight + 2}px`;
-            }
+            autoSetHeight();
             set(event.target.value);
           }}
           onKeyDown={onKeyDown}

@@ -4,6 +4,7 @@ import { BrowserRouter, Link, Route, Routes } from 'react-router-dom';
 import { GeneratorPage } from './generate/GeneratorPage';
 import { DefaultTextContentService } from './TextContentService';
 import Markdown from 'react-markdown';
+import { AdminPage } from './admin/AdminPage';
 
 const NavBar: React.FC = () => {
   return (
@@ -74,6 +75,7 @@ const App: React.FC = () => {
             />
             {/*<Route path="/evaluate" element={<EvaluationPage />} />*/}
             <Route path="/about" element={<AboutPage />} />
+            <Route path="/admin" element={<AdminPage />} />
             <Route
               path="*"
               element={
