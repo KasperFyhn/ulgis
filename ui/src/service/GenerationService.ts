@@ -2,7 +2,7 @@ import {
   GenerationOptions,
   GenerationOptionsMetadata,
   UiLevel,
-} from './models';
+} from '../generate/models';
 
 export interface GenerationService {
   getGenerationOptionsMetadata(

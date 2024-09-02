@@ -68,16 +68,12 @@ export const Options: React.FC<OptionsProps<OptionType>> = ({
             getAndSet={getAndSet as [() => number, (value: number) => void]}
           />
         );
-      } else if (
-        metadata.min !== undefined &&
-        metadata.max !== undefined &&
-        metadata.step !== undefined
-      ) {
+      } else if (metadata.min !== undefined && metadata.max !== undefined) {
         return (
           <NumberSlider
             min={metadata.min}
             max={metadata.max}
-            step={metadata.step}
+            step={metadata.step ?? 1}
             getAndSet={getAndSet as [() => number, (value: number) => void]}
           />
         );

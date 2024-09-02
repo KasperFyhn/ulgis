@@ -1,5 +1,5 @@
 import '../common.scss';
-import { getGenerationService } from './GenerationService';
+import { getGenerationService } from '../service/GenerationService';
 import React, { useEffect, useState } from 'react';
 import {
   GenerationOptions,

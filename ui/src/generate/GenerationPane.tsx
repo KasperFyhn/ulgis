@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { GenerationOptions } from './models';
 import { Notification } from '../common/Notification';
-import { GenerationService } from './GenerationService';
+import { GenerationService } from '../service/GenerationService';
 import { CopyableMarkdown } from '../common/CopyableMarkdown';
 import Markdown from 'react-markdown';
 
