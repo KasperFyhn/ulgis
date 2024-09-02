@@ -12,23 +12,28 @@ import {
 import React, { useState } from 'react';
 import { ToggleButton } from '../common/input/ToggleButton';
 import { Options } from './Options';
-import { HelpTooltip, TooltipWrap } from '../common/HelpTooltip';
+import { TooltipWrap } from '../common/HelpTooltip';
 
 export interface OptionGroupPanelProps {
   metadata: OptionGroupMetadata | ToggledOptionGroupMetadata;
   getAndSet: [() => OptionGroup, (v: OptionGroup) => void];
   horizontal?: boolean;
+  leftDecoratorLine?: boolean;
 }
 
 export const OptionGroupPanel: React.FC<OptionGroupPanelProps> = ({
   metadata,
   getAndSet,
   horizontal,
+  leftDecoratorLine,
 }: OptionGroupPanelProps) => {
   const [getOptionGroup, setOptionGroup] = getAndSet;
   return (
     <div
-      className={horizontal ? 'flex-container--horiz' : 'flex-container--vert'}
+      className={
+        (horizontal ? 'flex-container--horiz' : 'flex-container--vert') +
+        (leftDecoratorLine ? ' group' : '')
+      }
       style={
         horizontal
           ? {
@@ -41,16 +46,6 @@ export const OptionGroupPanel: React.FC<OptionGroupPanelProps> = ({
     >
       {Object.entries(metadata.group).map(([paramKey, paramMetadata]) => (
         <div key={paramKey}>
-          {paramMetadata.type !== 'boolean' && (
-            <span>
-              {paramMetadata.name}
-              <HelpTooltip
-                tooltipId={paramMetadata.name}
-                content={paramMetadata.description}
-              />
-            </span>
-          )}
-
           <Options
             metadata={paramMetadata}
             getAndSet={[
@@ -120,15 +115,14 @@ export const ToggledOptionGroupArrayPanel: React.FC<
 
             {getOptionGroupArray()[key].enabled &&
               !isEmptyOptionGroup(getOptionGroupArray()[key]) && (
-                <div className={'group'}>
-                  <OptionGroupPanel
-                    metadata={taxonomyMetadata}
-                    getAndSet={[
-                      () => getOptionGroupArray()[key],
-                      (value) => setValue(key, value),
-                    ]}
-                  />
-                </div>
+                <OptionGroupPanel
+                  metadata={taxonomyMetadata}
+                  getAndSet={[
+                    () => getOptionGroupArray()[key],
+                    (value) => setValue(key, value),
+                  ]}
+                  leftDecoratorLine
+                />
               )}
           </div>
         ))}
@@ -156,34 +150,17 @@ export const ToggledOptionGroupArrayPanel: React.FC<
         ))}
       </div>
       <div className={'flex-container--horiz'}>
-        {metadata.multiple
-          ? Object.entries(metadata.groups).map(([key, taxonomyMetadata]) => {
-              return (
-                <div key={key} className={'flex-container__box--equal-size'}>
-                  {getOptionGroupArray()[key].enabled && key !== 'none' ? (
-                    <div className={'group'}>
-                      <OptionGroupPanel
-                        key={key}
-                        metadata={taxonomyMetadata}
-                        getAndSet={[
-                          () => getOptionGroupArray()[key],
-                          (value) => setValue(key, value),
-                        ]}
-                      />
-                    </div>
-                  ) : (
-                    <div />
-                  )}
-                </div>
-              );
-            })
-          : Object.entries(metadata.groups)
-              .filter(
-                ([key, _]) =>
-                  getOptionGroupArray()[key].enabled && key !== 'none',
-              )
-              .map(([key, taxonomyMetadata]) => (
-                <div key={key} className={'flex-container__box'}>
+        {Object.entries(metadata.groups)
+          .filter(
+            ([key, _]) =>
+              metadata.multiple ||
+              (getOptionGroupArray()[key].enabled &&
+                !isEmptyOptionGroup(getOptionGroupArray()[key])),
+          )
+          .map(([key, taxonomyMetadata]) => {
+            return (
+              <div key={key} className={'flex-container__box--equal-size'}>
+                {getOptionGroupArray()[key].enabled && key !== 'none' ? (
                   <OptionGroupPanel
                     key={key}
                     metadata={taxonomyMetadata}
@@ -191,10 +168,15 @@ export const ToggledOptionGroupArrayPanel: React.FC<
                       () => getOptionGroupArray()[key],
                       (value) => setValue(key, value),
                     ]}
-                    horizontal
+                    horizontal={!metadata.multiple}
+                    leftDecoratorLine={metadata.multiple}
                   />
-                </div>
-              ))}
+                ) : (
+                  <div />
+                )}
+              </div>
+            );
+          })}
       </div>
     </div>
   );

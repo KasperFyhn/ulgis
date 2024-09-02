@@ -104,16 +104,14 @@ export const GeneratorPage: React.FC<GeneratorPageProps> = ({
       )}
       <div className={'flex-container--horiz'}>
         <div className={'content-pane flex-container__box--equal-size padded'}>
-          {leftPanelMetadata
-            .map((metadataEntry) => (
-              <OptionsPanel
-                key={metadataEntry[0]}
-                metadataEntry={metadataEntry}
-                options={options}
-                setOptions={setOptions}
-              />
-            ))
-            .filter((obj) => obj !== undefined)}
+          {leftPanelMetadata.map((metadataEntry) => (
+            <OptionsPanel
+              key={metadataEntry[0]}
+              metadataEntry={metadataEntry}
+              options={options}
+              setOptions={setOptions}
+            />
+          ))}
         </div>
         <GenerationPane generationOptions={options} service={service} />
         <div className={'content-pane flex-container__box--equal-size padded'}>
