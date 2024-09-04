@@ -1,5 +1,8 @@
-import React, { PropsWithChildren, useState } from 'react';
-import { DefaultTextContentService } from '../TextContentService';
+import React, { PropsWithChildren, useEffect, useState } from 'react';
+import {
+  DefaultTextContentService,
+  getTextContentService,
+} from '../service/TextContentService';
 import './Notification.scss';
 import Markdown from 'react-markdown';
 
@@ -24,11 +27,15 @@ export const Notification: React.FC<NotificationProps> = ({
   const [show, setShow] = useState(true);
   const [content, setContent] = useState<string | undefined>(undefined);
 
-  if (fetchKey && content === undefined) {
-    new DefaultTextContentService().get(fetchKey).then((text) => {
-      setContent(text);
-    });
-  }
+  useEffect(() => {
+    if (fetchKey && content === undefined) {
+      getTextContentService()
+        .get(fetchKey)
+        .then((text) => {
+          setContent(text);
+        });
+    }
+  });
 
   if (type === undefined) {
     type = 'neutral';

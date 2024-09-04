@@ -1,9 +1,10 @@
 from app.db.models import ParameterOrm
-from app.models.models import (
+from app.models.generationoptions import (
     GenerationOptions,
     AmpleGenerationOptions,
-    ModularEducationInfo, ModularGenerationOptions,
+    ModularGenerationOptions,
 )
+from app.models.educationinfo import ModularEducationInfo
 
 
 def build_prompt(
@@ -91,7 +92,7 @@ def build_prompt(
         phrase_about_target = f"for any {target_type} at {level}."
 
     if options.output_options.learning_goals.enabled:
-        prompt += "Create a list of five learning goals " + phrase_about_target
+        prompt += "Create a list of learning goals " + phrase_about_target
     elif options.output_options.competency_profile.enabled:
         prompt += "Create a 200 word competency profile " + phrase_about_target
     elif options.output_options.bullet_points.enabled:
@@ -109,8 +110,12 @@ def build_prompt(
 
     prompt += "\n\n"
 
-    if isinstance(options, ModularGenerationOptions):
-        prompt += ("Use these keywords as seed for inspiration: " +
-                   ', '.join(options.inspiration_seeds.keywords))
+    if (
+        isinstance(options, ModularGenerationOptions)
+        and options.inspiration_seeds.keywords
+    ):
+        prompt += "Use these keywords as seed for inspiration: " + ", ".join(
+            options.inspiration_seeds.keywords
+        )
 
     return prompt.strip()
