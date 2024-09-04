@@ -5,7 +5,7 @@ from sqlalchemy import ColumnElement
 from sqlalchemy.exc import SQLAlchemyError
 from sqlalchemy.orm import Session, subqueryload
 
-from app.db.base import SessionLocal
+from app.db.base import get_db
 from app.db.models import (
     TaxonomyOrm,
     TextContent,
@@ -17,14 +17,6 @@ from app.logger import create_logger
 logger = create_logger(__name__)
 
 data_router = APIRouter()
-
-
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
 
 
 @data_router.get("/data/taxonomies")

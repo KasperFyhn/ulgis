@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
-import { TextField } from '../generate/Options';
 import Markdown from 'react-markdown';
+import { TextField } from '../common/input/TextField';
 
 interface TextContentItem {
   name: string;
@@ -22,7 +22,7 @@ const TextContentEditor: React.FC<TextContentEditorProps> = ({
       <div className={'flex-container--horiz'} style={{ gap: '50px' }}>
         <div className={'flex-container__box--equal-size'}>
           <h2>Editor</h2>
-          <TextField getAndSet={[() => text, (value) => setText(value)]} />
+          <TextField value={text} setValue={(value) => setText(value)} />
         </div>
         <div className={'flex-container__box--equal-size'}>
           <h2>Preview</h2>

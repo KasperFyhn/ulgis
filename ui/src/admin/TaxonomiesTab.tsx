@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { UiLevel } from '../generate/models';
-import { MultiValueToggle } from '../common/MultiValueToggle';
+import { MultiValueToggle } from '../common/input/MultiValueToggle';
 
 interface TaxonomyItem {
   name: string;

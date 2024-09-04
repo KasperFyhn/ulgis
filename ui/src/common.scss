@@ -19,7 +19,9 @@ input[type='range'] {
   accent-color: color('theme');
 }
 
-input[type='text'] {
+input[type='text'],
+input[type='password'] {
+  display: block;
   border-radius: 0;
   border-width: 1px;
   padding: 5px;
