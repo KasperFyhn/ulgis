@@ -16,18 +16,19 @@ import { TooltipWrap } from '../common/HelpTooltip';
 
 export interface OptionGroupPanelProps {
   metadata: OptionGroupMetadata | ToggledOptionGroupMetadata;
-  getAndSet: [() => OptionGroup, (v: OptionGroup) => void];
+  optionGroup: OptionGroup;
+  setOptionGroup: (v: OptionGroup) => void;
   horizontal?: boolean;
   leftDecoratorLine?: boolean;
 }
 
 export const OptionGroupPanel: React.FC<OptionGroupPanelProps> = ({
   metadata,
-  getAndSet,
+  optionGroup,
+  setOptionGroup,
   horizontal,
   leftDecoratorLine,
 }: OptionGroupPanelProps) => {
-  const [getOptionGroup, setOptionGroup] = getAndSet;
   return (
     <div
       className={
@@ -48,14 +49,12 @@ export const OptionGroupPanel: React.FC<OptionGroupPanelProps> = ({
         <div key={paramKey}>
           <Options
             metadata={paramMetadata}
-            getAndSet={[
-              () => getOptionGroup()[paramKey],
-              (value) => {
-                const obj = getOptionGroup();
-                obj[paramKey] = value;
-                setOptionGroup({ ...obj });
-              },
-            ]}
+            value={optionGroup[paramKey]}
+            setValue={(value) => {
+              const obj = optionGroup;
+              obj[paramKey] = value;
+              setOptionGroup({ ...obj });
+            }}
           />
         </div>
       ))}
@@ -65,33 +64,34 @@ export const OptionGroupPanel: React.FC<OptionGroupPanelProps> = ({
 
 export interface ToggledOptionGroupArrayPanelProps {
   metadata: ToggledOptionGroupArrayMetadata;
-  getAndSet: [
-    () => ToggledOptionGroupArray,
-    (value: ToggledOptionGroupArray) => void,
-  ];
+  optionGroupArray: ToggledOptionGroupArray;
+  setOptionGroupArray: (value: ToggledOptionGroupArray) => void;
   vertical?: boolean;
 }
 
 export const ToggledOptionGroupArrayPanel: React.FC<
   ToggledOptionGroupArrayPanelProps
-> = ({ metadata, getAndSet, vertical }: ToggledOptionGroupArrayPanelProps) => {
-  const [getOptionGroupArray, setOptionGroupArray] = getAndSet;
-
+> = ({
+  metadata,
+  optionGroupArray,
+  setOptionGroupArray,
+  vertical,
+}: ToggledOptionGroupArrayPanelProps) => {
   const toggleOptionGroup = (key: string, value: boolean): void => {
     if (!metadata.multiple) {
       if (!value) return;
-      for (const optionGroupKey in getOptionGroupArray()) {
-        const optionGroup = getOptionGroupArray()[optionGroupKey];
+      for (const optionGroupKey in optionGroupArray) {
+        const optionGroup = optionGroupArray[optionGroupKey];
         optionGroup.enabled = false;
       }
     }
-    const obj = getOptionGroupArray();
+    const obj = optionGroupArray;
     obj[key].enabled = value;
     setOptionGroupArray({ ...obj });
   };
 
   const setValue = (key: string, value: unknown): void => {
-    const obj = getOptionGroupArray();
+    const obj = optionGroupArray;
     obj[key] = value as ToggledOptionGroup;
     setOptionGroupArray({ ...obj });
   };
@@ -106,21 +106,19 @@ export const ToggledOptionGroupArrayPanel: React.FC<
           >
             <TooltipWrap tooltipId={key} content={taxonomyMetadata.description}>
               <ToggleButton
-                checked={getOptionGroupArray()[key].enabled}
+                checked={optionGroupArray[key].enabled}
                 onChange={(value) => toggleOptionGroup(key, value)}
               >
                 {taxonomyMetadata.name}
               </ToggleButton>
             </TooltipWrap>
 
-            {getOptionGroupArray()[key].enabled &&
-              !isEmptyOptionGroup(getOptionGroupArray()[key]) && (
+            {optionGroupArray[key].enabled &&
+              !isEmptyOptionGroup(optionGroupArray[key]) && (
                 <OptionGroupPanel
                   metadata={taxonomyMetadata}
-                  getAndSet={[
-                    () => getOptionGroupArray()[key],
-                    (value) => setValue(key, value),
-                  ]}
+                  optionGroup={optionGroupArray[key]}
+                  setOptionGroup={(value) => setValue(key, value)}
                   leftDecoratorLine
                 />
               )}
@@ -141,7 +139,7 @@ export const ToggledOptionGroupArrayPanel: React.FC<
           >
             <ToggleButton
               className="flex-container__box--equal-size"
-              checked={getOptionGroupArray()[key].enabled}
+              checked={optionGroupArray[key].enabled}
               onChange={(value) => toggleOptionGroup(key, value)}
             >
               {taxonomyMetadata.name}
@@ -154,20 +152,18 @@ export const ToggledOptionGroupArrayPanel: React.FC<
           .filter(
             ([key, _]) =>
               metadata.multiple ||
-              (getOptionGroupArray()[key].enabled &&
-                !isEmptyOptionGroup(getOptionGroupArray()[key])),
+              (optionGroupArray[key].enabled &&
+                !isEmptyOptionGroup(optionGroupArray[key])),
           )
           .map(([key, taxonomyMetadata]) => {
             return (
               <div key={key} className={'flex-container__box--equal-size'}>
-                {getOptionGroupArray()[key].enabled && key !== 'none' ? (
+                {optionGroupArray[key].enabled && key !== 'none' ? (
                   <OptionGroupPanel
                     key={key}
                     metadata={taxonomyMetadata}
-                    getAndSet={[
-                      () => getOptionGroupArray()[key],
-                      (value) => setValue(key, value),
-                    ]}
+                    optionGroup={optionGroupArray[key]}
+                    setOptionGroup={(value) => setValue(key, value)}
                     horizontal={!metadata.multiple}
                     leftDecoratorLine={metadata.multiple}
                   />
@@ -210,13 +206,11 @@ export const OptionsPanel: React.FC<OptionsPanelProps> = ({
           <OptionGroupPanel
             key={key}
             metadata={metadata}
-            getAndSet={[
-              () => options[key] as OptionGroup,
-              (v) => {
-                options[key] = v;
-                setOptions({ ...options });
-              },
-            ]}
+            optionGroup={options[key] as OptionGroup}
+            setOptionGroup={(v) => {
+              options[key] = v;
+              setOptions({ ...options });
+            }}
           />
         </div>
       );
@@ -229,13 +223,11 @@ export const OptionsPanel: React.FC<OptionsPanelProps> = ({
             metadata={metadata}
             // TODO: fix this hack
             vertical={key !== 'taxonomies' || narrowWindow}
-            getAndSet={[
-              () => options[key] as ToggledOptionGroupArray,
-              (v) => {
-                options[key] = v;
-                setOptions({ ...options });
-              },
-            ]}
+            optionGroupArray={options[key] as ToggledOptionGroupArray}
+            setOptionGroupArray={(v) => {
+              options[key] = v;
+              setOptions({ ...options });
+            }}
           />
         </div>
       );

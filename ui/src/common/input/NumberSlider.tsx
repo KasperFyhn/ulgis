@@ -4,29 +4,30 @@ interface NumberSliderProps {
   min: number;
   max: number;
   step: number;
-  getAndSet: [() => number, (value: number) => void];
+  value: number;
+  setValue: (value: number) => void;
 }
 
 export const NumberSlider: React.FC<NumberSliderProps> = ({
   min,
   max,
   step,
-  getAndSet,
+  value,
+  setValue,
 }: NumberSliderProps) => {
-  const [get, set] = getAndSet;
   const maxDigits = max?.toString().length;
   return (
     <div className={'flex-container--horiz'}>
       <input
         type={'range'}
-        value={get()}
+        value={value}
         min={min}
         max={max}
         step={step}
-        onChange={(event) => set(Number(event.target.value))}
+        onChange={(event) => setValue(Number(event.target.value))}
       />
       <div className={'current-value'} style={{ width: `${maxDigits}ch` }}>
-        {get()}
+        {value}
       </div>
     </div>
   );

@@ -29,7 +29,6 @@ class ParameterOrm(Base):
     id = Column(Integer, primary_key=True)
     name = Column(String, unique=True, index=True)
     short_description = Column(String)
-    # default = Column(Integer)
 
     taxonomy_id = Column(Integer, ForeignKey("taxonomies.id"))
     taxonomy: Mapped[TaxonomyOrm] = relationship(back_populates="group")

@@ -25,12 +25,14 @@ const OptionsHeader: React.FC<OptionsHeaderProps> = ({ metadata }) => {
 
 interface OptionsProps<T extends OptionType> {
   metadata: OptionMetadata;
-  getAndSet: [() => T, (value: T) => void];
+  value: T;
+  setValue: (value: T) => void;
 }
 
 export const Options: React.FC<OptionsProps<OptionType>> = ({
   metadata,
-  getAndSet,
+  value,
+  setValue,
 }: OptionsProps<OptionType>) => {
   switch (metadata.type) {
     case 'boolean':
@@ -38,7 +40,8 @@ export const Options: React.FC<OptionsProps<OptionType>> = ({
         <BooleanToggle
           text={metadata.name}
           tooltipText={metadata.description}
-          getAndSet={getAndSet as [() => boolean, (value: boolean) => void]}
+          value={value as boolean}
+          setValue={(v) => setValue(v)}
         />
       );
     case 'string':
@@ -49,7 +52,8 @@ export const Options: React.FC<OptionsProps<OptionType>> = ({
             <StringOptions
               name={metadata.name}
               options={metadata.options}
-              getAndSet={getAndSet as [() => string, (value: string) => void]}
+              value={value as string}
+              setValue={(v) => setValue(v)}
             />
           </>
         );
@@ -59,7 +63,8 @@ export const Options: React.FC<OptionsProps<OptionType>> = ({
             <OptionsHeader metadata={metadata} />{' '}
             <TextField
               short={metadata.short}
-              getAndSet={getAndSet as [() => string, (value: string) => void]}
+              value={value as string}
+              setValue={setValue}
             />
           </>
         );
@@ -71,9 +76,8 @@ export const Options: React.FC<OptionsProps<OptionType>> = ({
             <OptionsHeader metadata={metadata} />{' '}
             <MultipleStringOptions
               options={metadata.options}
-              getAndSet={
-                getAndSet as [() => string[], (value: string[]) => void]
-              }
+              value={value as string[]}
+              setValue={(v) => setValue(v)}
             />
           </>
         );
@@ -83,9 +87,8 @@ export const Options: React.FC<OptionsProps<OptionType>> = ({
             <OptionsHeader metadata={metadata} />{' '}
             <MultipleTextFields
               short={metadata.short}
-              getAndSet={
-                getAndSet as [() => string[], (value: string[]) => void]
-              }
+              value={value as string[]}
+              setValue={(v) => setValue(v)}
             />
           </>
         );
@@ -97,7 +100,8 @@ export const Options: React.FC<OptionsProps<OptionType>> = ({
             <OptionsHeader metadata={metadata} />
             <StepSlider
               steps={metadata.steps}
-              getAndSet={getAndSet as [() => number, (value: number) => void]}
+              value={value as number}
+              setValue={(v) => setValue(v)}
             />
           </>
         );
@@ -109,7 +113,8 @@ export const Options: React.FC<OptionsProps<OptionType>> = ({
               min={metadata.min}
               max={metadata.max}
               step={metadata.step ?? 1}
-              getAndSet={getAndSet as [() => number, (value: number) => void]}
+              value={value as number}
+              setValue={(v) => setValue(v)}
             />
           </>
         );

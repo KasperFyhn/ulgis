@@ -4,22 +4,23 @@ import { MultiValueToggle } from './MultiValueToggle';
 export interface StringOptionsProps {
   name: string;
   options: string[];
-  getAndSet: [() => string, (value: string) => void];
+  value: string;
+  setValue: (value: string) => void;
 }
 
 export const StringOptions: React.FC<StringOptionsProps> = ({
   name,
   options,
-  getAndSet,
+  value,
+  setValue,
 }: StringOptionsProps) => {
-  const [get, set] = getAndSet;
   if (options.length < 10) {
     return (
       <div className={'small-vert-margin'}>
         <MultiValueToggle
           name={name}
-          selected={get()}
-          onChange={set}
+          selected={value}
+          onChange={setValue}
           options={options}
         />
       </div>
@@ -32,8 +33,8 @@ export const StringOptions: React.FC<StringOptionsProps> = ({
           <input
             type={'radio'}
             name={name}
-            checked={get() === option}
-            onChange={() => set(option)}
+            checked={value === option}
+            onChange={() => setValue(option)}
           />
           <label>{option}</label>
         </div>

@@ -3,42 +3,39 @@ import { TextField } from './TextField';
 
 interface MultipleTextFieldsProps {
   short?: boolean;
-  getAndSet: [() => string[], (value: string[]) => void];
+  value: string[];
+  setValue: (value: string[]) => void;
 }
 
 export const MultipleTextFields: React.FC<MultipleTextFieldsProps> = ({
   short,
-  getAndSet,
+  value,
+  setValue,
 }: MultipleTextFieldsProps) => {
-  const [get, set] = getAndSet;
-
   return (
     <div className={'flex-container--vert'}>
-      {get().map((_, i) => (
+      {value.map((_, i) => (
         <TextField
           key={i}
           short={short}
-          getAndSet={[
-            () => get()[i],
-            (value) => {
-              const textFields = get();
-              textFields[i] = value;
-              set([...textFields]);
-            },
-          ]}
+          value={value[i]}
+          setValue={(v) => {
+            value[i] = v;
+            setValue([...value]);
+          }}
           onKeyDown={(event) => {
             if (
               event.key === 'Enter' &&
-              get().every((element) => element !== '')
+              value.every((element) => element !== '')
             ) {
-              set([...get(), '']);
+              setValue([...value, '']);
             }
           }}
         />
       ))}
       <button
-        onClick={() => set([...get(), ''])}
-        disabled={get().some((v) => v === '')}
+        onClick={() => setValue([...value, ''])}
+        disabled={value.some((v) => v === '')}
         className={
           'button--icon button--icon--hide-label icon-add visually-disabled'
         }

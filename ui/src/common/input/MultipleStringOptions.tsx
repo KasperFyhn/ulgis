@@ -3,28 +3,29 @@ import { ToggleButton } from './ToggleButton';
 
 interface MultipleStringOptionsProps {
   options: string[];
-  getAndSet: [() => string[], (value: string[]) => void];
+  value: string[];
+  setValue: (value: string[]) => void;
 }
 
 export const MultipleStringOptions: React.FC<MultipleStringOptionsProps> = ({
   options,
-  getAndSet,
+  value,
+  setValue,
 }: MultipleStringOptionsProps) => {
-  const [get, set] = getAndSet;
   return (
     <div className={'flex-container--horiz'}>
       {options.map((option) => (
         <span key={option}>
           <ToggleButton
-            checked={option in get()}
-            onChange={(value) => {
-              let picked = get();
-              if (value) {
+            checked={option in value}
+            onChange={(v) => {
+              let picked = value;
+              if (v) {
                 picked.push(option);
               } else {
                 picked = picked.filter((o) => o !== option);
               }
-              set([...picked]);
+              setValue([...picked]);
             }}
           ></ToggleButton>
           {option}
