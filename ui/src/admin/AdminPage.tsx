@@ -1,14 +1,13 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { TaxonomiesTab } from './TaxonomiesTab';
 import { TextContentTab } from './TextContentTab';
-import { MultiValueToggle } from '../common/input/MultiValueToggle';
 import { getAuthenticationService } from '../service/AuthenticationService';
 import { LoginForm } from './LoginPage';
+import { AuthContext, AuthProvider } from './AuthProvider';
+import { Link, Route, Routes } from 'react-router-dom';
 
-export const AdminPage: React.FC = () => {
-  const [token, setToken] = useState<string | null>(
-    sessionStorage.getItem('access_key'),
-  );
+const AdminPageInner: React.FC = () => {
+  const { token, setToken } = useContext(AuthContext);
 
   const [username, setUsername] = useState('NO USER');
 
@@ -20,15 +19,10 @@ export const AdminPage: React.FC = () => {
     }
   }, [token]);
 
-  const tabs = ['Taxonomies', 'Text Content'];
-
-  const [selectedTab, setSelectedTab] = useState<string>(tabs[0]);
-
   if (token === null || username === undefined) {
     return (
       <LoginForm
         onRetrievedToken={(t) => {
-          sessionStorage.setItem('access_key', t);
           setToken(t);
         }}
       />
@@ -37,30 +31,46 @@ export const AdminPage: React.FC = () => {
 
   return (
     <div className={'flex-container--vert'}>
-      <div>
-        <MultiValueToggle
-          name={'tab-selector'}
-          selected={selectedTab}
-          onChange={(value) => setSelectedTab(value)}
-          options={tabs}
-        />
-        <div className={'flex-container--horiz'} style={{ float: 'right' }}>
-          <span>
-            Logged in as <b>{username}</b>
-          </span>
-          <button
-            onClick={() => {
-              sessionStorage.removeItem('access_key');
-              setToken(null);
-            }}
-          >
-            Log out
-          </button>
+      <nav className={'nav nav--site-nav'}>
+        <div className={'nav__site'}>
+          <div className={'nav__items'}>
+            <Link className={'nav__item'} to={'taxonomies'}>
+              Taxonomies
+            </Link>
+            <Link className={'nav__item'} to={'text-content'}>
+              Text Content
+            </Link>
+          </div>
         </div>
-      </div>
 
-      {selectedTab === 'Taxonomies' && <TaxonomiesTab />}
-      {selectedTab === 'Text Content' && <TextContentTab />}
+        <div className={'nav__utilities'}>
+          <div className={'nav__item flex-container--horiz'}>
+            <span>
+              Logged in as <b>{username}</b>
+            </span>
+            <button
+              onClick={() => {
+                sessionStorage.removeItem('access_key');
+                setToken(null);
+              }}
+            >
+              Log out
+            </button>
+          </div>
+        </div>
+      </nav>
+      <Routes>
+        <Route path="taxonomies" element={<TaxonomiesTab />} />
+        <Route path="text-content" element={<TextContentTab />} />
+      </Routes>
     </div>
+  );
+};
+
+export const AdminPage: React.FC = () => {
+  return (
+    <AuthProvider>
+      <AdminPageInner />
+    </AuthProvider>
   );
 };

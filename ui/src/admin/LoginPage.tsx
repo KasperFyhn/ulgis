@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { getAuthenticationService } from '../service/AuthenticationService';
+import { Notification } from '../common/Notification';
 
 interface LoginFormProps {
   onRetrievedToken: (token: string) => void;
@@ -22,6 +23,7 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onRetrievedToken }) => {
   return (
     <div className={'content-pane padded'}>
       <form className={'flex-container--vert'} onSubmit={handleSubmit}>
+        {error && <Notification type={'warning'}>{error}</Notification>}
         <div>
           <label htmlFor="username">Username</label>
           <input
@@ -43,7 +45,6 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onRetrievedToken }) => {
         <div>
           <button type="submit">Login</button>
         </div>
-        {error && <p style={{ color: 'red' }}>{error}</p>}
       </form>
     </div>
   );

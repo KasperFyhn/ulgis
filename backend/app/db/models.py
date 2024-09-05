@@ -18,13 +18,19 @@ class TaxonomyOrm(Base):
     ui_level = Column(String)
     priority = Column(Float)
 
-    group: Mapped[list["ParameterOrm"]] = relationship(back_populates="taxonomy")
+    group: Mapped[list["ParameterOrm"]] = relationship(
+        back_populates="taxonomy",
+        # backref="taxonomy",
+        cascade="all, delete-orphan",  # Enables cascading updates and deletions
+        passive_deletes=True,  # Allows cascading delete of children if the parent is deleted
+    )
 
 
 class TaxonomyOrmItem(CamelModel):
     class Config:
         from_attributes = True
 
+    id: Optional[int] = None
     name: str
     short_description: str
     text: str
@@ -43,17 +49,18 @@ class ParameterOrm(Base):
 
     # fields
     id = Column(Integer, primary_key=True)
-    name = Column(String, unique=True, index=True)
+    name = Column(String, index=True)
     short_description = Column(String)
 
     taxonomy_id = Column(Integer, ForeignKey("taxonomies.id"))
     taxonomy: Mapped[TaxonomyOrm] = relationship(back_populates="group")
 
 
-class ParameterOrmItem(BaseModel):
+class ParameterOrmItem(CamelModel):
     class Config:
         from_attributes = True
 
+    id: Optional[int] = None
     name: str
     short_description: Optional[str]
 

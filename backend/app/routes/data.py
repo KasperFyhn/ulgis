@@ -11,8 +11,10 @@ from app.db.models import (
     TextContent,
     TaxonomyOrmItem,
     TextContentItem,
+    ParameterOrm,
 )
 from app.logger import create_logger
+from app.routes.auth import oauth2_scheme
 
 logger = create_logger(__name__)
 
@@ -28,7 +30,11 @@ def get_taxonomies(db: Session = Depends(get_db)):
 
 
 @data_router.put("/data/taxonomies", response_model=bool)
-def put_or_update_taxonomy(arg_obj: TaxonomyOrmItem, db: Session = Depends(get_db)):
+def put_or_update_taxonomy(
+    arg_obj: TaxonomyOrmItem,
+    token: str = Depends(oauth2_scheme),
+    db: Session = Depends(get_db),
+):
     """Add or update a taxonomy object in the database."""
     try:
         existing = (
@@ -36,23 +42,35 @@ def put_or_update_taxonomy(arg_obj: TaxonomyOrmItem, db: Session = Depends(get_d
             .filter(cast(ColumnElement[bool], TaxonomyOrm.name == arg_obj.name))
             .first()
         )
-        if existing:
-            for key, value in vars(arg_obj).items():
-                if key == "group":
-                    # value = [ParameterOrm(**item.dict()) for item in value]
-                    # print([vars(v) for v in value])
-                    continue
 
-                setattr(existing, key, value)
-        else:
-            obj = TaxonomyOrm(
-                **{k: v for k, v in vars(arg_obj).items() if k != "group"}
-            )
-            db.add(obj)
+        obj = TaxonomyOrm(**{k: v for k, v in vars(arg_obj).items() if k != "group"})
+
+        obj.group = [ParameterOrm(**item.dict()) for item in arg_obj.group]
+        if existing is not None:
+            obj.id = existing.id
+        db.merge(obj)
 
         db.commit()  # Save changes to the database
         return True
 
+    except SQLAlchemyError as e:
+        db.rollback()  # Rollback in case of an error
+        raise HTTPException(status_code=500, detail=str(e))
+
+
+@data_router.delete("/data/taxonomies/{taxonomy_id}", response_model=bool)
+def delete_taxonomy(
+    taxonomy_id: int, token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)
+):
+    try:
+        existing = (
+            db.query(TaxonomyOrm)
+            .filter(cast(ColumnElement[bool], TaxonomyOrm.id == taxonomy_id))
+            .first()
+        )
+        db.delete(existing)
+        db.commit()
+        return True
     except SQLAlchemyError as e:
         db.rollback()  # Rollback in case of an error
         raise HTTPException(status_code=500, detail=str(e))

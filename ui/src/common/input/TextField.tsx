@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from 'react';
+import React, { useEffect, useLayoutEffect, useRef } from 'react';
 
 interface TextFieldProps {
   short?: boolean;
@@ -14,25 +14,23 @@ export const TextField: React.FC<TextFieldProps> = ({
   setValue,
 }: TextFieldProps) => {
   const textareaRef = useRef<HTMLTextAreaElement>(null);
-  const autoResize = () => {
+  useEffect((): void => {
     if (textareaRef.current) {
-      textareaRef.current.style.height = 'auto'; // Reset height
       const scrollHeight = textareaRef.current.scrollHeight;
       textareaRef.current.style.height = `${scrollHeight + 2}px`;
     }
-  };
-  useEffect(autoResize);
+  }, [value]);
 
   if (short) {
     return (
       <div className={'flex-container--vert'}>
         <input
           type={'text'}
-          maxLength={50}
+          maxLength={80}
           value={value}
           onChange={(event) => setValue(event.target.value)}
           onKeyDown={onKeyDown}
-          autoFocus
+          autoFocus={onKeyDown !== undefined}
         />
       </div>
     );
@@ -43,7 +41,6 @@ export const TextField: React.FC<TextFieldProps> = ({
           ref={textareaRef}
           value={value}
           onChange={(event) => {
-            autoResize();
             if (event.target.value === '\n') return; // caused annoying issues
             setValue(event.target.value);
           }}
