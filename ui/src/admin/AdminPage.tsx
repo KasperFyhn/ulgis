@@ -5,6 +5,7 @@ import { getAuthenticationService } from '../service/AuthenticationService';
 import { LoginForm } from './LoginPage';
 import { AuthContext, AuthProvider } from './AuthProvider';
 import { Link, Route, Routes } from 'react-router-dom';
+import { BackupsTab } from './BackupsTab';
 
 const AdminPageInner: React.FC = () => {
   const { token, setToken } = useContext(AuthContext);
@@ -40,6 +41,9 @@ const AdminPageInner: React.FC = () => {
             <Link className={'nav__item'} to={'text-content'}>
               Text Content
             </Link>
+            <Link className={'nav__item'} to={'backups'}>
+              Backups
+            </Link>
           </div>
         </div>
 
@@ -63,6 +67,7 @@ const AdminPageInner: React.FC = () => {
         <Route path="" element={'Welcome, ' + username} />
         <Route path="taxonomies" element={<TaxonomiesTab />} />
         <Route path="text-content" element={<TextContentTab />} />
+        <Route path="backups" element={<BackupsTab />} />
       </Routes>
     </div>
   );

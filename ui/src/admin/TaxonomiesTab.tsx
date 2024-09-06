@@ -6,6 +6,7 @@ import { NumberSlider } from '../common/input/NumberSlider';
 import { AuthContext } from './AuthProvider';
 import { DeleteButton } from './DeleteButton';
 import { HelpTooltip } from '../common/HelpTooltip';
+import HasDbSubmission from './HasDbSubmission';
 
 interface ParameterItem {
   id?: number;
@@ -23,10 +24,8 @@ interface TaxonomyItem {
   group: ParameterItem[];
 }
 
-interface TaxonomyEditorProps {
+interface TaxonomyEditorProps extends HasDbSubmission {
   taxonomy: TaxonomyItem;
-  onSuccessfulSubmit?: () => void;
-  onFailedSubmit?: () => void;
 }
 
 const TaxonomyEditor: React.FC<TaxonomyEditorProps> = ({

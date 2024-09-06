@@ -2,16 +2,15 @@ import React, { useContext, useEffect, useState } from 'react';
 import Markdown from 'react-markdown';
 import { TextField } from '../common/input/TextField';
 import { AuthContext } from './AuthProvider';
+import HasDbSubmission from './HasDbSubmission';
 
 interface TextContentItem {
   name: string;
   text: string;
 }
 
-interface TextContentEditorProps {
+interface TextContentEditorProps extends HasDbSubmission {
   textContent: TextContentItem;
-  onSuccessfulSubmit?: () => void;
-  onFailedSubmit?: () => void;
 }
 
 const TextContentEditor: React.FC<TextContentEditorProps> = ({

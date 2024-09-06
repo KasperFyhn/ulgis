@@ -30,6 +30,10 @@ export const Notification: React.FC<NotificationProps> = ({
   const [content, setContent] = useState<string | undefined>(undefined);
 
   useEffect(() => {
+    setShow(true);
+  }, [children, fetchKey]);
+
+  useEffect(() => {
     if (fetchKey && content === undefined) {
       getTextContentService()
         .get(fetchKey)
