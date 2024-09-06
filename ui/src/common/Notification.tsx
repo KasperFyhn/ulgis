@@ -12,6 +12,7 @@ export interface NotificationProps extends PropsWithChildren {
   type?: ToasterType;
   fetchKey?: string;
   onDismiss?: () => void;
+  nonDismissible?: boolean;
 }
 
 export const Notification: React.FC<NotificationProps> = ({
@@ -19,6 +20,7 @@ export const Notification: React.FC<NotificationProps> = ({
   type,
   fetchKey,
   onDismiss,
+  nonDismissible,
 }: NotificationProps) => {
   if (children !== undefined && fetchKey !== undefined) {
     throw Error('Use only fetch key or children for a notification!');
@@ -56,16 +58,18 @@ export const Notification: React.FC<NotificationProps> = ({
           )) ||
             children}
         </div>
-        <button
-          className={
-            'button--small button--icon button--icon--hide-label icon-close ' +
-            'close-button'
-          }
-          onClick={() => {
-            setShow(false);
-            if (onDismiss) onDismiss();
-          }}
-        />
+        {!nonDismissible && (
+          <button
+            className={
+              'button--small button--icon button--icon--hide-label icon-close ' +
+              'close-button'
+            }
+            onClick={() => {
+              setShow(false);
+              if (onDismiss) onDismiss();
+            }}
+          />
+        )}
       </div>
     );
   } else {

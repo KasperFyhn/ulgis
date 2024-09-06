@@ -79,3 +79,16 @@ class TextContentItem(BaseModel):
 
     name: str
     text: str
+
+
+class AdminUserOrm(Base):
+    __tablename__ = "admins"
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String, unique=True, index=True)
+    password_hash = Column(String)
+
+
+class AdminUserItem(BaseModel):
+    name: str
+    password_hash: str

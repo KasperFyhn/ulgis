@@ -7,8 +7,14 @@ import jwt
 from fastapi import Depends, HTTPException, status, APIRouter
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
 from jwt.exceptions import InvalidTokenError
-from passlib.context import CryptContext
 from pydantic import BaseModel
+from sqlalchemy.orm import Session
+
+from app.db.base import get_db
+from app.db.models import AdminUserOrm, AdminUserItem
+from app.passwordhash import verify_password
+
+auth_router = APIRouter()
 
 try:
     dotenv.load_dotenv()
@@ -19,57 +25,26 @@ except KeyError:
         "Use 'openssl rand -hex 32' to generate one."
     )
 
-ALGORITHM = "HS256"
-
-fake_users_db = {
-    "johndoe": {
-        "username": "johndoe",
-        "full_name": "John Doe",
-        "email": "johndoe@example.com",
-        "hashed_password": "$2b$12$EixZaYVK1fsbw1ZfbX3OXePaWxn96p36WQoeG6Lruj3vjPGga31lW",
-        "disabled": False,
-    }
-}
-
-
-class Token(BaseModel):
-    access_token: str
-    token_type: str
-
-
-class AdminUser(BaseModel):
-    username: str
-    hashed_password: str
-
-
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="auth/token")
-
-auth_router = APIRouter()
-
-
-def verify_password(plain_password, hashed_password):
-    return pwd_context.verify(plain_password, hashed_password)
-
-
-def get_password_hash(password):
-    return pwd_context.hash(password)
 
 
 def get_user(db, username: str):
-    if username in db:
-        user_dict = db[username]
-        return AdminUser(**user_dict)
+    user = db.query(AdminUserOrm).filter(AdminUserOrm.name == username).first()
+    if user is None:
+        return None
+    return AdminUserItem(name=user.name, password_hash=user.password_hash)
 
 
-def authenticate_user(fake_db, username: str, password: str):
-    user = get_user(fake_db, username)
+def authenticate_user(db, username: str, password: str):
+    user = get_user(db, username)
     if not user:
         return False
-    if not verify_password(password, user.hashed_password):
+    if not verify_password(password, user.password_hash):
         return False
     return user
+
+
+ALGORITHM = "HS256"
 
 
 def create_access_token(data: dict, expires_delta: timedelta):
@@ -81,7 +56,9 @@ def create_access_token(data: dict, expires_delta: timedelta):
 
 
 @auth_router.get("/auth/current_user", response_model=str)
-async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
+async def get_current_user(
+    token: Annotated[str, Depends(oauth2_scheme)], db: Session = Depends(get_db)
+):
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
         detail="Could not validate credentials",
@@ -94,17 +71,23 @@ async def get_current_user(token: Annotated[str, Depends(oauth2_scheme)]):
             raise credentials_exception
     except InvalidTokenError:
         raise credentials_exception
-    user = get_user(fake_users_db, username=username)
+    user = get_user(db, username=username)
     if user is None:
         raise credentials_exception
-    return user.username
+    return user.name
+
+
+class Token(BaseModel):
+    access_token: str
+    token_type: str
 
 
 @auth_router.post("/auth/token")
 async def login_for_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
+    db: Session = Depends(get_db),
 ) -> Token:
-    user = authenticate_user(fake_users_db, form_data.username, form_data.password)
+    user = authenticate_user(db, form_data.username, form_data.password)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -113,6 +96,6 @@ async def login_for_access_token(
         )
     access_token_expires = timedelta(hours=1)
     access_token = create_access_token(
-        data={"sub": user.username}, expires_delta=access_token_expires
+        data={"sub": user.name}, expires_delta=access_token_expires
     )
     return Token(access_token=access_token, token_type="bearer")

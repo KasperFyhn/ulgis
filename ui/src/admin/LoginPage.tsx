@@ -23,7 +23,11 @@ export const LoginForm: React.FC<LoginFormProps> = ({ onRetrievedToken }) => {
   return (
     <div className={'content-pane padded'}>
       <form className={'flex-container--vert'} onSubmit={handleSubmit}>
-        {error && <Notification type={'warning'}>{error}</Notification>}
+        {error && (
+          <Notification type={'warning'} nonDismissible>
+            {error}
+          </Notification>
+        )}
         <div>
           <label htmlFor="username">Username</label>
           <input
