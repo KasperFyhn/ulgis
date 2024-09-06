@@ -3,7 +3,7 @@ import os
 import sys
 
 from app.db.base import SessionLocal
-from app.db.models import TaxonomyOrm, ParameterOrm, TextContent
+from app.db.models import TaxonomyOrm, ParameterOrm, TextContentOrm
 
 
 def default_param(name: str) -> ParameterOrm:
@@ -26,7 +26,7 @@ def seed_database():
     if (
         session.query(TaxonomyOrm).count() != 0
         or session.query(ParameterOrm).count() != 0
-        or session.query(TextContent).count() != 0
+        or session.query(TextContentOrm).count() != 0
     ):
         if (
             input(
@@ -39,9 +39,9 @@ def seed_database():
 
         session.query(TaxonomyOrm).delete()
         session.query(ParameterOrm).delete()
-        session.query(TextContent).delete()
+        session.query(TextContentOrm).delete()
 
-    print('Seeding database ...')
+    print("Seeding database ...")
 
     parent_dir = os.path.dirname(__file__)
     seed_data_file = os.path.join(parent_dir, "seed_data.json")
@@ -68,7 +68,7 @@ def seed_database():
         for name, text in seed_data["textContent"].items():
             try:
                 session.add(
-                    TextContent(
+                    TextContentOrm(
                         name=name,
                         text=text,
                     )

@@ -60,6 +60,7 @@ const AdminPageInner: React.FC = () => {
         </div>
       </nav>
       <Routes>
+        <Route path="" element={'Welcome, ' + username} />
         <Route path="taxonomies" element={<TaxonomiesTab />} />
         <Route path="text-content" element={<TextContentTab />} />
       </Routes>

@@ -8,7 +8,7 @@ from sqlalchemy.orm import Session, subqueryload
 from app.db.base import get_db
 from app.db.models import (
     TaxonomyOrm,
-    TextContent,
+    TextContentOrm,
     TaxonomyOrmItem,
     TextContentItem,
     ParameterOrm,
@@ -87,15 +87,42 @@ def get_taxonomy_texts(db: Session = Depends(get_db)) -> dict[str, str]:
 @data_router.get("/data/text_content")
 def get_text_content_all(db: Session = Depends(get_db)):
     return [
-        TextContentItem.model_validate(item) for item in db.query(TextContent).all()
+        TextContentItem.model_validate(item) for item in db.query(TextContentOrm).all()
     ]
 
 
 @data_router.get("/data/text_content/{name}")
 def get_text_content(name: str, db: Session = Depends(get_db)):
     row = (
-        db.query(TextContent)
-        .filter(cast(ColumnElement[bool], TextContent.name == name))
+        db.query(TextContentOrm)
+        .filter(cast(ColumnElement[bool], TextContentOrm.name == name))
         .one_or_none()
     )
     return row.text if row else None
+
+
+@data_router.put("/data/text_content", response_model=bool)
+def put_or_update_text_content(
+    text_content: TextContentItem,
+    token: str = Depends(oauth2_scheme),
+    db: Session = Depends(get_db),
+):
+    """Add or update a taxonomy object in the database."""
+    try:
+        obj = (
+            db.query(TextContentOrm)
+            .filter(cast(ColumnElement[bool], TextContentOrm.name == text_content.name))
+            .first()
+        )
+        if obj is not None:
+            obj.text = text_content.text
+        else:
+            obj = TextContentOrm(**TextContentItem.dict())
+
+        db.merge(obj)
+        db.commit()  # Save changes to the database
+        return True
+
+    except SQLAlchemyError as e:
+        db.rollback()  # Rollback in case of an error
+        raise HTTPException(status_code=500, detail=str(e))

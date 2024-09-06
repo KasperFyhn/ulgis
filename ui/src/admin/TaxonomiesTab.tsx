@@ -4,10 +4,11 @@ import { TextField } from '../common/input/TextField';
 import { StringOptions } from '../common/input/StringOptions';
 import { NumberSlider } from '../common/input/NumberSlider';
 import { AuthContext } from './AuthProvider';
-import Markdown from 'react-markdown';
+import { DeleteButton } from './DeleteButton';
+import { HelpTooltip } from '../common/HelpTooltip';
 
 interface ParameterItem {
-  id: number;
+  id?: number;
   name: string;
   shortDescription: string;
 }
@@ -24,201 +25,231 @@ interface TaxonomyItem {
 
 interface TaxonomyEditorProps {
   taxonomy: TaxonomyItem;
+  onSuccessfulSubmit?: () => void;
+  onFailedSubmit?: () => void;
 }
 
-const TaxonomyEditor: React.FC<TaxonomyEditorProps> = ({ taxonomy }) => {
-  const [editableTaxonomy, setEditableTaxonomy] = useState<TaxonomyItem>({
-    ...taxonomy,
-  });
+const TaxonomyEditor: React.FC<TaxonomyEditorProps> = ({
+  taxonomy,
+  onSuccessfulSubmit,
+  onFailedSubmit,
+}) => {
+  const [editableTaxonomy, setEditableTaxonomy] =
+    useState<TaxonomyItem>(taxonomy);
+
+  useEffect(() => {
+    setEditableTaxonomy(structuredClone(taxonomy));
+  }, [taxonomy]);
 
   const { token } = useContext(AuthContext);
 
   return (
     <div className={'flex-container--vert content-pane padded'}>
-      Name
-      <TextField
-        value={editableTaxonomy.name}
-        setValue={(value) =>
-          setEditableTaxonomy((prev) => ({
-            ...prev,
-            name: value,
-          }))
-        }
-        short
-      />
-      Description
-      <TextField
-        value={editableTaxonomy.shortDescription}
-        setValue={(value) =>
-          setEditableTaxonomy((prev) => ({
-            ...prev,
-            shortDescription: value,
-          }))
-        }
-      />
-      Text
-      <TextField
-        value={editableTaxonomy.text}
-        setValue={(value) =>
-          setEditableTaxonomy((prev) => ({
-            ...prev,
-            text: value,
-          }))
-        }
-      />
-      UI Level
-      <StringOptions
-        name={editableTaxonomy.name + '_uiLevel'}
-        value={editableTaxonomy.uiLevel}
-        setValue={(value) =>
-          setEditableTaxonomy((prev) => ({
-            ...prev,
-            uiLevel: value as UiLevel,
-          }))
-        }
-        options={['Standard', 'Modular', 'Ample']}
-      />
-      Priority
-      <NumberSlider
-        min={0}
-        max={10}
-        step={0.1}
-        value={editableTaxonomy.priority}
-        setValue={(value) =>
-          setEditableTaxonomy((prev) => ({
-            ...prev,
-            priority: value,
-          }))
-        }
-      />
+      <div className={'flex-container--horiz'}>
+        <div className={'flex-container__box--equal-size flex-container--vert'}>
+          Name
+          <TextField
+            value={editableTaxonomy.name}
+            setValue={(value) =>
+              setEditableTaxonomy((prev) => ({
+                ...prev,
+                name: value,
+              }))
+            }
+            short
+          />
+          Description
+          <TextField
+            value={editableTaxonomy.shortDescription}
+            setValue={(value) =>
+              setEditableTaxonomy((prev) => ({
+                ...prev,
+                shortDescription: value,
+              }))
+            }
+          />
+          UI Level
+          <StringOptions
+            name={editableTaxonomy.name + '_uiLevel'}
+            value={editableTaxonomy.uiLevel}
+            setValue={(value) =>
+              setEditableTaxonomy((prev) => ({
+                ...prev,
+                uiLevel: value as UiLevel,
+              }))
+            }
+            options={['Standard', 'Modular', 'Ample']}
+          />
+          <span>
+            Priority
+            <HelpTooltip
+              tooltipId={'priority'}
+              content={
+                'Higher priority means that the taxonomy will be further to ' +
+                'the left in the Taxonomies panel.'
+              }
+            />
+          </span>
+          <NumberSlider
+            min={0}
+            max={10}
+            step={0.1}
+            value={editableTaxonomy.priority}
+            setValue={(value) =>
+              setEditableTaxonomy((prev) => ({
+                ...prev,
+                priority: value,
+              }))
+            }
+          />
+        </div>
+        <div className={'flex-container__box--equal-size flex-container--vert'}>
+          Text
+          <TextField
+            value={editableTaxonomy.text}
+            setValue={(value) =>
+              setEditableTaxonomy((prev) => ({
+                ...prev,
+                text: value,
+              }))
+            }
+          />
+        </div>
+      </div>
       <details>
         <summary>Parameters</summary>
-        {editableTaxonomy.group &&
-          editableTaxonomy.group.map((p, i) => (
-            <div key={i} className={'group flex-container--vert'}>
-              ID: {p.id}
-              <br />
-              Name
-              <TextField
-                value={p.name}
-                setValue={(value) => {
-                  editableTaxonomy.group[i].name = value;
-                  setEditableTaxonomy({ ...editableTaxonomy });
-                }}
-                short
-              />
-              Description
-              <TextField
-                value={p.shortDescription ?? ''}
-                setValue={(value) => {
-                  editableTaxonomy.group[i].shortDescription = value;
-                  setEditableTaxonomy({ ...editableTaxonomy });
-                }}
-              />
-            </div>
-          ))}
+        <div className={'flex-container--horiz'}>
+          {editableTaxonomy.group &&
+            editableTaxonomy.group.map((p, i) => (
+              <div key={i} className={'group flex-container--vert'}>
+                ID: {p.id}
+                <br />
+                Name
+                <TextField
+                  value={p.name}
+                  setValue={(value) => {
+                    editableTaxonomy.group[i].name = value;
+                    setEditableTaxonomy({ ...editableTaxonomy });
+                  }}
+                  short
+                />
+                Description
+                <TextField
+                  value={p.shortDescription ?? ''}
+                  setValue={(value) => {
+                    editableTaxonomy.group[i].shortDescription = value;
+                    setEditableTaxonomy({ ...editableTaxonomy });
+                  }}
+                />
+                <DeleteButton
+                  onClick={() => {
+                    setEditableTaxonomy((prev) => {
+                      const group = prev.group;
+                      group.splice(i);
+                      return {
+                        ...prev,
+                        group: [...group],
+                      };
+                    });
+                  }}
+                >
+                  Delete
+                </DeleteButton>
+              </div>
+            ))}
+          <button
+            className={'button--icon button--icon--hide-label icon-add'}
+            onClick={() => {
+              setEditableTaxonomy((prev) => ({
+                ...prev,
+                group: prev.group.concat({
+                  name: 'New parameter',
+                  shortDescription: '',
+                }),
+              }));
+            }}
+          />
+        </div>
       </details>
-      <button
-        className={'visually-disabled'}
-        disabled={JSON.stringify(taxonomy) === JSON.stringify(editableTaxonomy)}
-        onClick={() => {
-          fetch(process.env.REACT_APP_BACKEND_URL + '/data/taxonomies', {
-            method: 'PUT',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: 'Bearer ' + token,
-            },
-            body: JSON.stringify(editableTaxonomy),
-          });
-        }}
-      >
-        Submit
-      </button>
-      <button
-        onClick={() => {
-          fetch(
-            process.env.REACT_APP_BACKEND_URL +
-              '/data/taxonomies/' +
-              editableTaxonomy.id,
-            {
-              method: 'DELETE',
+
+      <div className={'button-container'}>
+        <button
+          className={'visually-disabled'}
+          disabled={
+            JSON.stringify(taxonomy) === JSON.stringify(editableTaxonomy)
+          }
+          onClick={() => {
+            fetch(process.env.REACT_APP_BACKEND_URL + '/data/taxonomies', {
+              method: 'PUT',
               headers: {
                 'Content-Type': 'application/json',
                 Authorization: 'Bearer ' + token,
               },
-            },
-          );
-        }}
-      >
-        Delete
-      </button>
-    </div>
-  );
-};
-
-interface TaxonomyViewProps {
-  taxonomy: TaxonomyItem;
-}
-
-const TaxonomyView: React.FC<TaxonomyViewProps> = ({ taxonomy }) => {
-  return (
-    <div className={'flex-container--vert content-pane padded'}>
-      <h1>{taxonomy.name}</h1>
-      <span>ID: {taxonomy.id || 'NONE'}</span>
-      <span>Description: {taxonomy.shortDescription}</span>
-      <span>UI Level: {taxonomy.uiLevel}</span>
-      <span>Priority: {taxonomy.priority}</span>
-
-      <details>
-        <summary>Text</summary>
-        <Markdown>{taxonomy.text}</Markdown>
-      </details>
-
-      <details>
-        <summary>Parameters</summary>
-        {taxonomy.group &&
-          taxonomy.group.map((p, i) => (
-            <div key={i} className={'group flex-container--vert'}>
-              <span>ID: {p.id}</span>
-              <span>Name: {p.name}</span>
-              <span>Description: {p.shortDescription || 'NONE'}</span>
-            </div>
-          ))}
-      </details>
+              body: JSON.stringify(editableTaxonomy),
+            }).then((r) => {
+              if (r.ok && onSuccessfulSubmit) {
+                onSuccessfulSubmit();
+              } else if (onFailedSubmit) {
+                onFailedSubmit();
+              }
+            });
+          }}
+        >
+          Save changes
+        </button>
+        <DeleteButton
+          onClick={() => {
+            fetch(
+              process.env.REACT_APP_BACKEND_URL +
+                '/data/taxonomies/' +
+                editableTaxonomy.id,
+              {
+                method: 'DELETE',
+                headers: {
+                  'Content-Type': 'application/json',
+                  Authorization: 'Bearer ' + token,
+                },
+              },
+            ).then((r) => {
+              if (r.ok && onSuccessfulSubmit) {
+                onSuccessfulSubmit();
+              } else if (onFailedSubmit) {
+                onFailedSubmit();
+              }
+            });
+          }}
+        >
+          Delete
+        </DeleteButton>
+      </div>
     </div>
   );
 };
 
 export const TaxonomiesTab: React.FC = () => {
   const [existing, setExisting] = useState<TaxonomyItem[]>([]);
-  const [editing, setEditing] = useState<TaxonomyItem | undefined>(undefined);
+
+  const fetchData = (): void => {
+    fetch(process.env.REACT_APP_BACKEND_URL + '/data/taxonomies')
+      .then((response) => response.json())
+      .then((data) => setExisting(data));
+  };
 
   useEffect(() => {
     if (existing.length === 0) {
-      console.log('here');
-      fetch(process.env.REACT_APP_BACKEND_URL + '/data/taxonomies')
-        .then((response) => response.json())
-        .then((data) => setExisting(data));
+      fetchData();
     }
   }, [existing.length]);
-
-  if (editing) {
-    return (
-      <div>
-        <button onClick={() => setEditing(undefined)}>Back</button>
-
-        <TaxonomyEditor taxonomy={editing} />
-      </div>
-    );
-  }
 
   return (
     <div className={'flex-container--vert'}>
       {existing.map((taxonomy) => (
         <div key={taxonomy.id}>
-          <button onClick={() => setEditing(taxonomy)}>Edit</button>
-
-          <TaxonomyView taxonomy={taxonomy} key={taxonomy.name} />
+          <TaxonomyEditor
+            taxonomy={taxonomy}
+            onSuccessfulSubmit={fetchData}
+            onFailedSubmit={() => alert('Failed :(')}
+          />
         </div>
       ))}
       <button

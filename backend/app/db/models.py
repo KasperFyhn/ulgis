@@ -65,7 +65,7 @@ class ParameterOrmItem(CamelModel):
     short_description: Optional[str]
 
 
-class TextContent(Base):
+class TextContentOrm(Base):
     __tablename__ = "text_content"
 
     id = Column(Integer, primary_key=True)

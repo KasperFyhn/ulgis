@@ -1,6 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import Markdown from 'react-markdown';
 import { TextField } from '../common/input/TextField';
+import { AuthContext } from './AuthProvider';
 
 interface TextContentItem {
   name: string;
@@ -9,11 +10,17 @@ interface TextContentItem {
 
 interface TextContentEditorProps {
   textContent: TextContentItem;
+  onSuccessfulSubmit?: () => void;
+  onFailedSubmit?: () => void;
 }
 
 const TextContentEditor: React.FC<TextContentEditorProps> = ({
   textContent,
+  onSuccessfulSubmit,
+  onFailedSubmit,
 }) => {
+  const { token } = useContext(AuthContext);
+
   const [text, setText] = useState(textContent.text);
 
   return (
@@ -29,6 +36,30 @@ const TextContentEditor: React.FC<TextContentEditorProps> = ({
           <Markdown>{text}</Markdown>
         </div>
       </div>
+      <div className={'button-container'}>
+        <button
+          className={'visually-disabled'}
+          disabled={textContent.text === text}
+          onClick={() => {
+            fetch(process.env.REACT_APP_BACKEND_URL + '/data/text_content', {
+              method: 'PUT',
+              headers: {
+                'Content-Type': 'application/json',
+                Authorization: 'Bearer ' + token,
+              },
+              body: JSON.stringify({ name: textContent.name, text: text }),
+            }).then((r) => {
+              if (r.ok && onSuccessfulSubmit) {
+                onSuccessfulSubmit();
+              } else if (onFailedSubmit) {
+                onFailedSubmit();
+              }
+            });
+          }}
+        >
+          Save changes
+        </button>
+      </div>
     </div>
   );
 };
@@ -36,18 +67,27 @@ const TextContentEditor: React.FC<TextContentEditorProps> = ({
 export const TextContentTab: React.FC = () => {
   const [existing, setExisting] = useState<TextContentItem[]>([]);
 
+  const fetchData = () => {
+    fetch(process.env.REACT_APP_BACKEND_URL + '/data/text_content')
+      .then((response) => response.json())
+      .then((data) => setExisting(data));
+  };
+
   useEffect(() => {
     if (existing.length === 0) {
-      fetch(process.env.REACT_APP_BACKEND_URL + '/data/text_content')
-        .then((response) => response.json())
-        .then((data) => setExisting(data));
+      fetchData();
     }
-  });
+  }, [existing.length]);
 
   return (
     <div className={'flex-container--vert'}>
       {existing.map((textContent) => (
-        <TextContentEditor textContent={textContent} key={textContent.name} />
+        <TextContentEditor
+          textContent={textContent}
+          key={textContent.name}
+          onSuccessfulSubmit={fetchData}
+          onFailedSubmit={() => alert('Submission failed!')}
+        />
       ))}
     </div>
   );
