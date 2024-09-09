@@ -1,5 +1,4 @@
 import React from 'react';
-import './MultiValueToggle.css';
 
 export interface MultiValueToggleProps {
   name: string;

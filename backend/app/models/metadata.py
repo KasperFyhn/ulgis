@@ -8,12 +8,10 @@ from pydantic.fields import FieldInfo  # noqa
 from sqlalchemy.orm import Session
 from typing_extensions import Annotated
 
-from app.models.models import (
-    OptionGroup,
-    ToggledOptionGroup,
-    ToggledOptionGroupArray,
+from app.models.generationoptions import (
     GenerationOptions,
 )
+from app.models._base import OptionGroup, ToggledOptionGroup, ToggledOptionGroupArray
 
 
 class OptionMetadataBase(CamelModel):
@@ -25,7 +23,6 @@ class OptionMetadataBase(CamelModel):
         default=None,
         validation_alias="short_description",
     )
-    ui_level: Literal["Inherit", "Standard", "Modular", "Ample"] = "Inherit"
 
 
 class BooleanOptionMetadata(OptionMetadataBase):
@@ -245,7 +242,7 @@ def _create_field_metadata(
                 field.json_schema_extra.get("short")
                 if field.json_schema_extra
                 else None
-            )
+            ),
         )
     elif issubclass(field.annotation, OptionGroup):
         return OptionGroupMetadata(

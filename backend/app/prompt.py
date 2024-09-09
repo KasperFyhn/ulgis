@@ -1,10 +1,10 @@
 from app.db.models import ParameterOrm
-from app.models.models import (
+from app.models.generationoptions import (
     GenerationOptions,
     AmpleGenerationOptions,
-    ModularEducationInfo,
     ModularGenerationOptions,
 )
+from app.models.educationinfo import ModularEducationInfo
 
 
 def build_prompt(
@@ -125,7 +125,10 @@ def build_prompt(
 
     prompt += "\n\n"
 
-    if isinstance(options, ModularGenerationOptions) and options.inspiration_seeds.keywords:
+    if (
+        isinstance(options, ModularGenerationOptions)
+        and options.inspiration_seeds.keywords
+    ):
         prompt += "Use these keywords as seed for inspiration: " + ", ".join(
             options.inspiration_seeds.keywords
         )

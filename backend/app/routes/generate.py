@@ -8,7 +8,7 @@ from starlette.responses import StreamingResponse
 from app import llm
 from app.logger import create_logger
 from app.models.metadata import create_metadata
-from app.models.models import (
+from app.models.generationoptions import (
     StandardGenerationOptions,
     ModularGenerationOptions,
     AmpleGenerationOptions,

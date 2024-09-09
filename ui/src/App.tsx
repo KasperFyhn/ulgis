@@ -2,7 +2,10 @@ import './App.scss';
 import React, { useEffect, useState } from 'react';
 import { BrowserRouter, Link, Route, Routes } from 'react-router-dom';
 import { GeneratorPage } from './generate/GeneratorPage';
-import { DefaultTextContentService } from './TextContentService';
+import {
+  DefaultTextContentService,
+  getTextContentService,
+} from './service/TextContentService';
 import Markdown from 'react-markdown';
 
 const NavBar: React.FC = () => {
@@ -37,7 +40,7 @@ const AboutPage = (): React.JSX.Element => {
   const [text, setText] = useState<string>('Loading ...');
 
   useEffect(() => {
-    new DefaultTextContentService()
+    getTextContentService()
       .get('about')
       .then((result) => setText(result));
   });
