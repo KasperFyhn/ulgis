@@ -87,26 +87,41 @@ def build_prompt(
 
     # output formatting
     if target_name:
-        phrase_about_target = f"for the {target_type} {target_name} at {level}."
+        prompt += f"For the {target_type} {target_name} at {level}, "
     else:
-        phrase_about_target = f"for any {target_type} at {level}."
+        prompt += f"For any {target_type} at {level}, "
 
     if options.output_options.learning_goals.enabled:
-        prompt += "Create a list of learning goals " + phrase_about_target
+        prompt += (
+            "define clear and broad learning goals that outline the general knowledge, "
+            "skills, and competencies students are expected to develop. These should "
+            "be aligned with the overall educational objectives and provide a foundation "
+            "for the specific learning outcomes."
+        )
+    elif options.output_options.learning_outcomes.enabled:
+        prompt += (
+            "specify detailed and measurable learning outcomes that describe the specific "
+            "knowledge, skills, and abilities students should demonstrate. These should be "
+            "precise, observable, and directly linked to the assessment methods used."
+        )
     elif options.output_options.competency_profile.enabled:
-        prompt += "Create a 200 word competency profile " + phrase_about_target
-    elif options.output_options.bullet_points.enabled:
-        prompt += (
-            f"Create learning outcomes in {options.output_options.bullet_points.number_of_bullets} bullet points "
-            f"which can {'' if options.output_options.bullet_points.nested else 'NOT'} be nested "
-            + phrase_about_target
-        )
-    elif options.output_options.prose_description.enabled:
-        prompt += (
-            f"Create a prose description of {options.output_options.prose_description.number_of_words} "
-            f"words and NOT bullet points which addresses learning outcomes {phrase_about_target} "
-            f"{'Include' if options.output_options.prose_description.headings else 'Do NOT include'} headings."
-        )
+        if target_type == "education" or target_type == 'programme':
+            prompt += (
+                "develop a comprehensive curriculum competency profile that outlines the key "
+                "competencies students are expected "
+                "to acquire by the time they graduate. This profile should encompass a broad "
+                "range of skills, knowledge, and attitudes across all courses, reflecting "
+                "the program’s core objectives and aligning with industry standards and "
+                "professional requirements."
+            )
+        else:
+            prompt += (
+                "create a detailed competency profile that identifies the essential skills, "
+                "knowledge, and attitudes students are expected to develop. This profile should "
+                "align with the broader program competencies while focusing on the unique "
+                f"outcomes of the {target_type}, ensuring students are prepared for both academic "
+                "progression and practical application."
+            )
 
     prompt += "\n\n"
 

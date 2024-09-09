@@ -9,7 +9,7 @@ from app.models.educationinfo import (
 )
 from app.models.inspirationseeds import InspirationSeeds
 from app.models.llmsettings import LlmSettings
-from app.models.outputoptions import OutputOptions, AdvancedOutputOptions
+from app.models.outputoptions import OutputOptions
 from app.models.taxonomies import (
     StandardTaxonomyArray,
     ModularTaxonomyArray,
@@ -47,7 +47,6 @@ class AmpleGenerationOptions(ModularGenerationOptions):
     taxonomies: CombinableTaxonomyArray = Field(title="Taxonomies")
     education_info: AdvancedEducationInfo = Field(title="Education Info")
     custom_inputs: CustomInputs = Field(title="Custom Inputs")
-    output_options: AdvancedOutputOptions = Field(title="Output Options")
     llm_settings: LlmSettings = Field(title="Model Settings")
 
 
