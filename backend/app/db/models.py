@@ -20,9 +20,7 @@ class TaxonomyOrm(Base):
 
     group: Mapped[list["ParameterOrm"]] = relationship(
         back_populates="taxonomy",
-        # backref="taxonomy",
         cascade="all, delete-orphan",  # Enables cascading updates and deletions
-        passive_deletes=True,  # Allows cascading delete of children if the parent is deleted
     )
 
 

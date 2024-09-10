@@ -144,7 +144,7 @@ const TaxonomyEditor: React.FC<TaxonomyEditorProps> = ({
                   onClick={() => {
                     setEditableTaxonomy((prev) => {
                       const group = prev.group;
-                      group.splice(i);
+                      group.splice(i, 1);
                       return {
                         ...prev,
                         group: [...group],
