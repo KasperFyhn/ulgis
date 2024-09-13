@@ -29,7 +29,7 @@ def get_taxonomies(db: Session = Depends(get_db)):
     ]
 
 
-@data_router.put("/data/taxonomies", response_model=bool)
+@data_router.put("/data/taxonomies")
 def put_or_update_taxonomy(
     arg_obj: TaxonomyOrmItem,
     token: str = Depends(oauth2_scheme),
@@ -51,7 +51,6 @@ def put_or_update_taxonomy(
         db.merge(obj)
 
         db.commit()  # Save changes to the database
-        return True
 
     except SQLAlchemyError as e:
         db.rollback()  # Rollback in case of an error

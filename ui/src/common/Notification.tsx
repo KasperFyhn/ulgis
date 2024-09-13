@@ -1,8 +1,5 @@
 import React, { PropsWithChildren, useEffect, useState } from 'react';
-import {
-  DefaultTextContentService,
-  getTextContentService,
-} from '../service/TextContentService';
+import { getTextContentService } from '../service/TextContentService';
 import './Notification.scss';
 import Markdown from 'react-markdown';
 

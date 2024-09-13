@@ -1,18 +1,18 @@
+import { DefaultServiceBase } from './ServiceBase';
+import { ServiceProvider } from './ServiceProvider';
+
 export interface AuthenticationService {
   getToken(username: string, password: string): Promise<string>;
 
-  getCurrentUser(token: string): Promise<string>;
+  getCurrentUser(token: string): Promise<string | undefined>;
 }
 
-export class DefaultAuthenticationService implements AuthenticationService {
-  private readonly url: string;
-
-  constructor(url: string) {
-    this.url = url;
-  }
-
+export class DefaultAuthenticationService
+  extends DefaultServiceBase
+  implements AuthenticationService
+{
   async getToken(username: string, password: string): Promise<string> {
-    const response = await fetch(this.url + '/auth/token', {
+    const response = await fetch(this.url + 'auth/token', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/x-www-form-urlencoded',
@@ -29,8 +29,8 @@ export class DefaultAuthenticationService implements AuthenticationService {
     return data['access_token'];
   }
 
-  async getCurrentUser(token: string): Promise<string> {
-    const response = await fetch(this.url + '/auth/current_user', {
+  async getCurrentUser(token: string): Promise<string | undefined> {
+    const response = await fetch(this.url + 'auth/current_user', {
       headers: {
         'Content-Type': 'application/json',
         Authorization: 'Bearer ' + token,
@@ -49,27 +49,20 @@ export class DefaultAuthenticationService implements AuthenticationService {
 
 class MockAuthenticationService implements AuthenticationService {
   getCurrentUser(token: string): Promise<string> {
-    throw new Error('Method not implemented.');
+    return Promise.resolve(token.replace('FAKE_TOKEN_FOR:', 'FAKE_USER:'));
   }
 
   getToken(name: string): Promise<string> {
-    return Promise.resolve(
-      'This text content is from a mock text content service, retrieved with ' +
-        'the fetch key "' +
-        name +
-        '".',
-    );
+    const fakeToken = 'FAKE_TOKEN_FOR:' + name;
+    return Promise.resolve(fakeToken);
   }
 }
 
-export function getAuthenticationService(): AuthenticationService {
-  const backendUrl = process.env.REACT_APP_BACKEND_URL;
+const provider = new ServiceProvider<AuthenticationService>(
+  MockAuthenticationService,
+  DefaultAuthenticationService,
+);
 
-  if (backendUrl === 'mock') {
-    return new MockAuthenticationService();
-  } else if (backendUrl) {
-    return new DefaultAuthenticationService(backendUrl);
-  } else {
-    throw Error('No text content service configured for this environment!');
-  }
+export function getAuthenticationService(): AuthenticationService {
+  return provider.get();
 }

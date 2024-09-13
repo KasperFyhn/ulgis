@@ -10,13 +10,11 @@ import { BackupsTab } from './BackupsTab';
 const AdminPageInner: React.FC = () => {
   const { token, setToken } = useContext(AuthContext);
 
-  const [username, setUsername] = useState('NO USER');
+  const [username, setUsername] = useState<string | undefined>(undefined);
 
   useEffect(() => {
     if (token !== null) {
-      getAuthenticationService()
-        .getCurrentUser(token)
-        .then((u) => setUsername(u));
+      getAuthenticationService().getCurrentUser(token).then(setUsername);
     }
   }, [token]);
 

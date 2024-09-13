@@ -7,22 +7,7 @@ import { AuthContext } from './AuthProvider';
 import { DeleteButton } from './DeleteButton';
 import { HelpTooltip } from '../common/HelpTooltip';
 import HasDbSubmission from './HasDbSubmission';
-
-interface ParameterItem {
-  id?: number;
-  name: string;
-  shortDescription: string;
-}
-
-interface TaxonomyItem {
-  id?: number;
-  name: string;
-  shortDescription: string;
-  text: string;
-  uiLevel: UiLevel;
-  priority: number;
-  group: ParameterItem[];
-}
+import { getTaxonomyService, TaxonomyItem } from '../service/TaxonomyService';
 
 interface TaxonomyEditorProps extends HasDbSubmission {
   taxonomy: TaxonomyItem;
@@ -41,6 +26,10 @@ const TaxonomyEditor: React.FC<TaxonomyEditorProps> = ({
   }, [taxonomy]);
 
   const { token } = useContext(AuthContext);
+
+  if (!token) {
+    return null;
+  }
 
   return (
     <div className={'flex-container--vert content-pane padded'}>
@@ -162,7 +151,7 @@ const TaxonomyEditor: React.FC<TaxonomyEditorProps> = ({
               setEditableTaxonomy((prev) => ({
                 ...prev,
                 group: prev.group.concat({
-                  name: 'New parameter',
+                  name: 'Parameter ' + (prev.group.length + 1),
                   shortDescription: '',
                 }),
               }));
@@ -170,56 +159,44 @@ const TaxonomyEditor: React.FC<TaxonomyEditorProps> = ({
           />
         </div>
       </details>
-
-      <div className={'button-container'}>
+      <div className={'button-container button-container--centered'}>
         <button
           className={'visually-disabled'}
           disabled={
             JSON.stringify(taxonomy) === JSON.stringify(editableTaxonomy)
           }
           onClick={() => {
-            fetch(process.env.REACT_APP_BACKEND_URL + '/data/taxonomies', {
-              method: 'PUT',
-              headers: {
-                'Content-Type': 'application/json',
-                Authorization: 'Bearer ' + token,
-              },
-              body: JSON.stringify(editableTaxonomy),
-            }).then((r) => {
-              if (r.ok && onSuccessfulSubmit) {
-                onSuccessfulSubmit();
-              } else if (onFailedSubmit) {
-                onFailedSubmit();
-              }
-            });
+            getTaxonomyService()
+              // token will always be defined in this component
+              // eslint-disable-next-line
+              .putOrUpdateTaxonomy(editableTaxonomy, token)
+              .then(onSuccessfulSubmit, onFailedSubmit);
           }}
         >
           Save changes
         </button>
-        <DeleteButton
-          onClick={() => {
-            fetch(
-              process.env.REACT_APP_BACKEND_URL +
-                '/data/taxonomies/' +
-                editableTaxonomy.id,
-              {
-                method: 'DELETE',
-                headers: {
-                  'Content-Type': 'application/json',
-                  Authorization: 'Bearer ' + token,
-                },
-              },
-            ).then((r) => {
-              if (r.ok && onSuccessfulSubmit) {
-                onSuccessfulSubmit();
-              } else if (onFailedSubmit) {
-                onFailedSubmit();
-              }
-            });
-          }}
+        <button
+          className={'visually-disabled'}
+          disabled={
+            JSON.stringify(taxonomy) === JSON.stringify(editableTaxonomy)
+          }
+          onClick={() => setEditableTaxonomy(structuredClone(taxonomy))}
         >
-          Delete
-        </DeleteButton>
+          Discard changes
+        </button>
+        {editableTaxonomy.id !== undefined && (
+          <DeleteButton
+            onClick={() => {
+              getTaxonomyService()
+                // id will always be defined here
+                // eslint-disable-next-line
+                .deleteTaxonomy(editableTaxonomy.id!, token)
+                .then(onSuccessfulSubmit, onFailedSubmit);
+            }}
+          >
+            Delete
+          </DeleteButton>
+        )}
       </div>
     </div>
   );
@@ -229,9 +206,7 @@ export const TaxonomiesTab: React.FC = () => {
   const [existing, setExisting] = useState<TaxonomyItem[]>([]);
 
   const fetchData = (): void => {
-    fetch(process.env.REACT_APP_BACKEND_URL + '/data/taxonomies')
-      .then((response) => response.json())
-      .then((data) => setExisting(data));
+    getTaxonomyService().getTaxonomies().then(setExisting);
   };
 
   useEffect(() => {
@@ -243,29 +218,34 @@ export const TaxonomiesTab: React.FC = () => {
   return (
     <div className={'flex-container--vert'}>
       {existing.map((taxonomy) => (
-        <div key={taxonomy.id}>
+        <div key={taxonomy.id ?? -1}>
           <TaxonomyEditor
             taxonomy={taxonomy}
             onSuccessfulSubmit={fetchData}
-            onFailedSubmit={() => alert('Failed :(')}
+            onFailedSubmit={() => alert('Failed')}
           />
         </div>
       ))}
-      <button
-        onClick={() => {
-          existing.push({
-            name: 'New Taxonomy',
-            priority: 0,
-            shortDescription: '',
-            text: '',
-            uiLevel: 'Standard',
-            group: [],
-          });
-          setExisting([...existing]);
-        }}
-      >
-        Add new taxonomy
-      </button>
+      {(existing.length === 0 ||
+        existing[existing.length - 1].id !== undefined) && (
+        <button
+          onClick={() => {
+            setExisting((prev) => [
+              ...prev,
+              {
+                name: '',
+                priority: 0,
+                shortDescription: '',
+                text: '',
+                uiLevel: 'Standard',
+                group: [],
+              },
+            ]);
+          }}
+        >
+          Add new taxonomy
+        </button>
+      )}
     </div>
   );
 };
