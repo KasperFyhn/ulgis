@@ -27,7 +27,26 @@ export interface TaxonomyService {
 }
 
 export class MockTaxonomiesService implements TaxonomyService {
-  private taxonomies: TaxonomyItem[] = [];
+  private taxonomies: TaxonomyItem[] = [
+    {
+      id: 0,
+      name: 'Some taxonomy',
+      shortDescription: 'Cool taxonomy',
+      text: 'Really cool text too',
+      uiLevel: 'Modular',
+      priority: 5,
+      group: [
+        {
+          name: 'Param 1',
+          shortDescription: 'Param 1',
+        },
+        {
+          name: 'Param 2',
+          shortDescription: 'Param 2',
+        },
+      ],
+    },
+  ];
 
   getTaxonomies(): Promise<TaxonomyItem[]> {
     return Promise.resolve([...this.taxonomies]);
@@ -65,23 +84,24 @@ export class DefaultTaxonomiesService
     taxonomy: TaxonomyItem,
     token: string,
   ): Promise<void> {
-    const r = await fetch(this.url + 'data/taxonomies', {
+    return fetch(this.url + 'data/taxonomies', {
       method: 'PUT',
       headers: {
         'Content-Type': 'application/json',
         Authorization: 'Bearer ' + token,
       },
       body: JSON.stringify(taxonomy),
+    }).then((r) => {
+      if (r.ok) {
+        return;
+      } else {
+        throw new Error('Failed to delete taxonomy');
+      }
     });
-    if (r.ok) {
-      return;
-    } else {
-      throw new Error('Failed to put/update taxonomy');
-    }
   }
 
   async deleteTaxonomy(id: string | number, token: string): Promise<void> {
-    fetch(this.url + 'data/taxonomies/' + id, {
+    return fetch(this.url + 'data/taxonomies/' + id, {
       method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',

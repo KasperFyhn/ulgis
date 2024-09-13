@@ -3,6 +3,7 @@ import { AuthContext } from './AuthProvider';
 import { DeleteButton } from './DeleteButton';
 import { TextField } from '../common/input/TextField';
 import HasDbSubmission from './HasDbSubmission';
+import { getBackupService } from '../service/BackupService';
 
 interface BackupPanelProps extends HasDbSubmission {
   nameAndTimestamp: string;
@@ -15,6 +16,10 @@ const BackupPanel: React.FC<BackupPanelProps> = ({
 }) => {
   const { token } = useContext(AuthContext);
 
+  if (token === null) {
+    return null;
+  }
+
   return (
     <div className={'content-pane padded flex-container--horiz'}>
       <div className={'flex-container__box'}>
@@ -23,46 +28,21 @@ const BackupPanel: React.FC<BackupPanelProps> = ({
       <div className={'flex-container__box--small button-container'}>
         <button
           onClick={() => {
-            fetch(
-              process.env.REACT_APP_BACKEND_URL +
-                '/backup/restore/' +
-                nameAndTimestamp,
-              {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  Authorization: 'Bearer ' + token,
-                },
-              },
-            ).then((r) => {
-              alert(
-                'Restoring from backup ' + (r.ok ? 'successful' : 'failed'),
+            getBackupService()
+              .restore(nameAndTimestamp, token)
+              .then(
+                () => alert('Restoring from backup successful'),
+                () => alert('failed'),
               );
-            });
           }}
         >
           Restore from this backup
         </button>
         <DeleteButton
           onClick={() => {
-            fetch(
-              process.env.REACT_APP_BACKEND_URL +
-                '/backup/delete/' +
-                nameAndTimestamp,
-              {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  Authorization: 'Bearer ' + token,
-                },
-              },
-            ).then((r) => {
-              if (r.ok && onSuccessfulSubmit) {
-                onSuccessfulSubmit();
-              } else if (onFailedSubmit) {
-                onFailedSubmit();
-              }
-            });
+            getBackupService()
+              .delete(nameAndTimestamp, token)
+              .then(onSuccessfulSubmit, onFailedSubmit);
           }}
         ></DeleteButton>
       </div>
@@ -78,6 +58,10 @@ const NewBackupPanel: React.FC<HasDbSubmission> = ({
 
   const [name, setName] = useState('');
 
+  if (token === null) {
+    return null;
+  }
+
   return (
     <div className={'content-pane padded flex-container--horiz'}>
       <div className={'flex-container__box'}>
@@ -90,23 +74,12 @@ const NewBackupPanel: React.FC<HasDbSubmission> = ({
           disabled={name === ''}
           className={'visually-disabled'}
           onClick={() => {
-            fetch(
-              process.env.REACT_APP_BACKEND_URL + '/backup/create/' + name,
-              {
-                method: 'POST',
-                headers: {
-                  'Content-Type': 'application/json',
-                  Authorization: 'Bearer ' + token,
-                },
-              },
-            ).then((r) => {
-              if (r.ok && onSuccessfulSubmit) {
+            getBackupService()
+              .create(name, token)
+              .then(() => {
                 setName('');
-                onSuccessfulSubmit();
-              } else if (onFailedSubmit) {
-                onFailedSubmit();
-              }
-            });
+                if (onSuccessfulSubmit) onSuccessfulSubmit();
+              }, onFailedSubmit);
           }}
         >
           Create backup
@@ -120,14 +93,11 @@ export const BackupsTab: React.FC = () => {
   const [existing, setExisting] = useState<string[]>([]);
 
   const fetchData = (): void => {
-    fetch(process.env.REACT_APP_BACKEND_URL + '/backup/list', {
-      headers: {
-        'Content-Type': 'application/json',
-        Authorization: 'Bearer ' + token,
-      },
-    })
-      .then((response) => response.json())
-      .then((data) => setExisting(data));
+    if (token !== null) {
+      getBackupService()
+        .list(token)
+        .then((data) => setExisting(data));
+    }
   };
 
   useEffect(() => {

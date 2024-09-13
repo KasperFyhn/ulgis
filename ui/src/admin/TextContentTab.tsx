@@ -3,11 +3,10 @@ import Markdown from 'react-markdown';
 import { TextField } from '../common/input/TextField';
 import { AuthContext } from './AuthProvider';
 import HasDbSubmission from './HasDbSubmission';
-
-interface TextContentItem {
-  name: string;
-  text: string;
-}
+import {
+  getTextContentService,
+  TextContentItem,
+} from '../service/TextContentService';
 
 interface TextContentEditorProps extends HasDbSubmission {
   textContent: TextContentItem;
@@ -21,6 +20,10 @@ const TextContentEditor: React.FC<TextContentEditorProps> = ({
   const { token } = useContext(AuthContext);
 
   const [text, setText] = useState(textContent.text);
+
+  if (token === null) {
+    return null;
+  }
 
   return (
     <div className={'content-pane padded'} key={textContent.name}>
@@ -40,20 +43,9 @@ const TextContentEditor: React.FC<TextContentEditorProps> = ({
           className={'visually-disabled'}
           disabled={textContent.text === text}
           onClick={() => {
-            fetch(process.env.REACT_APP_BACKEND_URL + '/data/text_content', {
-              method: 'PUT',
-              headers: {
-                'Content-Type': 'application/json',
-                Authorization: 'Bearer ' + token,
-              },
-              body: JSON.stringify({ name: textContent.name, text: text }),
-            }).then((r) => {
-              if (r.ok && onSuccessfulSubmit) {
-                onSuccessfulSubmit();
-              } else if (onFailedSubmit) {
-                onFailedSubmit();
-              }
-            });
+            getTextContentService()
+              .put(textContent.name, text, token)
+              .then(onSuccessfulSubmit, onFailedSubmit);
           }}
         >
           Save changes
@@ -66,10 +58,9 @@ const TextContentEditor: React.FC<TextContentEditorProps> = ({
 export const TextContentTab: React.FC = () => {
   const [existing, setExisting] = useState<TextContentItem[]>([]);
 
-  const fetchData = () => {
-    fetch(process.env.REACT_APP_BACKEND_URL + '/data/text_content')
-      .then((response) => response.json())
-      .then((data) => setExisting(data));
+  const fetchData = (): void => {
+    console.log('here');
+    getTextContentService().getAll().then(setExisting);
   };
 
   useEffect(() => {

@@ -61,7 +61,7 @@ Create a file `backend/.env` with the contents of `backend/.env.example`.
 
 Set the correct path for the database file (you can do relative paths, but it can be tricky depending on how you run the app). Set the OpenAI API key or remove/comment out the line to use Ollama.
 
-Also create `ui/.env` from `ui/.env.example`. By default you don't need to change anything. It just needs a URL for the backend.
+Also create `ui/.env` from `ui/.env.example`. By default, you don't need to change anything. It just needs a URL for the backend.
 
 #### Mock backend service
 

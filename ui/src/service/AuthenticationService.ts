@@ -7,7 +7,7 @@ export interface AuthenticationService {
   getCurrentUser(token: string): Promise<string | undefined>;
 }
 
-export class DefaultAuthenticationService
+class DefaultAuthenticationService
   extends DefaultServiceBase
   implements AuthenticationService
 {
