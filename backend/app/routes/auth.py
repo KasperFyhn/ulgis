@@ -14,7 +14,7 @@ from app.db.base import get_db
 from app.db.models import AdminUserOrm, AdminUserItem
 from app.passwordhash import verify_password
 
-auth_router = APIRouter()
+auth_router = APIRouter(prefix="/auth")
 
 try:
     dotenv.load_dotenv()
@@ -55,7 +55,7 @@ def create_access_token(data: dict, expires_delta: timedelta):
     return encoded_jwt
 
 
-@auth_router.get("/auth/current_user", response_model=str)
+@auth_router.get("/current_user", response_model=str)
 async def get_current_user(
     token: Annotated[str, Depends(oauth2_scheme)], db: Session = Depends(get_db)
 ):
@@ -82,7 +82,7 @@ class Token(BaseModel):
     token_type: str
 
 
-@auth_router.post("/auth/token")
+@auth_router.post("/token")
 async def login_for_access_token(
     form_data: Annotated[OAuth2PasswordRequestForm, Depends()],
     db: Session = Depends(get_db),

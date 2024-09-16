@@ -19,10 +19,10 @@ from app.routes.data import get_db, get_taxonomy_texts
 
 logger = create_logger(__name__)
 
-generate_router = APIRouter()
+generate_router = APIRouter(prefix="/generate")
 
 
-@generate_router.get("/generate/generation_options_metadata/{ui_level}")
+@generate_router.get("/generation_options_metadata/{ui_level}")
 async def generation_options_metadata(
     ui_level: Literal["Standard", "Modular", "Ample"], db: Session = Depends(get_db)
 ):
@@ -34,7 +34,7 @@ async def generation_options_metadata(
         return create_metadata(AmpleGenerationOptions, db)
 
 
-@generate_router.post("/generate/create_prompt")
+@generate_router.post("/create_prompt")
 async def create_prompt(
     request: GenerationOptions,
     db: Session = Depends(get_db),
@@ -57,7 +57,7 @@ def _extra_kwargs(generation_options: GenerationOptions):
     return extra_kwargs
 
 
-@generate_router.post("/generate/generate_response")
+@generate_router.post("/generate_response")
 async def generate_outcomes(
     request: GenerationOptions,
     db: Session = Depends(get_db),
@@ -72,7 +72,7 @@ async def generate_outcomes(
 _streaming_responses = dict()
 
 
-@generate_router.post("/generate/start_stream")
+@generate_router.post("/start_stream")
 async def start_stream(
     request: GenerationOptions,
     db: Session = Depends(get_db),
@@ -85,7 +85,7 @@ async def start_stream(
     return {"token": token}
 
 
-@generate_router.get("/generate/stream_response/{token}")
+@generate_router.get("/stream_response/{token}")
 async def stream_response(token: str):
     async def generator_function():
         stream = _streaming_responses[token]
