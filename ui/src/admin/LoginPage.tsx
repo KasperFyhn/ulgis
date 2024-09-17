@@ -1,22 +1,20 @@
-import React, { useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { getAuthenticationService } from '../service/AuthenticationService';
 import { Notification } from '../common/Notification';
+import { AuthContext } from './AuthProvider';
 
-interface LoginFormProps {
-  onRetrievedToken: (token: string) => void;
-}
-
-export const LoginForm: React.FC<LoginFormProps> = ({ onRetrievedToken }) => {
-  // Form state management
+export const LoginForm: React.FC = () => {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [error, setError] = useState<string | null>(null);
+
+  const { setToken } = useContext(AuthContext);
 
   const handleSubmit = async (event: React.FormEvent): Promise<void> => {
     event.preventDefault(); // Prevent default form submission behavior
     getAuthenticationService()
       .getToken(username, password)
-      .then((t) => onRetrievedToken(t))
+      .then(setToken)
       .catch((err) => setError(err.message));
   };
 

@@ -1,6 +1,6 @@
 import './App.scss';
 import React, { useEffect, useState } from 'react';
-import { BrowserRouter, Link, Route, Routes } from 'react-router-dom';
+import { BrowserRouter, Link, Outlet, Route, Routes } from 'react-router-dom';
 import { GeneratorPage } from './generate/GeneratorPage';
 import { getTextContentService } from './service/TextContentService';
 import Markdown from 'react-markdown';
@@ -56,11 +56,20 @@ const AboutPage = (): React.JSX.Element => {
 const App: React.FC = () => {
   return (
     <BrowserRouter>
-      <NavBar />
       <div className="app theme--blue">
-        <div className={'app__content'}>
-          <Routes>
-            <Route path="/" element={<GeneratorPage uiLevel={'Standard'} />} />
+        <Routes>
+          {/* Main app nested route */}
+          <Route
+            element={
+              <>
+                <NavBar />
+                <div className={'app__content'}>
+                  <Outlet />
+                </div>
+              </>
+            }
+          >
+            <Route index element={<GeneratorPage uiLevel={'Standard'} />} />
             <Route
               path="/standard"
               element={<GeneratorPage uiLevel={'Standard'} />}
@@ -73,9 +82,7 @@ const App: React.FC = () => {
               path="/ample"
               element={<GeneratorPage uiLevel={'Ample'} />}
             />
-            {/*<Route path="/evaluate" element={<EvaluationPage />} />*/}
             <Route path="/about" element={<AboutPage />} />
-            <Route path="/admin/*" element={<AdminPage />} />
             <Route
               path="*"
               element={
@@ -87,8 +94,10 @@ const App: React.FC = () => {
                 </div>
               }
             />
-          </Routes>
-        </div>
+          </Route>
+          {/* Admin route */}
+          <Route path="/admin/*" element={<AdminPage />} />
+        </Routes>
       </div>
     </BrowserRouter>
   );

@@ -1,37 +1,25 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext } from 'react';
 import { TaxonomiesTab } from './TaxonomiesTab';
 import { TextContentTab } from './TextContentTab';
-import { getAuthenticationService } from '../service/AuthenticationService';
 import { LoginForm } from './LoginPage';
 import { AuthContext, AuthProvider } from './AuthProvider';
 import { Link, Route, Routes } from 'react-router-dom';
 import { BackupsTab } from './BackupsTab';
 
-const AdminPageInner: React.FC = () => {
-  const { token, setToken } = useContext(AuthContext);
+interface AdminPageNavBarProps {
+  username?: string;
+}
 
-  const [username, setUsername] = useState<string | undefined>(undefined);
-
-  useEffect(() => {
-    if (token !== null) {
-      getAuthenticationService().getCurrentUser(token).then(setUsername);
-    }
-  }, [token]);
-
-  if (token === null || username === undefined) {
-    return (
-      <LoginForm
-        onRetrievedToken={(t) => {
-          setToken(t);
-        }}
-      />
-    );
-  }
+const AdminPageNavBar: React.FC<AdminPageNavBarProps> = () => {
+  const { setToken, username } = useContext(AuthContext);
 
   return (
-    <div className={'flex-container--vert'}>
-      <nav className={'nav nav--site-nav'}>
-        <div className={'nav__site'}>
+    <nav className={'nav nav--site-nav theme--dark'}>
+      <div className={'nav__site'}>
+        <Link className={'nav__home home-title'} to={''}>
+          ULGIS ADMIN PAGE
+        </Link>
+        {username && (
           <div className={'nav__items'}>
             <Link className={'nav__item'} to={'taxonomies'}>
               Taxonomies
@@ -43,38 +31,67 @@ const AdminPageInner: React.FC = () => {
               Backups
             </Link>
           </div>
-        </div>
+        )}
+      </div>
 
-        <div className={'nav__utilities'}>
-          <div className={'nav__item flex-container--horiz'}>
-            <span>
-              Logged in as <b>{username}</b>
-            </span>
-            <button
-              onClick={() => {
-                sessionStorage.removeItem('access_key');
-                setToken(null);
-              }}
-            >
-              Log out
-            </button>
-          </div>
-        </div>
-      </nav>
-      <Routes>
-        <Route path="" element={'Welcome, ' + username} />
-        <Route path="taxonomies" element={<TaxonomiesTab />} />
-        <Route path="text-content" element={<TextContentTab />} />
-        <Route path="backups" element={<BackupsTab />} />
-      </Routes>
-    </div>
+      <div className={'nav__utilities'}>
+        <Link className={'nav__item'} to={'/'}>
+          &#8617; Back to Main Page
+        </Link>
+        {username && (
+          <>
+            <Link className={'nav__item nav__item--icon icon-user'} to={'user'}>
+              {username}
+            </Link>
+            <div className={'nav__item'}>
+              <button
+                className={'button--icon button--icon--right icon-sign-out'}
+                onClick={() => {
+                  setToken(null);
+                }}
+              >
+                Log out
+              </button>
+            </div>
+          </>
+        )}
+      </div>
+    </nav>
+  );
+};
+
+const AdminPageInner: React.FC = () => {
+  const { token, username } = useContext(AuthContext);
+
+  if (token === null || username === null) {
+    return <LoginForm />;
+  }
+
+  return (
+    <Routes>
+      <Route
+        path=""
+        element={
+          <p>
+            Welcome, <b>{username}</b>!
+          </p>
+        }
+      />
+      <Route path="taxonomies" element={<TaxonomiesTab />} />
+      <Route path="text-content" element={<TextContentTab />} />
+      <Route path="backups" element={<BackupsTab />} />
+      <Route path="user" element={<p>Nothing to see here yet.</p>} />
+    </Routes>
   );
 };
 
 export const AdminPage: React.FC = () => {
   return (
     <AuthProvider>
-      <AdminPageInner />
+      <AdminPageNavBar />
+      <div className={'app__content'}>
+        <AdminPageInner />
+      </div>
     </AuthProvider>
   );
 };

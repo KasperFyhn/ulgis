@@ -4,7 +4,7 @@ import { ServiceProvider } from './ServiceProvider';
 export interface AuthenticationService {
   getToken(username: string, password: string): Promise<string>;
 
-  getCurrentUser(token: string): Promise<string | undefined>;
+  getCurrentUser(token: string): Promise<string | null>;
 }
 
 class DefaultAuthenticationService
@@ -29,8 +29,8 @@ class DefaultAuthenticationService
     return data['access_token'];
   }
 
-  async getCurrentUser(token: string): Promise<string | undefined> {
-    const response = await fetch(this.url + 'auth/current_user', {
+  async getCurrentUser(token: string): Promise<string | null> {
+    return fetch(this.url + 'auth/current_user', {
       headers: {
         'Content-Type': 'application/json',
         Authorization: 'Bearer ' + token,
@@ -39,11 +39,9 @@ class DefaultAuthenticationService
       if (r.ok) {
         return r.json();
       } else {
-        return undefined;
+        return null;
       }
     });
-
-    return await response;
   }
 }
 
