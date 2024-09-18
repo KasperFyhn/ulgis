@@ -6,12 +6,14 @@ import dotenv
 import jwt
 from fastapi import Depends, HTTPException, status, APIRouter
 from fastapi.security import OAuth2PasswordBearer, OAuth2PasswordRequestForm
+from fastapi_camelcase import CamelModel
 from jwt.exceptions import InvalidTokenError
 from pydantic import BaseModel
 from sqlalchemy.orm import Session
 
+from app import passwordhash
 from app.db.base import get_db
-from app.db.models import AdminUserOrm, AdminUserItem
+from app.db.models import AdminUserOrm
 from app.passwordhash import verify_password
 
 auth_router = APIRouter(prefix="/auth")
@@ -32,7 +34,7 @@ def get_user(db, username: str):
     user = db.query(AdminUserOrm).filter(AdminUserOrm.name == username).first()
     if user is None:
         return None
-    return AdminUserItem(name=user.name, password_hash=user.password_hash)
+    return user
 
 
 def authenticate_user(db, username: str, password: str):
@@ -75,6 +77,29 @@ async def get_current_user(
     if user is None:
         raise credentials_exception
     return user.name
+
+
+class PasswordChange(CamelModel):
+    username: str
+    old_password: str
+    new_password: str
+
+
+@auth_router.post("/set_password")
+async def set_password(
+    form_data: PasswordChange,
+    token: Annotated[str, Depends(oauth2_scheme)],
+    db: Session = Depends(get_db),
+):
+    user = authenticate_user(db, form_data.username, form_data.old_password)
+    if not user:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Could not validate credentials",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    user.password_hash = passwordhash.get_password_hash(form_data.new_password)
+    db.commit()
 
 
 class Token(BaseModel):

@@ -5,6 +5,13 @@ export interface AuthenticationService {
   getToken(username: string, password: string): Promise<string>;
 
   getCurrentUser(token: string): Promise<string | null>;
+
+  setPassword(
+    token: string,
+    username: string,
+    oldPassword: string,
+    newPassword: string,
+  ): Promise<void>;
 }
 
 class DefaultAuthenticationService
@@ -43,9 +50,35 @@ class DefaultAuthenticationService
       }
     });
   }
+
+  async setPassword(
+    token: string,
+    username: string,
+    oldPassword: string,
+    newPassword: string,
+  ): Promise<void> {
+    return fetch(this.url + 'auth/set_password', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        Authorization: 'Bearer ' + token,
+      },
+      body: JSON.stringify({ username, oldPassword, newPassword }),
+    }).then((r) => {
+      if (r.ok) {
+        return;
+      } else {
+        throw new Error('Failed to change password!');
+      }
+    });
+  }
 }
 
 class MockAuthenticationService implements AuthenticationService {
+  setPassword(): Promise<void> {
+    return Promise.resolve();
+  }
+
   getCurrentUser(token: string): Promise<string> {
     return Promise.resolve(token.replace('FAKE_TOKEN_FOR:', 'FAKE_USER:'));
   }

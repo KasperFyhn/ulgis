@@ -5,6 +5,7 @@ import { LoginForm } from './LoginPage';
 import { AuthContext, AuthProvider } from './AuthProvider';
 import { Link, Route, Routes } from 'react-router-dom';
 import { BackupsTab } from './BackupsTab';
+import { UserTab } from './UserTab';
 
 interface AdminPageNavBarProps {
   username?: string;
@@ -80,7 +81,7 @@ const AdminPageInner: React.FC = () => {
       <Route path="taxonomies" element={<TaxonomiesTab />} />
       <Route path="text-content" element={<TextContentTab />} />
       <Route path="backups" element={<BackupsTab />} />
-      <Route path="user" element={<p>Nothing to see here yet.</p>} />
+      <Route path="user" element={<UserTab />} />
     </Routes>
   );
 };
