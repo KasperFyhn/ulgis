@@ -62,7 +62,7 @@ export const Notification: React.FC<NotificationProps> = ({
         {!nonDismissible && (
           <button
             className={
-              'button--small button--icon button--icon--hide-label' +
+              'button--small button--icon button--icon--hide-label ' +
               'icon-close close-button'
             }
             onClick={() => {
