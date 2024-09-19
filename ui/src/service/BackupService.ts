@@ -51,7 +51,7 @@ class DefaultBackupService extends DefaultServiceBase implements BackupService {
 
   async delete(nameAndTimestamp: string, token: string): Promise<void> {
     return fetch(this.url + 'backup/delete/' + nameAndTimestamp, {
-      method: 'POST',
+      method: 'DELETE',
       headers: {
         'Content-Type': 'application/json',
         Authorization: 'Bearer ' + token,
