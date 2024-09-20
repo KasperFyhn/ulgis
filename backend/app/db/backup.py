@@ -78,7 +78,7 @@ def delete_backup(name_and_timestamp: str):
 
 def list_backups():
     backups = [
-        backup.split("_")[-1].replace(".json", "")
+        backup.split("_", maxsplit=1)[-1].replace(".json", "")
         for backup in glob.glob("backup_*", root_dir=DATABASE_DIR)
     ]
     backups.sort(key=lambda x: x.split("@")[-1])
