@@ -2,6 +2,7 @@ import React, { PropsWithChildren, useEffect, useState } from 'react';
 import { getTextContentService } from '../service/TextContentService';
 import './Notification.scss';
 import Markdown from 'react-markdown';
+import { ExternalLink } from './ExternalLink';
 
 export type ToasterType = 'neutral' | 'warning' | 'attention' | 'confirm';
 
@@ -55,7 +56,7 @@ export const Notification: React.FC<NotificationProps> = ({
       >
         <div className={'notification__content'}>
           {(content && (
-            <Markdown className={'notification__markdown'}>{content}</Markdown>
+            <Markdown components={{ a: ExternalLink }}>{content}</Markdown>
           )) ||
             children}
         </div>

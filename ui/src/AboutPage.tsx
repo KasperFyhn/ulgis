@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { getTextContentService } from './service/TextContentService';
 import Markdown from 'react-markdown';
+import { ExternalLink } from './common/ExternalLink';
 
 export const AboutPage = (): React.JSX.Element => {
   const [text, setText] = useState<string>('Loading ...');
@@ -16,7 +17,7 @@ export const AboutPage = (): React.JSX.Element => {
     // is why there is a specific max width for this piece of text for now
     <div className={'content-pane padded'} style={{ maxWidth: '70ch' }}>
       <h1>About</h1>
-      <Markdown>{text}</Markdown>
+      <Markdown components={{ a: ExternalLink }}>{text}</Markdown>
     </div>
   );
 };

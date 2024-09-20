@@ -9,6 +9,7 @@ import {
 } from '../service/TextContentService';
 import { Notification } from '../common/Notification';
 import { Link } from 'react-router-dom';
+import { ExternalLink } from '../common/ExternalLink';
 
 interface TextContentEditorProps extends HasDbSubmission {
   textContent: TextContentItem;
@@ -37,7 +38,7 @@ const TextContentEditor: React.FC<TextContentEditorProps> = ({
         </div>
         <div className={'flex-container__box--equal-size'}>
           <h2>Preview</h2>
-          <Markdown>{text}</Markdown>
+          <Markdown components={{ a: ExternalLink }}>{text}</Markdown>
         </div>
       </div>
       <div className={'button-container'}>
