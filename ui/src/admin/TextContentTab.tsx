@@ -7,6 +7,8 @@ import {
   getTextContentService,
   TextContentItem,
 } from '../service/TextContentService';
+import { Notification } from '../common/Notification';
+import { Link } from 'react-router-dom';
 
 interface TextContentEditorProps extends HasDbSubmission {
   textContent: TextContentItem;
@@ -59,7 +61,6 @@ export const TextContentTab: React.FC = () => {
   const [existing, setExisting] = useState<TextContentItem[]>([]);
 
   const fetchData = (): void => {
-    console.log('here');
     getTextContentService().getAll().then(setExisting);
   };
 
@@ -71,6 +72,16 @@ export const TextContentTab: React.FC = () => {
 
   return (
     <div className={'flex-container--vert'}>
+      <Notification type={'confirm'}>
+        Text contents support{' '}
+        <Link
+          className={'a--text-link'}
+          to={'https://www.markdownguide.org/basic-syntax/'}
+          target={'_blank'}
+        >
+          Markdown formatting <span className={'icon icon-link-external'} />
+        </Link>
+      </Notification>
       {existing.map((textContent) => (
         <TextContentEditor
           textContent={textContent}
