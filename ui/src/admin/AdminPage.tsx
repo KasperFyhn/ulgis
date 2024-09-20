@@ -6,6 +6,7 @@ import { AuthContext, AuthProvider } from './AuthProvider';
 import { Link, Route, Routes } from 'react-router-dom';
 import { BackupsTab } from './BackupsTab';
 import { UserTab } from './UserTab';
+import { NotFoundPage } from '../common/NotFoundPage';
 
 interface AdminPageNavBarProps {
   username?: string;
@@ -82,6 +83,7 @@ const AdminPageInner: React.FC = () => {
       <Route path="text-content" element={<TextContentTab />} />
       <Route path="backups" element={<BackupsTab />} />
       <Route path="user" element={<UserTab />} />
+      <Route path="*" element={<NotFoundPage />} />
     </Routes>
   );
 };
