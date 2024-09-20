@@ -1,8 +1,5 @@
 import React, { PropsWithChildren, useEffect, useState } from 'react';
-import {
-  DefaultTextContentService,
-  getTextContentService,
-} from '../service/TextContentService';
+import { getTextContentService } from '../service/TextContentService';
 import './Notification.scss';
 import Markdown from 'react-markdown';
 
@@ -12,6 +9,7 @@ export interface NotificationProps extends PropsWithChildren {
   type?: ToasterType;
   fetchKey?: string;
   onDismiss?: () => void;
+  nonDismissible?: boolean;
 }
 
 export const Notification: React.FC<NotificationProps> = ({
@@ -19,6 +17,7 @@ export const Notification: React.FC<NotificationProps> = ({
   type,
   fetchKey,
   onDismiss,
+  nonDismissible,
 }: NotificationProps) => {
   if (children !== undefined && fetchKey !== undefined) {
     throw Error('Use only fetch key or children for a notification!');
@@ -26,6 +25,10 @@ export const Notification: React.FC<NotificationProps> = ({
 
   const [show, setShow] = useState(true);
   const [content, setContent] = useState<string | undefined>(undefined);
+
+  useEffect(() => {
+    setShow(true);
+  }, [children, fetchKey]);
 
   useEffect(() => {
     if (fetchKey && content === undefined) {
@@ -56,16 +59,18 @@ export const Notification: React.FC<NotificationProps> = ({
           )) ||
             children}
         </div>
-        <button
-          className={
-            'button--small button--icon button--icon--hide-label icon-close ' +
-            'close-button'
-          }
-          onClick={() => {
-            setShow(false);
-            if (onDismiss) onDismiss();
-          }}
-        />
+        {!nonDismissible && (
+          <button
+            className={
+              'button--small button--icon button--icon--hide-label ' +
+              'icon-close close-button'
+            }
+            onClick={() => {
+              setShow(false);
+              if (onDismiss) onDismiss();
+            }}
+          />
+        )}
       </div>
     );
   } else {

@@ -1,3 +1,7 @@
+from typing import Optional
+
+from fastapi_camelcase import CamelModel
+from pydantic import BaseModel
 from sqlalchemy import Column, Integer, String, Text, ForeignKey, Float
 from sqlalchemy.orm import Mapped, relationship
 
@@ -14,7 +18,23 @@ class TaxonomyOrm(Base):
     ui_level = Column(String)
     priority = Column(Float)
 
-    group: Mapped[list["ParameterOrm"]] = relationship(back_populates="taxonomy")
+    group: Mapped[list["ParameterOrm"]] = relationship(
+        back_populates="taxonomy",
+        cascade="all, delete-orphan",  # Enables cascading updates and deletions
+    )
+
+
+class TaxonomyOrmItem(CamelModel):
+    class Config:
+        from_attributes = True
+
+    id: Optional[int] = None
+    name: str
+    short_description: str
+    text: str
+    ui_level: str
+    priority: float
+    group: Optional[list["ParameterOrmItem"]] = None
 
 
 class ParameterOrm(Base):
@@ -27,16 +47,46 @@ class ParameterOrm(Base):
 
     # fields
     id = Column(Integer, primary_key=True)
-    name = Column(String, unique=True, index=True)
+    name = Column(String, index=True)
     short_description = Column(String)
 
     taxonomy_id = Column(Integer, ForeignKey("taxonomies.id"))
     taxonomy: Mapped[TaxonomyOrm] = relationship(back_populates="group")
 
 
-class TextContent(Base):
+class ParameterOrmItem(CamelModel):
+    class Config:
+        from_attributes = True
+
+    id: Optional[int] = None
+    name: str
+    short_description: Optional[str]
+
+
+class TextContentOrm(Base):
     __tablename__ = "text_content"
 
     id = Column(Integer, primary_key=True)
     name = Column(String, unique=True, index=True)
     text = Column(Text)
+
+
+class TextContentItem(BaseModel):
+    class Config:
+        from_attributes = True
+
+    name: str
+    text: str
+
+
+class AdminUserOrm(Base):
+    __tablename__ = "admins"
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String, unique=True, index=True)
+    password_hash = Column(String)
+
+
+class AdminUserItem(BaseModel):
+    name: str
+    password_hash: str

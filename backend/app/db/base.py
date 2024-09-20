@@ -6,7 +6,7 @@ from sqlalchemy.orm import sessionmaker
 
 import dotenv
 
-dotenv.load_dotenv()  # noqa
+dotenv.load_dotenv()
 
 SQLALCHEMY_DATABASE_URL = os.environ.get("DATABASE_URL")
 
@@ -16,3 +16,11 @@ engine = create_engine(
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)
 
 Base = declarative_base()
+
+
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()

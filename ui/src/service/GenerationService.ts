@@ -3,6 +3,8 @@ import {
   GenerationOptionsMetadata,
   UiLevel,
 } from '../generate/models';
+import { DefaultServiceBase } from './ServiceBase';
+import { ServiceProvider } from './ServiceProvider';
 
 export interface GenerationService {
   getGenerationOptionsMetadata(
@@ -189,25 +191,22 @@ export class MockGenerationService implements GenerationService {
   }
 }
 
-export class DefaultGenerationService implements GenerationService {
-  private readonly url: string;
-
-  constructor(url: string) {
-    this.url = url;
-  }
-
+export class DefaultGenerationService
+  extends DefaultServiceBase
+  implements GenerationService
+{
   async getGenerationOptionsMetadata(
     uiLevel: UiLevel,
   ): Promise<GenerationOptionsMetadata> {
     const response = await fetch(
-      this.url + '/generate/generation_options_metadata/' + uiLevel,
+      this.url + 'generate/generation_options_metadata/' + uiLevel,
     );
 
     return await response.json();
   }
 
   async createPrompt(options: GenerationOptions): Promise<string> {
-    const response = await fetch(this.url + '/generate/create_prompt', {
+    const response = await fetch(this.url + 'generate/create_prompt', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -219,7 +218,7 @@ export class DefaultGenerationService implements GenerationService {
   }
 
   async generate(options: GenerationOptions): Promise<string> {
-    const response = await fetch(this.url + '/generate/generate_response', {
+    const response = await fetch(this.url + 'generate/generate_response', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -236,7 +235,7 @@ export class DefaultGenerationService implements GenerationService {
     onMessage: (event: MessageEvent<string>) => void,
     onClose?: () => void,
   ): void {
-    fetch(this.url + '/generate/start_stream', {
+    fetch(this.url + 'generate/start_stream', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(options),
@@ -245,7 +244,7 @@ export class DefaultGenerationService implements GenerationService {
         response.json().then((json) => {
           console.log('Successfully generated stream:', json);
           const eventSource = new EventSource(
-            this.url + '/generate/stream_response/' + json['token'],
+            this.url + 'generate/stream_response/' + json['token'],
           );
           eventSource.onmessage = onMessage;
           eventSource.onerror = () => {
@@ -263,14 +262,11 @@ export class DefaultGenerationService implements GenerationService {
   }
 }
 
-export function getGenerationService(): GenerationService {
-  const backendUrl = process.env.REACT_APP_BACKEND_URL;
+const provider = new ServiceProvider<GenerationService>(
+  MockGenerationService,
+  DefaultGenerationService,
+);
 
-  if (backendUrl === 'mock') {
-    return new MockGenerationService();
-  } else if (backendUrl) {
-    return new DefaultGenerationService(backendUrl);
-  } else {
-    throw Error('No generation service configured for this environment!');
-  }
+export function getGenerationService(): GenerationService {
+  return provider.get();
 }

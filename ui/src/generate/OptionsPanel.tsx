@@ -69,6 +69,8 @@ export interface ToggledOptionGroupArrayPanelProps {
   vertical?: boolean;
 }
 
+// TODO: This component is really a mess. It works and looks fine, but the code
+//  is not very well-structured.
 export const ToggledOptionGroupArrayPanel: React.FC<
   ToggledOptionGroupArrayPanelProps
 > = ({
