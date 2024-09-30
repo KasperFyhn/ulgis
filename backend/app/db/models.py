@@ -43,7 +43,7 @@ class ParameterOrm(Base):
     # static setup for parameters
     type = "number"  # for Pydantic discrimination between option metadata types
     steps = ["disabled", "fundamental", "intermediate", "advanced", "specialised"]
-    default = 1
+    default = 0
 
     # fields
     id = Column(Integer, primary_key=True)
