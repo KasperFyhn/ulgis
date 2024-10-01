@@ -86,14 +86,6 @@ def delete_taxonomy(
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@data_router.get("/taxonomies/texts", response_model=dict[str, str])
-def get_taxonomy_texts(db: Session = Depends(get_db)) -> dict[str, str]:
-    name_and_text = (
-        db.query(TaxonomyOrm).add_columns(TaxonomyOrm.name, TaxonomyOrm.text).all()
-    )
-    return {taxonomy.name: taxonomy.text for taxonomy in name_and_text}
-
-
 @data_router.get("/text_content")
 def get_text_content_all(db: Session = Depends(get_db)):
     return [

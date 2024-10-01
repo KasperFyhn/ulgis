@@ -1,4 +1,4 @@
-from app.db.models import ParameterOrm
+from app.db.models import StepType, TaxonomyOrmItem
 from app.models.generationoptions import (
     GenerationOptions,
     AmpleGenerationOptions,
@@ -8,7 +8,7 @@ from app.models.educationinfo import ModularEducationInfo
 
 
 def build_prompt(
-    options: GenerationOptions, taxonomy_texts: dict[str, str] = None
+    options: GenerationOptions, taxonomies_info: dict[str, TaxonomyOrmItem]
 ) -> str:
     prompt = ""
 
@@ -19,9 +19,7 @@ def build_prompt(
             if not taxonomy_params.enabled:
                 continue
             prompt += f"Title: {taxonomy_name}\n\n"
-            if taxonomy_texts:
-                prompt += f"{taxonomy_texts[taxonomy_name]}"
-
+            prompt += f"{taxonomies_info[taxonomy_name].text}"
             prompt += "\n\n"
 
     # custom inputs
@@ -44,11 +42,14 @@ def build_prompt(
             if not taxonomy_params.enabled:
                 continue
             prompt += f"- {taxonomy_name}\n"
+            step_type = taxonomies_info[taxonomy_name].step_type
             for param_name, param_value in taxonomy_params.iter_options():
                 if param_value == 0:
                     prompt += f"\t- Ignore '{param_name}'.\n"
-                else:
-                    prompt += f"\t- Aim for a {ParameterOrm.steps[param_value]} level for '{param_name}'.\n"
+                elif step_type == StepType.ATTENTION:
+                    prompt += f"\t- Pay {StepType.ATTENTION.value[param_value]} to '{param_name}'.\n"
+                elif step_type == StepType.LEVEL:
+                    prompt += f"\t- Aim for a {StepType.LEVEL.value[param_value]} level for '{param_name}'.\n"
 
         prompt += "\n\n"
 
@@ -105,7 +106,7 @@ def build_prompt(
             "precise, observable, and directly linked to the assessment methods used."
         )
     elif options.output_options.competency_profile.enabled:
-        if target_type == "education" or target_type == 'programme':
+        if target_type == "education" or target_type == "programme":
             prompt += (
                 "develop a comprehensive curriculum competency profile that outlines the key "
                 "competencies students are expected "
