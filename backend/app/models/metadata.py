@@ -117,6 +117,7 @@ class ToggledOptionGroupArrayMetadata(OptionMetadataBase):
     @model_validator(mode="after")
     def group_validator_sort(self):
         # post validation setup of groups
+        # FIXME: This happens to work with sorting, but it is not guaranteed.
         groups = {
             k: v
             for k, v in sorted(

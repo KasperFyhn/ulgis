@@ -16,6 +16,10 @@ export const TextField: React.FC<TextFieldProps> = ({
   const textareaRef = useRef<HTMLTextAreaElement>(null);
   useEffect((): void => {
     if (textareaRef.current) {
+      // The resetting of height caused some weird re-renders at some point,
+      // but it seems to work now. It could be the culprit, though, if it starts
+      // happening again.
+      textareaRef.current.style.height = 'auto'; // Reset height
       const scrollHeight = textareaRef.current.scrollHeight;
       textareaRef.current.style.height = `${scrollHeight + 2}px`;
     }

@@ -8,6 +8,7 @@ import { DeleteButton } from './DeleteButton';
 import { HelpTooltip } from '../common/HelpTooltip';
 import HasDbSubmission from './HasDbSubmission';
 import { getTaxonomyService, TaxonomyItem } from '../service/TaxonomyService';
+import { BooleanToggle } from '../common/input/BooleanToggle';
 
 interface TaxonomyEditorProps extends HasDbSubmission {
   taxonomy: TaxonomyItem;
@@ -128,6 +129,18 @@ const TaxonomyEditor: React.FC<TaxonomyEditorProps> = ({
                     editableTaxonomy.group[i].shortDescription = value;
                     setEditableTaxonomy({ ...editableTaxonomy });
                   }}
+                />
+                <BooleanToggle
+                  text={'Fixed value'}
+                  value={p.fixed || false}
+                  setValue={(value) => {
+                    editableTaxonomy.group[i].fixed = value;
+                    setEditableTaxonomy({ ...editableTaxonomy });
+                  }}
+                  tooltipText={
+                    'If toggled, a disabled slider is shown at a fixed value.'
+                  }
+                  checkMarkButton
                 />
                 <DeleteButton
                   onClick={() => {

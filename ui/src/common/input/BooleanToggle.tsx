@@ -1,5 +1,5 @@
 import React from 'react';
-import { TooltipWrap } from '../HelpTooltip';
+import { HelpTooltip, TooltipWrap } from '../HelpTooltip';
 import { ToggleButton } from './ToggleButton';
 
 interface BooleanToggleProps {
@@ -7,6 +7,7 @@ interface BooleanToggleProps {
   tooltipText?: string;
   value: boolean;
   setValue: (value: boolean) => void;
+  checkMarkButton?: boolean;
 }
 
 export const BooleanToggle: React.FC<BooleanToggleProps> = ({
@@ -14,12 +15,32 @@ export const BooleanToggle: React.FC<BooleanToggleProps> = ({
   tooltipText,
   value,
   setValue,
+  checkMarkButton,
 }: BooleanToggleProps) => {
-  return (
-    <TooltipWrap tooltipId={text} content={tooltipText}>
-      <ToggleButton checked={value} onChange={(v) => setValue(v)}>
-        {text}
-      </ToggleButton>
-    </TooltipWrap>
-  );
+  if (checkMarkButton) {
+    return (
+      <span>
+        <ToggleButton
+          className={
+            'button button--small button--icon button--text ' +
+            'button--icon--hide-label ' +
+            (value ? 'icon-confirm' : 'icon-failed')
+          }
+          checked={value}
+          onChange={(v) => setValue(v)}
+        />
+        {' ' + text}
+        <HelpTooltip tooltipId={text} content={tooltipText} />
+      </span>
+    );
+  } else {
+    return (
+      <TooltipWrap tooltipId={text} content={tooltipText}>
+        <ToggleButton checked={value} onChange={(v) => setValue(v)}>
+          {text}
+        </ToggleButton>
+        )
+      </TooltipWrap>
+    );
+  }
 };

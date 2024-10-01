@@ -65,6 +65,10 @@ class ParameterOrm(Base):
     def fixed(self):
         return self.disabled or False
 
+    @fixed.setter
+    def fixed(self, value):
+        self.disabled = value
+
     @property
     def steps(self):
         if self.taxonomy and self.taxonomy.step_type:
@@ -79,6 +83,7 @@ class ParameterOrmItem(CamelModel):
     id: Optional[int] = None
     name: str
     short_description: Optional[str]
+    fixed: Optional[bool]
 
 
 class TextContentOrm(Base):
