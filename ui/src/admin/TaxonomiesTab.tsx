@@ -7,7 +7,11 @@ import { AuthContext } from './AuthProvider';
 import { DeleteButton } from './DeleteButton';
 import { HelpTooltip } from '../common/HelpTooltip';
 import HasDbSubmission from './HasDbSubmission';
-import { getTaxonomyService, TaxonomyItem } from '../service/TaxonomyService';
+import {
+  getTaxonomyService,
+  StepType,
+  TaxonomyItem,
+} from '../service/TaxonomyService';
 import { BooleanToggle } from '../common/input/BooleanToggle';
 
 interface TaxonomyEditorProps extends HasDbSubmission {
@@ -88,6 +92,27 @@ const TaxonomyEditor: React.FC<TaxonomyEditorProps> = ({
               setEditableTaxonomy((prev) => ({
                 ...prev,
                 priority: value,
+              }))
+            }
+          />
+          <span>
+            Step Type
+            <HelpTooltip
+              tooltipId={'stepType'}
+              content={
+                'The type of slider steps for parameters which is reflected ' +
+                'in the prompt.'
+              }
+            />
+          </span>
+          <StringOptions
+            name={taxonomy.name + '-stepType'}
+            options={['ATTENTION', 'LEVEL']}
+            value={editableTaxonomy.stepType}
+            setValue={(value) =>
+              setEditableTaxonomy((prev) => ({
+                ...prev,
+                stepType: value as StepType,
               }))
             }
           />
@@ -251,6 +276,7 @@ export const TaxonomiesTab: React.FC = () => {
                 shortDescription: '',
                 text: '',
                 uiLevel: 'Standard',
+                stepType: 'ATTENTION',
                 group: [],
               },
             ]);

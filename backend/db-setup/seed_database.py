@@ -2,6 +2,7 @@ import json
 import os
 import sys
 
+from app.db.backup import overwrite_tables
 from app.db.base import SessionLocal
 from app.db.models import TaxonomyOrm, ParameterOrm, TextContentOrm
 
@@ -37,47 +38,16 @@ def seed_database():
             print("Aborting")
             return
 
-        session.query(TaxonomyOrm).delete()
-        session.query(ParameterOrm).delete()
-        session.query(TextContentOrm).delete()
-
     print("Seeding database ...")
 
     parent_dir = os.path.dirname(__file__)
     seed_data_file = os.path.join(parent_dir, "seed_data.json")
+    with open(seed_data_file, "r") as f:
+        data = json.load(f)
 
-    with open(seed_data_file) as in_file:
-        seed_data = json.load(in_file)
-        for name, taxonomy in seed_data["taxonomies"].items():
-            try:
-                session.add(
-                    TaxonomyOrm(
-                        name=name,
-                        short_description=taxonomy["short_description"],
-                        text=taxonomy["text"],
-                        ui_level=taxonomy["ui_level"],
-                        priority=taxonomy["priority"],
-                        group=[
-                            default_param(param) for param in taxonomy["parameters"]
-                        ],
-                    )
-                )
-            except Exception as e:
-                print(f"Problem with {name}:", e)
+    overwrite_tables(data, session)
 
-        for name, text in seed_data["textContent"].items():
-            try:
-                session.add(
-                    TextContentOrm(
-                        name=name,
-                        text=text,
-                    )
-                )
-            except Exception as e:
-                print(f"Problem with {name}:", e)
-
-    session.commit()
-    print("Done!")
+    print("Database seeding complete")
 
 
 if __name__ == "__main__":

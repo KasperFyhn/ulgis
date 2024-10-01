@@ -9,9 +9,21 @@ from sqlalchemy.orm import Mapped, relationship
 from app.db.base import Base
 
 
-class StepType(enum.Enum):
-    LEVEL = ["disabled", "fundamental", "intermediate", "advanced", "specialised"]
-    ATTENTION = ["disabled", "low attention", "medium attention", "high attention"]
+class StepType(str, enum.Enum):
+    LEVEL = "LEVEL"
+    ATTENTION = "ATTENTION"
+
+    def steps(self):
+        if self == StepType.LEVEL:
+            return [
+                "disabled",
+                "fundamental",
+                "intermediate",
+                "advanced",
+                "specialised",
+            ]
+        elif self == StepType.ATTENTION:
+            return ["disabled", "low attention", "medium attention", "high attention"]
 
 
 class TaxonomyOrm(Base):
@@ -72,7 +84,7 @@ class ParameterOrm(Base):
     @property
     def steps(self):
         if self.taxonomy and self.taxonomy.step_type:
-            return self.taxonomy.step_type.value
+            return self.taxonomy.step_type.steps()
         return []
 
 

@@ -4,6 +4,8 @@ import json
 import os.path
 from pathlib import Path
 
+from sqlalchemy.orm import Session
+
 from app.db.base import Base, SQLALCHEMY_DATABASE_URL, SessionLocal
 from app.db.models import AdminUserOrm
 
@@ -42,15 +44,8 @@ def create_backup(name: str = ""):
     db.close()
 
 
-def load_backup(name_and_timestamp: str):
-    backup_file = DATABASE_DIR / f"backup_{name_and_timestamp}.json"
-
-    db = SessionLocal()
-
+def overwrite_tables(backup_data: dict, db: Session):
     try:
-        with open(backup_file, "r") as f:
-            backup_data = json.load(f)
-
         for table_name, records in backup_data.items():
             model = None
             for cls in Base.__subclasses__():
@@ -70,6 +65,14 @@ def load_backup(name_and_timestamp: str):
         raise e
     finally:
         db.close()
+
+
+def load_backup(name_and_timestamp: str):
+    backup_file = DATABASE_DIR / f"backup_{name_and_timestamp}.json"
+    db = SessionLocal()
+    with open(backup_file, "r") as f:
+        backup_data = json.load(f)
+    overwrite_tables(backup_data, db)
 
 
 def delete_backup(name_and_timestamp: str):

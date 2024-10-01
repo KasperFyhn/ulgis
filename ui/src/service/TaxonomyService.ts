@@ -9,6 +9,8 @@ export interface ParameterItem {
   fixed?: boolean;
 }
 
+export type StepType = 'ATTENTION' | 'LEVEL';
+
 export interface TaxonomyItem {
   id?: number;
   name: string;
@@ -16,6 +18,7 @@ export interface TaxonomyItem {
   text: string;
   uiLevel: UiLevel;
   priority: number;
+  stepType: StepType;
   group: ParameterItem[];
 }
 
@@ -36,6 +39,7 @@ export class MockTaxonomiesService implements TaxonomyService {
       text: 'Really cool text too',
       uiLevel: 'Modular',
       priority: 5,
+      stepType: 'ATTENTION',
       group: [
         {
           name: 'Param 1',
