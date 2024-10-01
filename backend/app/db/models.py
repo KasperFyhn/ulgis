@@ -1,11 +1,17 @@
+import enum
 from typing import Optional
 
 from fastapi_camelcase import CamelModel
 from pydantic import BaseModel
-from sqlalchemy import Column, Integer, String, Text, ForeignKey, Float
+from sqlalchemy import Column, Integer, String, Text, ForeignKey, Float, Boolean, Enum
 from sqlalchemy.orm import Mapped, relationship
 
 from app.db.base import Base
+
+
+class StepType(enum.Enum):
+    LEVEL = ["disabled", "fundamental", "intermediate", "advanced", "specialised"]
+    ATTENTION = ["disabled", "low attention", "medium attention", "high attention"]
 
 
 class TaxonomyOrm(Base):
@@ -17,6 +23,7 @@ class TaxonomyOrm(Base):
     text = Column(Text)
     ui_level = Column(String)
     priority = Column(Float)
+    step_type = Column(Enum(StepType))
 
     group: Mapped[list["ParameterOrm"]] = relationship(
         back_populates="taxonomy",
@@ -34,6 +41,7 @@ class TaxonomyOrmItem(CamelModel):
     text: str
     ui_level: str
     priority: float
+    step_type: StepType
     group: Optional[list["ParameterOrmItem"]] = None
 
 
@@ -42,16 +50,30 @@ class ParameterOrm(Base):
 
     # static setup for parameters
     type = "number"  # for Pydantic discrimination between option metadata types
-    steps = ["disabled", "fundamental", "intermediate", "advanced", "specialised"]
     default = 0
 
     # fields
     id = Column(Integer, primary_key=True)
     name = Column(String, index=True)
     short_description = Column(String)
+    disabled = Column(Boolean, default=False, server_default="false")
 
     taxonomy_id = Column(Integer, ForeignKey("taxonomies.id"))
     taxonomy: Mapped[TaxonomyOrm] = relationship(back_populates="group")
+
+    @property
+    def fixed(self):
+        return self.disabled or False
+
+    @fixed.setter
+    def fixed(self, value):
+        self.disabled = value
+
+    @property
+    def steps(self):
+        if self.taxonomy and self.taxonomy.step_type:
+            return self.taxonomy.step_type.value
+        return []
 
 
 class ParameterOrmItem(CamelModel):
@@ -61,6 +83,7 @@ class ParameterOrmItem(CamelModel):
     id: Optional[int] = None
     name: str
     short_description: Optional[str]
+    fixed: Optional[bool]
 
 
 class TextContentOrm(Base):

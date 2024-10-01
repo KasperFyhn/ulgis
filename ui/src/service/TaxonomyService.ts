@@ -6,6 +6,7 @@ export interface ParameterItem {
   id?: number;
   name: string;
   shortDescription: string;
+  fixed?: boolean;
 }
 
 export interface TaxonomyItem {
@@ -43,6 +44,7 @@ export class MockTaxonomiesService implements TaxonomyService {
         {
           name: 'Param 2',
           shortDescription: 'Param 2',
+          fixed: true,
         },
       ],
     },

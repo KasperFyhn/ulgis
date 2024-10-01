@@ -31,7 +31,6 @@ export type UiLevel = 'Standard' | 'Modular' | 'Ample';
 interface OptionMetadataBase {
   name: string;
   description?: string;
-  uiLevel: UiLevel;
 }
 
 interface PrimitiveOptionMetadataBase<T extends OptionType>
@@ -65,6 +64,7 @@ export interface NumberOptionMetadata
   max?: number;
   step?: number;
   steps?: string[];
+  fixed?: boolean;
 }
 
 export type OptionMetadata =

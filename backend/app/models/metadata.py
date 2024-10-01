@@ -60,6 +60,7 @@ class NumberOptionMetadata(OptionMetadataBase):
     max: Optional[int | float] = None
     step: Optional[int | float] = 1.0
     steps: Optional[list[str]] = None
+    fixed: Optional[bool] = None
 
     # TODO: validate that either steps or mix+max are defined
 
@@ -116,6 +117,7 @@ class ToggledOptionGroupArrayMetadata(OptionMetadataBase):
     @model_validator(mode="after")
     def group_validator_sort(self):
         # post validation setup of groups
+        # FIXME: This happens to work with sorting, but it is not guaranteed.
         groups = {
             k: v
             for k, v in sorted(
@@ -217,32 +219,16 @@ def _create_field_metadata(
             name=field.title or field.alias,
             description=field.description,
             default=field.default,
-            options=(
-                field.json_schema_extra.get("options")
-                if field.json_schema_extra
-                else None
-            ),
-            short=(
-                field.json_schema_extra.get("short")
-                if field.json_schema_extra
-                else None
-            ),
+            options=_get_from_json_schema_extra(field, "options", None),
+            short=_get_from_json_schema_extra(field, "short", False),
         )
     elif field.annotation == list[str]:
         return StringArrayOptionMetadata(
             name=field.title or field.alias,
             description=field.description,
             default=field.default,
-            options=(
-                field.json_schema_extra.get("options")
-                if field.json_schema_extra
-                else None
-            ),
-            short=(
-                field.json_schema_extra.get("short")
-                if field.json_schema_extra
-                else None
-            ),
+            options=_get_from_json_schema_extra(field, "options", None),
+            short=_get_from_json_schema_extra(field, "short", False),
         )
     elif issubclass(field.annotation, OptionGroup):
         return OptionGroupMetadata(

@@ -42,10 +42,8 @@ export class MockGenerationService implements GenerationService {
                 type: 'number',
                 min: 1,
                 max: 100,
-                uiLevel: 'Standard',
               },
             },
-            uiLevel: 'Standard',
           },
           taxonomy2: {
             type: 'toggledOptionGroup',
@@ -58,18 +56,14 @@ export class MockGenerationService implements GenerationService {
                 type: 'number',
                 min: 1,
                 max: 100,
-                uiLevel: 'Standard',
               },
               parameter2: {
                 name: 'Parameter 1',
                 type: 'boolean',
-                uiLevel: 'Standard',
               },
             },
-            uiLevel: 'Ample',
           },
         },
-        uiLevel: 'Standard',
       },
 
       customInputs: {
@@ -80,10 +74,8 @@ export class MockGenerationService implements GenerationService {
           customInput: {
             name: 'Custom input',
             type: 'string',
-            uiLevel: 'Ample',
           },
         },
-        uiLevel: 'Ample',
       },
       outputOptions: {
         type: 'toggledOptionGroupArray',
@@ -104,10 +96,8 @@ export class MockGenerationService implements GenerationService {
                 type: 'number',
                 min: 1,
                 max: 100,
-                uiLevel: 'Standard',
               },
             },
-            uiLevel: 'Standard',
           },
           option2: {
             type: 'toggledOptionGroup',
@@ -121,13 +111,10 @@ export class MockGenerationService implements GenerationService {
                 type: 'number',
                 min: 1,
                 max: 100,
-                uiLevel: 'Standard',
               },
             },
-            uiLevel: 'Modular',
           },
         },
-        uiLevel: 'Standard',
       },
 
       educationInfo: {
@@ -139,10 +126,8 @@ export class MockGenerationService implements GenerationService {
             name: 'Setting 1',
             type: 'string',
             options: ['1', '2', '3'],
-            uiLevel: 'Standard',
           },
         },
-        uiLevel: 'Standard',
       },
     };
     return Promise.resolve(generationOptions);

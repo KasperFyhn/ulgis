@@ -60,7 +60,7 @@ export const Options: React.FC<OptionsProps<OptionType>> = ({
       } else {
         return (
           <>
-            <OptionsHeader metadata={metadata} />{' '}
+            <OptionsHeader metadata={metadata} />
             <TextField
               short={metadata.short}
               value={value as string}
@@ -73,7 +73,7 @@ export const Options: React.FC<OptionsProps<OptionType>> = ({
       if (metadata.options) {
         return (
           <>
-            <OptionsHeader metadata={metadata} />{' '}
+            <OptionsHeader metadata={metadata} />
             <MultipleStringOptions
               options={metadata.options}
               value={value as string[]}
@@ -84,7 +84,7 @@ export const Options: React.FC<OptionsProps<OptionType>> = ({
       } else {
         return (
           <>
-            <OptionsHeader metadata={metadata} />{' '}
+            <OptionsHeader metadata={metadata} />
             <MultipleTextFields
               short={metadata.short}
               value={value as string[]}
@@ -102,6 +102,7 @@ export const Options: React.FC<OptionsProps<OptionType>> = ({
               steps={metadata.steps}
               value={value as number}
               setValue={(v) => setValue(v)}
+              disabled={metadata.fixed}
             />
           </>
         );
