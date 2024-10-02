@@ -47,9 +47,9 @@ def build_prompt(
                 if param_value == 0:
                     prompt += f"\t- Ignore '{param_name}'.\n"
                 elif step_type == StepType.ATTENTION:
-                    prompt += f"\t- Pay {StepType.ATTENTION.value[param_value]} to '{param_name}'.\n"
+                    prompt += f"\t- Pay {StepType.ATTENTION.steps()[param_value]} to '{param_name}'.\n"
                 elif step_type == StepType.LEVEL:
-                    prompt += f"\t- Aim for a {StepType.LEVEL.value[param_value]} level for '{param_name}'.\n"
+                    prompt += f"\t- Aim for a {StepType.LEVEL.steps()[param_value]} level for '{param_name}'.\n"
 
         prompt += "\n\n"
 
